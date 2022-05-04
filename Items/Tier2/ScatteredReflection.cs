@@ -12,8 +12,8 @@ using Hex3Mod.Logging;
 namespace Hex3Mod.Items
 {
     /*
-    Shard Of Glass is a very simple stat increase, an item you'd never be unhappy to find
-    Its secondary purpose, however, is to synergize with Shattered Reflection, forming a unique common-uncommon synergy and giving this simple item more utility
+    Scattered Reflection provides a unique item synergy for the simple Shard Of Glass
+    It also provides damage reduction and retaliation in one, making it ideal for players who want to tank some damage
     */
     public class ScatteredReflection
     {
@@ -36,8 +36,8 @@ namespace Hex3Mod.Items
             item.canRemove = true;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/Items/shatter.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/postShatter.png");
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/ScatteredReflection.png");
 
             return item;
         }
@@ -67,63 +67,61 @@ namespace Hex3Mod.Items
             float damageReflectShardStack = ScatteredReflection_DamageReflectShardStack;
             float damageReflectBonus = ScatteredReflection_DamageReflectBonus;
 
-            void OnHpLost(DamageInfo damageInfo, HealthComponent healthComponent)
+            void H3_OnHpLost(DamageInfo damageInfo, HealthComponent healthComponent)
             {
-                if (healthComponent.body) // Those darned pots...
+                if (healthComponent.body && healthComponent.body.master && healthComponent.body.teamComponent) // Those darned pots...
                 {
-                    if (healthComponent.body.master) // Make sure to qualify hooks with these if statements to save us from errors
+                    CharacterBody body = healthComponent.body;
+                    if (body.teamComponent.teamIndex >= 0)
                     {
-                        CharacterBody body = healthComponent.body;
-                        if (body.teamComponent.teamIndex >= 0)
+                        if (body.inventory && damageInfo.attacker) // And also make sure that there's an attacker in the first place...
                         {
-                            if (body.inventory)
+                            GameObject enemyGameObject = damageInfo.attacker;
+
+                            if (enemyGameObject.GetComponent<CharacterBody>()) // AND that they have a body...
                             {
-                                if (damageInfo.attacker) // And also make sure that there's an attacker in the first place...
+                                CharacterBody enemy = enemyGameObject.GetComponent<CharacterBody>();
+                                Inventory inventory = body.inventory;
+                                TeamIndex teamIndex = body.teamComponent.teamIndex;
+                                int itemCount = inventory.GetItemCount(itemDefToHooks);
+                                int shardCount = inventory.GetItemCount(ShardOfGlassDef);
+
+                                if (itemCount > 0)
                                 {
-                                    GameObject enemyGameObject = damageInfo.attacker;
-                                    CharacterBody enemy = enemyGameObject.GetComponent<CharacterBody>();
-                                    Inventory inventory = body.inventory;
-                                    TeamIndex teamIndex = body.teamComponent.teamIndex;
-                                    int itemCount = inventory.GetItemCount(itemDefToHooks);
-                                    int shardCount = inventory.GetItemCount(ShardOfGlassDef);
-
-                                    if (itemCount > 0)
+                                    float percentWithShardBonus = damageReflectPercent + (damageReflectShardStack * shardCount);
+                                    if (percentWithShardBonus > 0.9f) // First, we should cap damage reduction at 90% to prevent total invincibility
                                     {
-                                        float percentWithShardBonus = damageReflectPercent + (damageReflectShardStack * shardCount);
-                                        if (percentWithShardBonus > 0.9f) // First, we should cap damage reduction at 90% to prevent total invincibility
-                                        {
-                                            percentWithShardBonus = 0.9f;
-                                        }
-
-                                        // Get the damage we need to do back, and then the damage we must prevent
-                                        float damageValue = ((damageInfo.damage + (damageInfo.damage * percentWithShardBonus)) + (damageInfo.damage * (damageReflectBonus * itemCount)));
-                                        float damageReduction = (damageInfo.damage * percentWithShardBonus);
-
-                                        // Deal the reflected damage
-
-                                        if (enemy != body)
-                                        {
-                                            LightningOrb lightningOrb = new LightningOrb();
-                                            lightningOrb.attacker = body.gameObject;
-                                            lightningOrb.bouncedObjects = null;
-                                            lightningOrb.bouncesRemaining = 0;
-                                            lightningOrb.damageCoefficientPerBounce = 1f;
-                                            lightningOrb.damageColorIndex = DamageColorIndex.Item;
-                                            lightningOrb.damageValue = damageValue;
-                                            lightningOrb.isCrit = false;
-                                            lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
-                                            lightningOrb.origin = body.corePosition;
-                                            lightningOrb.procChainMask = default(ProcChainMask);
-                                            lightningOrb.procCoefficient = 0f;
-                                            lightningOrb.range = 0f;
-                                            lightningOrb.teamIndex = teamIndex;
-                                            lightningOrb.target = enemy.mainHurtBox;
-                                            OrbManager.instance.AddOrb(lightningOrb);
-
-                                        }
-                                        // Finally, reduce the damage dealt to the item holder
-                                        damageInfo.damage -= damageReduction;
+                                        percentWithShardBonus = 0.9f;
                                     }
+
+                                    // Get the damage we need to do back, and then the damage we must prevent
+                                    float damageValue = ((damageInfo.damage + (damageInfo.damage * percentWithShardBonus)) + (damageInfo.damage * (damageReflectBonus * itemCount)));
+                                    float damageReduction = (damageInfo.damage * percentWithShardBonus);
+
+                                    // Deal the reflected damage
+
+                                    if (enemy != body)
+                                    {
+                                        LightningOrb lightningOrb = new LightningOrb();
+                                        lightningOrb.attacker = body.gameObject;
+                                        lightningOrb.bouncedObjects = null;
+                                        lightningOrb.bouncesRemaining = 0;
+                                        lightningOrb.damageCoefficientPerBounce = 1f;
+                                        lightningOrb.damageColorIndex = DamageColorIndex.Item;
+                                        lightningOrb.damageValue = damageValue;
+                                        lightningOrb.isCrit = false;
+                                        lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
+                                        lightningOrb.origin = body.corePosition;
+                                        lightningOrb.procChainMask = default(ProcChainMask);
+                                        lightningOrb.procCoefficient = 1f;
+                                        lightningOrb.range = 0f;
+                                        lightningOrb.teamIndex = teamIndex;
+                                        lightningOrb.target = enemy.mainHurtBox;
+                                        OrbManager.instance.AddOrb(lightningOrb);
+
+                                    }
+                                    // Finally, reduce the damage dealt to the item holder
+                                    damageInfo.damage -= damageReduction;
                                 }
                             }
                         }
@@ -133,7 +131,7 @@ namespace Hex3Mod.Items
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
                 orig(self, damageInfo);
-                OnHpLost(damageInfo, self); // Hook into the damage report that occurs whenever damage is dealt to a body
+                H3_OnHpLost(damageInfo, self); // Hook into the damage report that occurs whenever damage is dealt to a body
             };
         }
 

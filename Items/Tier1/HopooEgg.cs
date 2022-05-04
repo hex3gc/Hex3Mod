@@ -38,8 +38,8 @@ namespace Hex3Mod.Items
             item.canRemove = true;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/Items/HopooEggPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/HopooEggIcon.png");
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/HopooEggPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/HopooEgg.png");
 
             return item;
         }
@@ -65,7 +65,7 @@ namespace Hex3Mod.Items
             float jumpModifier = HopooEgg_JumpModifier;
             float airControlModifier = HopooEgg_AirControlModifier;
 
-            void JumpVelocity(GenericCharacterMain.orig_ApplyJumpVelocity orig, CharacterMotor motor, CharacterBody body, float horiz, float vert, bool vault)
+            void H3_JumpVelocity(GenericCharacterMain.orig_ApplyJumpVelocity orig, CharacterMotor motor, CharacterBody body, float horiz, float vert, bool vault)
             {
                 if ((body != null) && (body.inventory != null))
                 {
@@ -79,7 +79,7 @@ namespace Hex3Mod.Items
                 orig.Invoke(motor, body, horiz, vert, vault);
             }
 
-            GenericCharacterMain.ApplyJumpVelocity += new GenericCharacterMain.hook_ApplyJumpVelocity(JumpVelocity);
+            GenericCharacterMain.ApplyJumpVelocity += new GenericCharacterMain.hook_ApplyJumpVelocity(H3_JumpVelocity);
         }
 
         public static void Initiate(float HopooEgg_JumpModifier, float HopooEgg_AirControlModifier) // Finally, initiate the item and all of its features

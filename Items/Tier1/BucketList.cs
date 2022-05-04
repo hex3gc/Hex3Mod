@@ -35,8 +35,8 @@ namespace Hex3Mod.Items
             item.canRemove = true;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/Items/BucketListPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/BucketListIcon.png");
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BucketListPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/BucketList.png");
 
             return item;
         }
@@ -66,11 +66,11 @@ namespace Hex3Mod.Items
             // IF a boss exists, then change the item's argsmultspeed to 0.25x the value
             // ELSE, set it to 1x the value
 
-            void recalcStatsCharacter(CharacterBody character, RecalculateStatsAPI.StatHookEventArgs args)
+            void H3_recalcStatsCharacter(CharacterBody character, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                Inventory inventory = character.inventory;
-                if (inventory)
+                if (character.inventory)
                 {
+                    Inventory inventory = character.inventory;
                     int itemCount = inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0)
                     {
@@ -80,9 +80,12 @@ namespace Hex3Mod.Items
                             int bossCount = 0;
                             foreach (var monster in monsters)
                             {
-                                if (monster.body.isBoss)
+                                if (monster.body)
                                 {
-                                    bossCount += 1;
+                                    if (monster.body.isBoss)
+                                    {
+                                        bossCount += 1;
+                                    }
                                 }
                             }
                             if (bossCount > 0) // Boss present: Reduced buff
@@ -98,7 +101,7 @@ namespace Hex3Mod.Items
                 }
             }
 
-            RecalculateStatsAPI.GetStatCoefficients += recalcStatsCharacter;
+            RecalculateStatsAPI.GetStatCoefficients += H3_recalcStatsCharacter;
         }
 
         public static void Initiate(float BucketList_FullBuff, float BucketList_BuffReduce) // Finally, initiate the item and all of its features

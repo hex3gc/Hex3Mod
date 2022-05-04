@@ -35,8 +35,8 @@ namespace Hex3Mod.Items
             item.canRemove = true;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/Items/ShardOfGlassPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/ShardOfGlassIcon.png");
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ShardOfGlassPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/ShardOfGlass.png");
 
             return item;
         }
@@ -60,11 +60,11 @@ namespace Hex3Mod.Items
         {
             float DamageIncrease = DamageIncrease_Config;
 
-            void RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
+            void H3_RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                Inventory inventory = sender.inventory;
-                if (inventory)
+                if (sender.inventory)
                 {
+                    Inventory inventory = sender.inventory;
                     int itemCount = inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0)
                     {
@@ -73,7 +73,7 @@ namespace Hex3Mod.Items
                 }
             }
 
-            RecalculateStatsAPI.GetStatCoefficients += RecalculateStatsAPI_GetStatCoefficients;
+            RecalculateStatsAPI.GetStatCoefficients += H3_RecalculateStatsAPI_GetStatCoefficients;
         }
 
         public static void Initiate(float DamageIncrease_Config) // Finally, initiate the item and all of its features
