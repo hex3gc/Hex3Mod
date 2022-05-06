@@ -69,6 +69,14 @@ namespace Hex3Mod
         public static ConfigEntry<int> MintCondition_AddJumps;
         public static ConfigEntry<int> MintCondition_AddJumpsStack;
 
+        public static ConfigEntry<bool> CorruptingParasite_Enable;
+
+        public static ConfigEntry<bool> NoticeOfAbsence_Enable;
+
+        public static ConfigEntry<bool> Discovery_Enable;
+        public static ConfigEntry<float> Discovery_ShieldAdd;
+        public static ConfigEntry<int> Discovery_MaxStacks;
+
         public void Awake()
         {
             Log.Init(Logger);
@@ -109,6 +117,15 @@ namespace Hex3Mod
             MintCondition_AddJumps = Config.Bind<int>(new ConfigDefinition("Mint Condition", "Additional jumps"), 1, new ConfigDescription("Jump count increase", null, Array.Empty<object>()));
             MintCondition_AddJumpsStack = Config.Bind<int>(new ConfigDefinition("Mint Condition", "Additional jumps per stack"), 2, new ConfigDescription("Jump count increase per additional stack", null, Array.Empty<object>()));
 
+            CorruptingParasite_Enable = Config.Bind<bool>(new ConfigDefinition("Corrupting Parasite", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
+
+            NoticeOfAbsence_Enable = Config.Bind<bool>(new ConfigDefinition("Notice Of Absence", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
+
+            Discovery_Enable = Config.Bind<bool>(new ConfigDefinition("Discovery", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
+            Discovery_ShieldAdd = Config.Bind<float>(new ConfigDefinition("Discovery", "Shield value"), 5f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>()));
+            Discovery_MaxStacks = Config.Bind<int>(new ConfigDefinition("Discovery", "Maximum uses"), 100, new ConfigDescription("Maximum interactable uses per stack before shield is no longer granted", null, Array.Empty<object>()));
+
+            Log.LogInfo("Creating assets...");
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Hex3Mod.hex3modassets"))
             {
                 MainAssets = AssetBundle.LoadFromStream(stream); // Load mainassets into stream
@@ -161,6 +178,18 @@ namespace Hex3Mod
             if (MintCondition_Enable.Value == true)
             {
                 MintCondition.Initiate(MintCondition_MoveSpeed.Value, MintCondition_MoveSpeedStack.Value, MintCondition_AddJumps.Value, MintCondition_AddJumpsStack.Value);
+            }
+            if (CorruptingParasite_Enable.Value == true)
+            {
+                CorruptingParasite.Initiate();
+            }
+            if (NoticeOfAbsence_Enable.Value == true)
+            {
+                NoticeOfAbsence.Initiate();
+            }
+            if (Discovery_Enable.Value == true)
+            {
+                Discovery.Initiate(Discovery_ShieldAdd.Value, Discovery_MaxStacks.Value);
             }
 
             Log.LogInfo("Done!");
