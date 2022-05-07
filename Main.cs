@@ -72,6 +72,7 @@ namespace Hex3Mod
         public static ConfigEntry<bool> CorruptingParasite_Enable;
 
         public static ConfigEntry<bool> NoticeOfAbsence_Enable;
+        public static ConfigEntry<float> NoticeOfAbsence_SpeedBuff;
 
         public static ConfigEntry<bool> Discovery_Enable;
         public static ConfigEntry<float> Discovery_ShieldAdd;
@@ -106,10 +107,10 @@ namespace Hex3Mod
             Empathy_HealFor = Config.Bind<float>(new ConfigDefinition("Empathy", "Healing amount"), 5f, new ConfigDescription("Healing per sustained hit", null, Array.Empty<object>()));
 
             Apathy_Enable = Config.Bind<bool>(new ConfigDefinition("Apathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
-            Apathy_Barrier = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier on receiving damage"), 0.05f, new ConfigDescription("Percentage barrier gained and granted to allies when you or your allies are hit", null, Array.Empty<object>()));
+            Apathy_Barrier = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier on receiving damage"), 0.03f, new ConfigDescription("Percentage barrier gained and granted to allies when you or your allies are hit", null, Array.Empty<object>()));
             Apathy_BarrierStack = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier on receiving damage per stack"), 0.02f, new ConfigDescription("Percentage barrier gained and granted to allies when you or your allies are hit per stack", null, Array.Empty<object>()));
-            Apathy_Reduction = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier damage reduction"), 0.3f, new ConfigDescription("Damage reduction while the item holder has barrier", null, Array.Empty<object>()));
-            Apathy_ReductionStack = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier damage reduction per stack"), 0.15f, new ConfigDescription("Damage reduction while the item holder has barrier (Hyperbolic, caps at 90%)", null, Array.Empty<object>()));
+            Apathy_Reduction = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier damage reduction"), 0.2f, new ConfigDescription("Damage reduction while the item holder has barrier", null, Array.Empty<object>()));
+            Apathy_ReductionStack = Config.Bind<float>(new ConfigDefinition("Apathy", "Barrier damage reduction per stack"), 0.10f, new ConfigDescription("Damage reduction while the item holder has barrier (Hyperbolic, caps at 90%)", null, Array.Empty<object>()));
 
             MintCondition_Enable = Config.Bind<bool>(new ConfigDefinition("Mint Condition", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
             MintCondition_MoveSpeed = Config.Bind<float>(new ConfigDefinition("Mint Condition", "Move speed increase"), 0.2f, new ConfigDescription("Base movement speed increase", null, Array.Empty<object>()));
@@ -120,6 +121,7 @@ namespace Hex3Mod
             CorruptingParasite_Enable = Config.Bind<bool>(new ConfigDefinition("Corrupting Parasite", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
 
             NoticeOfAbsence_Enable = Config.Bind<bool>(new ConfigDefinition("Notice Of Absence", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
+            NoticeOfAbsence_SpeedBuff = Config.Bind<float>(new ConfigDefinition("Notice Of Absence", "Damage multiplier"), 0.03f, new ConfigDescription("Percentage of base speed per void item", null, Array.Empty<object>()));
 
             Discovery_Enable = Config.Bind<bool>(new ConfigDefinition("Discovery", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
             Discovery_ShieldAdd = Config.Bind<float>(new ConfigDefinition("Discovery", "Shield value"), 5f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>()));
@@ -185,7 +187,7 @@ namespace Hex3Mod
             }
             if (NoticeOfAbsence_Enable.Value == true)
             {
-                NoticeOfAbsence.Initiate();
+                NoticeOfAbsence.Initiate(NoticeOfAbsence_SpeedBuff.Value);
             }
             if (Discovery_Enable.Value == true)
             {

@@ -4,6 +4,7 @@ using R2API;
 using R2API.Utils;
 using RoR2;
 using System;
+using System.Runtime;
 using UnityEngine;
 using Hex3Mod;
 using Hex3Mod.Logging;
@@ -20,6 +21,7 @@ namespace Hex3Mod.Items
         static string itemName = "Discovery"; // Change this name when making a new item
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -30,7 +32,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.Utility };
+            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Would be useless and complicated on monsters
             item.deprecatedTier = ItemTier.VoidTier2;
             item.canRemove = true;
             item.hidden = false;
@@ -63,56 +65,97 @@ namespace Hex3Mod.Items
             "\n\n<style=cStack>I'm so cold...</style>");
         }
 
-        public static void AddHooks(ItemDef itemDefToHooks, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
+        public static void AddHooks(ItemDef itemDefToHooks, ItemDef hiddenItemDefToHooks, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
         {
-            int stackCount = 0;
-
-            void DiscoveryInitStacks() // Set stacks to 0 at the start of each run. This is a global value for all players
+            // Easy way to do this: Make a new hidden item, add one each time an interactable is used
+            void DiscoveryInteract(Interactor interactor, PurchaseInteraction interaction)
             {
-                stackCount = 0;
+                // First, make sure the item isn't a printer, so we can't have infinite interaction loops
+                if (interaction.costType != CostTypeIndex.WhiteItem && interaction.costType != CostTypeIndex.GreenItem && interaction.costType != CostTypeIndex.RedItem && interaction.costType != CostTypeIndex.BossItem && interaction.costType != CostTypeIndex.LunarItemOrEquipment)
+                {
+                    if (interactor.gameObject.GetComponent<CharacterBody>())
+                    {
+                        CharacterBody body = interactor.gameObject.GetComponent<CharacterBody>();
+                        var bodyTeamMembers = TeamComponent.GetTeamMembers(body.teamComponent.teamIndex);
+
+                        foreach (var member in bodyTeamMembers)
+                        {
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < Discovery_MaxStacks)
+                            {
+                                member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
+                            }
+                        }
+                    }
+                }
             }
-
-            void DiscoveryAlterStacks(Interactor interactor)
+            void DiscoveryBarrelInteract(Interactor interactor)
             {
-                // Figure this out
-                // If we can find a way to store individual stacks per player, then we do that
-                // Otherwise, find a way to limit the number of stacks per player depending on item count
+
+                if (interactor.gameObject.GetComponent<CharacterBody>())
+                {
+                    CharacterBody body = interactor.gameObject.GetComponent<CharacterBody>();
+                    var bodyTeamMembers = TeamComponent.GetTeamMembers(body.teamComponent.teamIndex);
+
+                    foreach (var member in bodyTeamMembers)
+                    {
+                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < Discovery_MaxStacks)
+                        {
+                            member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
+                        }
+                    }
+                }
             }
 
             void DiscoveryRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
                 if (body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
                 {
-                    args.baseShieldAdd += Discovery_ShieldAdd * stackCount;
+                    args.baseShieldAdd += Discovery_ShieldAdd * body.inventory.GetItemCount(hiddenItemDefToHooks);
                 }
             }
 
             RecalculateStatsAPI.GetStatCoefficients += DiscoveryRecalculateStats;
-            On.RoR2.PreGameController.StartRun += (orig, self) =>
-            {
-                orig(self);
-                DiscoveryInitStacks();
-            };
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, interactor) =>
             {
                 orig(self, interactor);
-                DiscoveryAlterStacks(interactor);
+                DiscoveryInteract(interactor, self);
             };
             On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, interactor) =>
             {
                 orig(self, interactor);
-                DiscoveryAlterStacks(interactor);
+                DiscoveryBarrelInteract(interactor);
             };
         }
 
+        public static ItemDef CreateHiddenItem()
+        {
+            ItemDef item = ScriptableObject.CreateInstance<ItemDef>(); // New hidden item to keep track of stacks, like infusion
 
+            item.name = "DiscoveryHidden";
+            item.nameToken = "H3_" + upperName + "_NAME";
+            item.pickupToken = "H3_" + upperName + "_PICKUP";
+            item.descriptionToken = "H3_" + upperName + "_DESC";
+            item.loreToken = "H3_" + upperName + "_LORE";
+
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
+            item.deprecatedTier = ItemTier.NoTier;
+            item.canRemove = false;
+            item.hidden = true;
+
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Discovery.png");
+
+            return item;
+        }
 
         public static void Initiate(float Discovery_ShieldAdd, int Discovery_MaxStacks) // Finally, initiate the item and all of its features
         {
             CreateItem();
+            CreateHiddenItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
+            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateDisplayRules()));
             AddTokens(Discovery_ShieldAdd, Discovery_MaxStacks);
-            AddHooks(itemDefinition, Discovery_ShieldAdd, Discovery_MaxStacks);
+            AddHooks(itemDefinition, hiddenItemDefinition, Discovery_ShieldAdd, Discovery_MaxStacks);
         }
     }
 }
