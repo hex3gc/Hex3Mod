@@ -3,11 +3,14 @@ using BepInEx.Configuration;
 using R2API;
 using R2API.Utils;
 using RoR2;
+using RoR2.ExpansionManagement;
 using System;
 using System.Runtime;
+using System.Linq;
 using UnityEngine;
 using Hex3Mod;
 using Hex3Mod.Logging;
+using VoidItemAPI;
 
 namespace Hex3Mod.Items
 {
@@ -32,10 +35,11 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Would be useless and complicated on monsters
+            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Would be useless and complicated on monsters
             item.deprecatedTier = ItemTier.VoidTier2;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
 
             item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
             item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Discovery.png");
@@ -52,8 +56,8 @@ namespace Hex3Mod.Items
         {
             float finalNumber = Discovery_ShieldAdd * Discovery_MaxStacks;
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Discovery");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Using a world interactable grants <style=cIsHealing>regenerating shield</style> to all holders of this item.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Using a world interactable grants " + Discovery_ShieldAdd + " points of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at " + finalNumber + " shield <style=cStack>(+" + finalNumber + " per stack)</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Using a world interactable grants <style=cIsHealing>regenerating shield</style> to all holders of this item. <style=cIsVoid>Corrupts all Infusions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd + "</style> points of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + finalNumber + " shield</style> <style=cStack>(+" + finalNumber + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "EXPLORER'S LOG" +
             "\n// 'Author' information lost, attempting to fix..." +
             "\n// 'Date' information lost, attempting to fix..." +
@@ -67,6 +71,9 @@ namespace Hex3Mod.Items
 
         public static void AddHooks(ItemDef itemDefToHooks, ItemDef hiddenItemDefToHooks, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
         {
+            // Void transformation
+            VoidTransformation.CreateTransformation(itemDefToHooks, "Infusion");
+
             // Easy way to do this: Make a new hidden item, add one each time an interactable is used
             void DiscoveryInteract(Interactor interactor, PurchaseInteraction interaction)
             {
@@ -83,6 +90,10 @@ namespace Hex3Mod.Items
                             if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < Discovery_MaxStacks)
                             {
                                 member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
+                            }
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) < 1)
+                            {
+                                member.body.inventory.ResetItem(hiddenItemDefToHooks);
                             }
                         }
                     }
@@ -108,7 +119,7 @@ namespace Hex3Mod.Items
 
             void DiscoveryRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
+                if (body && body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
                 {
                     args.baseShieldAdd += Discovery_ShieldAdd * body.inventory.GetItemCount(hiddenItemDefToHooks);
                 }

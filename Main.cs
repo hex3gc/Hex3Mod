@@ -10,19 +10,21 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Hex3Mod.Items;
+using Hex3Mod.Artifacts;
 using Hex3Mod.Logging;
 
 namespace Hex3Mod
 {
     [BepInPlugin(ModGuid, ModName, ModVer)]
     [BepInDependency(R2API.R2API.PluginGUID, R2API.R2API.PluginVersion)]
+    [BepInDependency(VoidItemAPI.VoidItemAPI.MODGUID)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2APISubmoduleDependency(nameof(ItemAPI), nameof(LanguageAPI), nameof(RecalculateStatsAPI), nameof(PrefabAPI))]
     public class Main : BaseUnityPlugin
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "0.2.2";
+        public const string ModVer = "0.2.4";
 
         public static AssetBundle MainAssets;
 
@@ -70,6 +72,7 @@ namespace Hex3Mod
         public static ConfigEntry<int> MintCondition_AddJumpsStack;
 
         public static ConfigEntry<bool> CorruptingParasite_Enable;
+        public static ConfigEntry<bool> CorruptingParasite_CorruptBossItems;
 
         public static ConfigEntry<bool> NoticeOfAbsence_Enable;
         public static ConfigEntry<float> NoticeOfAbsence_SpeedBuff;
@@ -77,6 +80,10 @@ namespace Hex3Mod
         public static ConfigEntry<bool> Discovery_Enable;
         public static ConfigEntry<float> Discovery_ShieldAdd;
         public static ConfigEntry<int> Discovery_MaxStacks;
+
+        public static ConfigEntry<bool> TheHermit_Enable;
+        public static ConfigEntry<float> TheHermit_BuffDuration;
+        public static ConfigEntry<float> TheHermit_DamageReduction;
 
         public void Awake()
         {
@@ -119,13 +126,18 @@ namespace Hex3Mod
             MintCondition_AddJumpsStack = Config.Bind<int>(new ConfigDefinition("Mint Condition", "Additional jumps per stack"), 2, new ConfigDescription("Jump count increase per additional stack", null, Array.Empty<object>()));
 
             CorruptingParasite_Enable = Config.Bind<bool>(new ConfigDefinition("Corrupting Parasite", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
+            CorruptingParasite_CorruptBossItems = Config.Bind<bool>(new ConfigDefinition("Corrupting Parasite", "Corrupt boss items"), true, new ConfigDescription("Allows the parasite to corrupt boss items", null, Array.Empty<object>()));
 
             NoticeOfAbsence_Enable = Config.Bind<bool>(new ConfigDefinition("Notice Of Absence", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
             NoticeOfAbsence_SpeedBuff = Config.Bind<float>(new ConfigDefinition("Notice Of Absence", "Damage multiplier"), 0.03f, new ConfigDescription("Percentage of base speed per void item", null, Array.Empty<object>()));
 
             Discovery_Enable = Config.Bind<bool>(new ConfigDefinition("Discovery", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
-            Discovery_ShieldAdd = Config.Bind<float>(new ConfigDefinition("Discovery", "Shield value"), 5f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>()));
+            Discovery_ShieldAdd = Config.Bind<float>(new ConfigDefinition("Discovery", "Shield value"), 2f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>()));
             Discovery_MaxStacks = Config.Bind<int>(new ConfigDefinition("Discovery", "Maximum uses"), 100, new ConfigDescription("Maximum interactable uses per stack before shield is no longer granted", null, Array.Empty<object>()));
+
+            TheHermit_Enable = Config.Bind<bool>(new ConfigDefinition("The Hermit", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>()));
+            TheHermit_BuffDuration = Config.Bind<float>(new ConfigDefinition("The Hermit", "Buff duration"), 1f, new ConfigDescription("How long in seconds the on-hit buff should last", null, Array.Empty<object>()));
+            TheHermit_DamageReduction = Config.Bind<float>(new ConfigDefinition("The Hermit", "Buff damage reduction"), 0.01f, new ConfigDescription("Damage reduced by each buff in percent", null, Array.Empty<object>()));
 
             Log.LogInfo("Creating assets...");
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Hex3Mod.hex3modassets"))
@@ -136,7 +148,6 @@ namespace Hex3Mod
             var materialAssets = MainAssets.LoadAllAssets<Material>();
             foreach (Material material in materialAssets) // Oh christ this was annoying
             {
-                Log.LogInfo("Replacing shaders for " + material.name);
                 if (!material.shader.name.StartsWith("Stubbed Hopoo Games"))
                 {
                     continue;
@@ -183,7 +194,7 @@ namespace Hex3Mod
             }
             if (CorruptingParasite_Enable.Value == true)
             {
-                CorruptingParasite.Initiate();
+                CorruptingParasite.Initiate(CorruptingParasite_CorruptBossItems.Value);
             }
             if (NoticeOfAbsence_Enable.Value == true)
             {
@@ -193,6 +204,12 @@ namespace Hex3Mod
             {
                 Discovery.Initiate(Discovery_ShieldAdd.Value, Discovery_MaxStacks.Value);
             }
+            if (TheHermit_Enable.Value == true)
+            {
+                TheHermit.Initiate(TheHermit_BuffDuration.Value, TheHermit_DamageReduction.Value);
+            }
+
+            ArtifactOfCorruption.Initiate();
 
             Log.LogInfo("Done!");
         }

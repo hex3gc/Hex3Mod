@@ -96,7 +96,10 @@ namespace Hex3Mod.Items
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
                 orig(self, damageInfo);
-                H3_OnHpLost2(self);
+                if (self.body && !self.body.name.StartsWith("ShopkeeperBody"))
+                {
+                    H3_OnHpLost2(self);
+                }
             };
         }
 

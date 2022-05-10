@@ -3,10 +3,13 @@ using BepInEx.Configuration;
 using R2API;
 using R2API.Utils;
 using RoR2;
+using RoR2.ExpansionManagement;
 using System;
+using System.Linq;
 using UnityEngine;
 using Hex3Mod;
 using Hex3Mod.Logging;
+using VoidItemAPI;
 
 namespace Hex3Mod.Items
 {
@@ -34,6 +37,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
 
             item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/NoticeOfAbsencePrefab.prefab");
             item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/NoticeOfAbsence.png");
@@ -51,13 +55,16 @@ namespace Hex3Mod.Items
             float NoticeOfAbsence_SpeedBuffReadable = NoticeOfAbsence_SpeedBuff * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Notice Of Absence");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Move faster the more void items you have.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "For each void item in your inventory, move " + NoticeOfAbsence_SpeedBuffReadable + "% faster per stack.");
-            LanguageAPI.Add("H3_" + upperName + "_LORE", "I'm leaving tomorrow\n\nYou wouldn't understand why\n\n- Alice");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Move faster the more void items you have. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "For each <style=cIsVoid>void item</style> in your inventory, move <style=cIsUtility>" + NoticeOfAbsence_SpeedBuffReadable + "%</style> faster per stack. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_LORE", "I'm leaving tomorrow\n\nYou wouldn't understand why\n\n- Alex");
         }
 
         public static void AddHooks(ItemDef itemDefToHooks, float NoticeOfAbsence_SpeedBuff) // Insert hooks here
         {
+            // Void transformation
+            VoidTransformation.CreateTransformation(itemDefToHooks, "BucketList");
+
             void NoticeOfAbsenceRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
                 if (body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)

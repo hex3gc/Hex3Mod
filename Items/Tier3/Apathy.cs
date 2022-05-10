@@ -57,7 +57,7 @@ namespace Hex3Mod.Items
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Apathy");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your barrier is more resistant to damage. Grants barrier to your team when you or your allies are hit.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Reduce ALL incoming damage by <style=cIsUtility>" + Apathy_Reduction_Readable + "%</style> <style=cStack>(+" + Apathy_ReductionStack_Readable + "% per stack)</style> when you have <style=cIsUtility>Barrier</style>. When you or your allies are hit, grant <style=cIsUtility>" + Apathy_Barrier_Readable + "%</style> <style=cStack>(+" + Apathy_BarrierStack_Readable + "% per stack)</style> <style=cIsUtility>Barrier</style> to your whole team.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Reduce ALL incoming damage by <style=cIsUtility>" + Apathy_Reduction_Readable + "%</style> <style=cStack>(+" + Apathy_ReductionStack_Readable + "% per stack)</style> when you have <style=cIsHealing>barrier</style>. When you or your allies are hit, grant <style=cIsUtility>" + Apathy_Barrier_Readable + "%</style> <style=cStack>(+" + Apathy_BarrierStack_Readable + "% per stack)</style> <style=cIsHealing>barrier</style> to your whole team.");
             LanguageAPI.Add("H3_" + upperName + "_LORE",
                 "\"I can't [REDACTED] believe I'm doing this...\"" +
                 "\n\n\"We'll share the network. We have to.\"" +
@@ -146,7 +146,10 @@ namespace Hex3Mod.Items
             }
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
-                H3_OnHpLost3(damageInfo, self);
+                if (self.body && !self.body.name.StartsWith("ShopkeeperBody"))
+                {
+                    H3_OnHpLost3(damageInfo, self);
+                }
                 orig(self, damageInfo);
             };
         }

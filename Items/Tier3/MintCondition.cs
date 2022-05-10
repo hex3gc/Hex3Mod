@@ -57,7 +57,7 @@ namespace Hex3Mod.Items
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Mint Condition");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "You are immune to movement restricting status effects. Gain movement speed and extra jumps.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Provides immunity to all movement restricting status effects. Gain <style=cIsUtility>" + MintCondition_MoveSpeed_Readable + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack_Readable + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack + " per stack)</style> jumps.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Provides immunity to all movement restricting status effects. Gain <style=cIsUtility>" + MintCondition_MoveSpeed_Readable + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack_Readable + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack + " per stack)</style> extra jumps.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", 
                 "\nOrder: Eclipse 380 Boosts(Mint Condition)" +
                 "\nTracking Number: 240******" +
@@ -87,7 +87,7 @@ namespace Hex3Mod.Items
 
             void H3_MobilityIncreaseRoR(CharacterBody body) // I don't know how to effectively add base move speed, so doing it separately through r2api is the safe option
             {
-                if (body.inventory)
+                if (body && body.inventory)
                 {
                     int itemCount = body.inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0)
@@ -99,7 +99,7 @@ namespace Hex3Mod.Items
 
             void H3_MobilityIncreaseR2API(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (body.inventory)
+                if (body && body.inventory)
                 {
                     int itemCount = body.inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0)
@@ -111,7 +111,7 @@ namespace Hex3Mod.Items
 
             void H3_PreventFreeze(DamageReport damageReport) // Make sure that no received damage can be stunning or freezing
             {
-                if (damageReport.victim.body.inventory)
+                if (damageReport.victim && damageReport.victim.body && damageReport.victim.body.inventory)
                 {
                     int itemCount = damageReport.victim.body.inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0 && damageReport.damageInfo != null)
@@ -128,7 +128,7 @@ namespace Hex3Mod.Items
 
             void H3_RemoveMovementBuff(CharacterBody body, BuffDef receivedBuff)
             {
-                if (body.master && body.inventory)
+                if (body && body.master && body.inventory)
                 {
                     int itemCount = body.inventory.GetItemCount(itemDefToHooks); // Now, for a looong list of all the movement-restricting buffs I could find...
                     if (itemCount > 0)

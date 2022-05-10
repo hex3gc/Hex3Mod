@@ -23,6 +23,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+[Ll]ibs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -51,7 +52,6 @@ BenchmarkDotNet.Artifacts/
 # .NET Core
 project.lock.json
 project.fragment.lock.json
-artifacts/
 **/Properties/launchSettings.json
 
 # StyleCop

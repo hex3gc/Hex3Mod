@@ -1,11 +1,12 @@
 # Info
 
-Adds 8 new items to the game:
+Adds 11 new items to the game:
 * 4 Common
 * 2 Uncommon
 * 2 Legendary
+* 4 Void
 
-![Items1](https://i.imgur.com/NADUApK.png)
+![Items1](https://i.imgur.com/obxON5Y.png)
 
 Each item has a unique effect and configurable values. Special thanks to the RoR2 Modding Discord for teaching me how to do this.
 
@@ -16,14 +17,26 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * Assess balance and bugginess
 * Ensure mod compatibility
 
-# Bugs
+#Bugs
 
-* They are inevitable, but I'll try to fix them as soon as I can. Please give feedback/bug reports on Discord: hex3#7952
+* Please give feedback/bug reports on Discord: hex3#7952
 
 # Changelog
 
+### 0.2.4
+* Added item "The Hermit" (Void legendary)
+* Adjusted the sizes of some item models
+* Fixed an NRE caused by the Newt
+
+### 0.2.3 - Void Update, pt 1
+* Added item "Corrupting Parasite". Thanks to kking and conq for giving me the idea for the item and allowing me to use it (Void common)
+* Added item "Notice of Absence" (Void common)
+* Added item "Discovery" (Void uncommon)
+* Apathy damage reduction reverted to 20% (+10%)
+* Apathy barrier on hit 5% (+2%) -> 3% (+2%)
+
 ### 0.2.2
-* Added item "Mint Condition"
+* Added item "Mint Condition" (Legendary)
 
 ### 0.2.1
 You may need to change your config files for some of these changes to take effect.
@@ -36,13 +49,13 @@ You may need to change your config files for some of these changes to take effec
 * Hopoo Egg air control modifier 5% -> 10%
 
 ### 0.2.0
-* Added item "Apathy"
+* Added item "Apathy" (Legendary)
 
 ### 0.1.6
 * VFX Overhaul: New models, icons and shaders for all items
 
 ### 0.1.5
-* Added item "ATG Prototype"
+* Added item "ATG Prototype" (Common)
 
 ### 0.1.4
 * (Hopefully) fixed another NRE caused by Scattered Reflection interacting with Blood Shrines and Void Cradles incorrectly
@@ -52,7 +65,7 @@ You may need to change your config files for some of these changes to take effec
 * Fixed an NRE caused by Scattered Reflection
 
 ### 0.1.1
-* Added item "Empathy"
+* Added item "Empathy" (Uncommon)
 
 ### 0.1.0
 * Initial release

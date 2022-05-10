@@ -34,4 +34,10 @@
 	<PackageReference Include="R2API" Version="4.3.21" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="VoidItemAPI">
+      <HintPath>libs\VoidItemAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
