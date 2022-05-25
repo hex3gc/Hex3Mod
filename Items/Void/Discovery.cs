@@ -10,6 +10,7 @@ using System.Linq;
 using UnityEngine;
 using Hex3Mod;
 using Hex3Mod.Logging;
+using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 
 namespace Hex3Mod.Items
@@ -25,6 +26,16 @@ namespace Hex3Mod.Items
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static ItemDef hiddenItemDefinition = CreateHiddenItem();
+        public static GameObject LoadPrefab()
+        {
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
+            return pickupModelPrefab;
+        }
+        public static Sprite LoadSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Discovery.png");
+            return pickupIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -41,13 +52,183 @@ namespace Hex3Mod.Items
             item.hidden = false;
             item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Discovery.png");
+            item.pickupModelPrefab = LoadPrefab();
+            item.pickupIconSprite = LoadSprite();
 
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We'll figure item displays out... when our models get better
+        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        {
+            GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
+
+            ItemDisplayRuleDict rules = new ItemDisplayRuleDict();
+            rules.Add("mdlCommandoDualies", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Pelvis",
+                        localPos = new Vector3(0.15416F, -0.07144F, -0.00001F),
+                        localAngles = new Vector3(0F, 0F, 0F),
+                        localScale = new Vector3(0.09441F, 0.09441F, 0.09441F)
+                    }
+                }
+            );
+            rules.Add("mdlHuntress", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Head",
+                        localPos = new Vector3(0.00001F, 0.24273F, 0.05034F),
+                        localAngles = new Vector3(25.39802F, 0F, 0F),
+                        localScale = new Vector3(0.07587F, 0.07587F, 0.07587F)
+                    }
+                }
+            );
+            rules.Add("mdlToolbot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(1.05056F, 1.94221F, 1.64765F),
+                        localAngles = new Vector3(45.8378F, 0F, 0F),
+                        localScale = new Vector3(0.85108F, 0.85108F, 0.85108F)
+                    }
+                }
+            );
+            rules.Add("mdlEngi", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "CannonHeadR",
+                        localPos = new Vector3(0F, 0.39234F, 0.00003F),
+                        localAngles = new Vector3(314.5863F, 0F, 0F),
+                        localScale = new Vector3(0.11812F, 0.11812F, 0.11812F)
+                    }
+                }
+            );
+            rules.Add("mdlMage", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(0.11241F, 0.28087F, -0.18459F),
+                        localAngles = new Vector3(323.6529F, 0F, 0F),
+                        localScale = new Vector3(0.09022F, 0.09022F, 0.09022F)
+                    }
+                }
+            );
+            rules.Add("mdlMerc", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "HandR",
+                        localPos = new Vector3(-0.021F, 0.17313F, 0.01653F),
+                        localAngles = new Vector3(36.11853F, 98.29133F, 8.29494F),
+                        localScale = new Vector3(0.1098F, 0.1098F, 0.1098F)
+                    }
+                }
+            );
+            rules.Add("mdlTreebot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "WeaponPlatform",
+                        localPos = new Vector3(-0.14601F, 0.07474F, 0.17599F),
+                        localAngles = new Vector3(314.9279F, 0F, 0F),
+                        localScale = new Vector3(0.19015F, 0.19015F, 0.19015F)
+                    }
+                }
+            );
+            rules.Add("mdlLoader", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(0.20309F, 0.53486F, 0.03296F),
+                        localAngles = new Vector3(50.2245F, 0F, 0F),
+                        localScale = new Vector3(0.10039F, 0.10039F, 0.10039F)
+                    }
+                }
+            );
+            rules.Add("mdlCroco", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "MouthMuzzle",
+                        localPos = new Vector3(-0.21135F, 2.19588F, 2.52151F),
+                        localAngles = new Vector3(44.53611F, 86.83545F, 0.12085F),
+                        localScale = new Vector3(1.12444F, 1.12444F, 1.12885F)
+                    }
+                }
+            );
+            rules.Add("mdlCaptain", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "LowerArmL",
+                        localPos = new Vector3(-0.00595F, 0.42614F, 0.04707F),
+                        localAngles = new Vector3(315.9901F, 351.1433F, 12.76379F),
+                        localScale = new Vector3(0.11838F, 0.11838F, 0.11838F)
+                    }
+                }
+            );
+            rules.Add("mdlBandit2", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "MainWeapon",
+                        localPos = new Vector3(-0.14041F, 0.41272F, -0.00407F),
+                        localAngles = new Vector3(315.4345F, 0F, 0F),
+                        localScale = new Vector3(0.08203F, 0.08203F, 0.08203F)
+                    }
+                }
+            );
+            rules.Add("EngiTurretBody", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Head",
+                        localPos = new Vector3(0F, 0.57577F, 0.58945F),
+                        localAngles = new Vector3(45.66947F, 0F, 0F),
+                        localScale = new Vector3(0.35445F, 0.35445F, 0.35445F)
+                    }
+                }
+            );
+            rules.Add("EngiWalkerTurretBody", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Head",
+                        localPos = new Vector3(0F, 0.20624F, -0.20413F),
+                        localAngles = new Vector3(45.29741F, 0F, 0F),
+                        localScale = new Vector3(0.33057F, 0.33057F, 0.33057F)
+                    }
+                }
+            );
+            rules.Add("mdlScav", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Backpack",
+                        localPos = new Vector3(-10.62732F, 13.82996F, 1.14351F),
+                        localAngles = new Vector3(42.83438F, 0F, 0F),
+                        localScale = new Vector3(1.34648F, 1.34648F, 1.34648F)
+                    }
+                }
+            );
+            rules.Add("mdlRailGunner", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "GunScope",
+                        localPos = new Vector3(-0.07081F, -0.14643F, 0.17777F),
+                        localAngles = new Vector3(44.5719F, 0F, 0F),
+                        localScale = new Vector3(0.13531F, 0.13156F, 0.13156F)
+                    }
+                }
+            );
+            rules.Add("mdlVoidSurvivor", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "ThighL",
+                        localPos = new Vector3(0F, 0F, -0.14146F),
+                        localAngles = new Vector3(345.2758F, 49.11308F, 282.4109F),
+                        localScale = new Vector3(0.10932F, 0.10932F, 0.10932F)
+                    }
+                }
+            );
+
+            return rules;
+        }
+
+        // Hidden items should not display at all
+        public static ItemDisplayRuleDict CreateHiddenDisplayRules()
         {
             return new ItemDisplayRuleDict();
         }
@@ -57,7 +238,7 @@ namespace Hex3Mod.Items
             float finalNumber = Discovery_ShieldAdd * Discovery_MaxStacks;
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Discovery");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Using a world interactable grants <style=cIsHealing>regenerating shield</style> to all holders of this item. <style=cIsVoid>Corrupts all Infusions.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd + "</style> points of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + finalNumber + " shield</style> <style=cStack>(+" + finalNumber + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd + "</style> points per stack of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + finalNumber + " shield</style> <style=cStack>(+" + finalNumber + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "EXPLORER'S LOG" +
             "\n// 'Author' information lost, attempting to fix..." +
             "\n// 'Date' information lost, attempting to fix..." +
@@ -69,7 +250,7 @@ namespace Hex3Mod.Items
             "\n\n<style=cStack>I'm so cold...</style>");
         }
 
-        public static void AddHooks(ItemDef itemDefToHooks, ItemDef hiddenItemDefToHooks, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
+        private static void AddHooks(ItemDef itemDefToHooks, ItemDef hiddenItemDefToHooks, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDefToHooks, "Infusion");
@@ -87,9 +268,22 @@ namespace Hex3Mod.Items
 
                         foreach (var member in bodyTeamMembers)
                         {
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < Discovery_MaxStacks)
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks)))
                             {
                                 member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
+                                if (member.body.inventory.GetItemCount(hiddenItemDefToHooks) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks))
+                                {
+                                    for (int i = member.body.inventory.GetItemCount(hiddenItemDefToHooks); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks); i--)
+                                    {
+                                        member.body.inventory.RemoveItem(hiddenItemDefToHooks);
+                                    }
+                                }
+                                Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
+                                EffectData effectData = new EffectData
+                                {
+                                    origin = body.corePosition
+                                };
+                                EffectManager.SpawnEffect(EntityStates.NullifierMonster.FirePortalBomb.muzzleflashEffectPrefab, effectData, false);
                             }
                             if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) < 1)
                             {
@@ -109,9 +303,22 @@ namespace Hex3Mod.Items
 
                     foreach (var member in bodyTeamMembers)
                     {
-                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < Discovery_MaxStacks)
+                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks)))
                         {
                             member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
+                            if (member.body.inventory.GetItemCount(hiddenItemDefToHooks) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks))
+                            {
+                                for (int i = member.body.inventory.GetItemCount(hiddenItemDefToHooks); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks); i--)
+                                {
+                                    member.body.inventory.RemoveItem(hiddenItemDefToHooks);
+                                }
+                            }
+                            Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
+                            EffectData effectData = new EffectData
+                            {
+                                origin = body.corePosition
+                            };
+                            EffectManager.SpawnEffect(EntityStates.NullifierMonster.FirePortalBomb.muzzleflashEffectPrefab, effectData, false);
                         }
                     }
                 }
@@ -122,6 +329,7 @@ namespace Hex3Mod.Items
                 if (body && body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
                 {
                     args.baseShieldAdd += Discovery_ShieldAdd * body.inventory.GetItemCount(hiddenItemDefToHooks);
+                    body.SetBuffCount(discoveryBuff.buffIndex, body.inventory.GetItemCount(hiddenItemDefToHooks));
                 }
             }
 
@@ -159,13 +367,28 @@ namespace Hex3Mod.Items
             return item;
         }
 
+        public static BuffDef discoveryBuff { get; private set; }
+        public static void AddBuffs() // Just for players to track their discovery stacks
+        {
+            discoveryBuff = ScriptableObject.CreateInstance<BuffDef>();
+            discoveryBuff.buffColor = new Color(1f, 1f, 1f);
+            discoveryBuff.canStack = true;
+            discoveryBuff.isDebuff = false;
+            discoveryBuff.name = "Discovery Shields";
+            discoveryBuff.isHidden = false;
+            discoveryBuff.isCooldown = false;
+            discoveryBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png"); // Rework this later
+            ContentAddition.AddBuffDef(discoveryBuff);
+        }
+
         public static void Initiate(float Discovery_ShieldAdd, int Discovery_MaxStacks) // Finally, initiate the item and all of its features
         {
             CreateItem();
             CreateHiddenItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateDisplayRules()));
+            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
             AddTokens(Discovery_ShieldAdd, Discovery_MaxStacks);
+            AddBuffs();
             AddHooks(itemDefinition, hiddenItemDefinition, Discovery_ShieldAdd, Discovery_MaxStacks);
         }
     }

@@ -11,6 +11,7 @@ using UnityEngine;
 using Hex3Mod;
 using Hex3Mod.Logging;
 using VoidItemAPI;
+using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
 {
@@ -25,6 +26,16 @@ namespace Hex3Mod.Items
         static string itemName = "TheHermit"; // Change this name when making a new item
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
+        public static GameObject LoadPrefab()
+        {
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheHermitPrefab.prefab");
+            return pickupModelPrefab;
+        }
+        public static Sprite LoadSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/TheHermit.png");
+            return pickupIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -41,15 +52,179 @@ namespace Hex3Mod.Items
             item.hidden = false;
             item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheHermitPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/TheHermit.png");
+            item.pickupModelPrefab = LoadPrefab();
+            item.pickupIconSprite = LoadSprite();
 
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We'll figure item displays out... when our models get better
+        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
         {
-            return new ItemDisplayRuleDict();
+            GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
+
+            ItemDisplayRuleDict rules = new ItemDisplayRuleDict();
+            rules.Add("mdlCommandoDualies", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(-0.01248F, 0.42417F, -0.17057F),
+                        localAngles = new Vector3(352.275F, 282.2963F, 350.3966F),
+                        localScale = new Vector3(0.23097F, 0.21308F, 0.21643F)
+                    }
+                }
+            );
+            rules.Add("mdlHuntress", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "HeadCenter",
+                        localPos = new Vector3(-0.02213F, -0.09881F, 0.10617F),
+                        localAngles = new Vector3(21.97226F, 76.78506F, 31.59275F),
+                        localScale = new Vector3(0.18335F, 0.18335F, 0.18335F)
+                    }
+                }
+            );
+            rules.Add("mdlToolbot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Head",
+                        localPos = new Vector3(-0.45113F, 1.71135F, -0.5302F),
+                        localAngles = new Vector3(329.3982F, 336.148F, 339.0386F),
+                        localScale = new Vector3(2.94697F, 2.94697F, 2.94697F)
+                    }
+                }
+            );
+            rules.Add("mdlEngi", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "CannonHeadR",
+                        localPos = new Vector3(-0.17948F, 0.16459F, 0.00262F),
+                        localAngles = new Vector3(54.38401F, 131.6052F, 138.6951F),
+                        localScale = new Vector3(0.25445F, 0.25445F, 0.25445F)
+                    }
+                }
+            );
+            rules.Add("mdlMage", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(-0.00119F, 0.04999F, -0.28631F),
+                        localAngles = new Vector3(356.5753F, 276.9439F, 22.30641F),
+                        localScale = new Vector3(0.2105F, 0.2105F, 0.2105F)
+                    }
+                }
+            );
+            rules.Add("mdlMerc", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(0.00918F, 0.08362F, -0.27662F),
+                        localAngles = new Vector3(7.01334F, 272.4854F, 38.51432F),
+                        localScale = new Vector3(0.32255F, 0.32255F, 0.32255F)
+                    }
+                }
+            );
+            rules.Add("mdlTreebot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "PlatformBase",
+                        localPos = new Vector3(0.56956F, 0.221F, -0.35119F),
+                        localAngles = new Vector3(51.06863F, 340.1037F, 277.2233F),
+                        localScale = new Vector3(0.7225F, 0.7225F, 0.7225F)
+                    }
+                }
+            );
+            rules.Add("mdlLoader", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "ThighR",
+                        localPos = new Vector3(-0.12666F, 0.13209F, 0.02458F),
+                        localAngles = new Vector3(324.0293F, 305.8312F, 70.87708F),
+                        localScale = new Vector3(0.20347F, 0.20347F, 0.20347F)
+                    }
+                }
+            );
+            rules.Add("mdlCroco", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "HeadCenter",
+                        localPos = new Vector3(0.62093F, 3.56951F, 0.62145F),
+                        localAngles = new Vector3(323.7129F, 179.6431F, 325.5504F),
+                        localScale = new Vector3(2.29979F, 2.29979F, 2.29979F)
+                    }
+                }
+            );
+            rules.Add("mdlCaptain", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Neck",
+                        localPos = new Vector3(0.02166F, 0.11679F, 0.0974F),
+                        localAngles = new Vector3(11.35254F, 290.6996F, 245.9148F),
+                        localScale = new Vector3(0.1795F, 0.1815F, 0.1795F)
+                    }
+                }
+            );
+            rules.Add("mdlBandit2", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Chest",
+                        localPos = new Vector3(0.19331F, 0.21284F, -0.15525F),
+                        localAngles = new Vector3(335.8373F, 229.7396F, 38.50159F),
+                        localScale = new Vector3(0.17084F, 0.17084F, 0.17084F)
+                    }
+                }
+            );
+            rules.Add("EngiTurretBody", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Base",
+                        localPos = new Vector3(-0.3055F, 0.74397F, 0.20357F),
+                        localAngles = new Vector3(16.53893F, 14.99345F, 25.73735F),
+                        localScale = new Vector3(0.84315F, 0.84315F, 0.84315F)
+                    }
+                }
+            );
+            rules.Add("EngiWalkerTurretBody", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Base",
+                        localPos = new Vector3(-0.36004F, 0.91609F, -0.19541F),
+                        localAngles = new Vector3(38.83065F, 267.0875F, 327.8494F),
+                        localScale = new Vector3(0.66535F, 0.66535F, 0.66535F)
+                    }
+                }
+            );
+            rules.Add("mdlScav", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Head",
+                        localPos = new Vector3(-4.33622F, 3.70776F, -0.94777F),
+                        localAngles = new Vector3(21.97188F, 232.2604F, 325.6177F),
+                        localScale = new Vector3(3.81427F, 3.81427F, 3.81427F)
+                    }
+                }
+            );
+            rules.Add("mdlRailGunner", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "Backpack",
+                        localPos = new Vector3(0.26499F, 0.07962F, -0.02356F),
+                        localAngles = new Vector3(323.4973F, 5.6934F, 234.7006F),
+                        localScale = new Vector3(0.17824F, 0.17824F, 0.17824F)
+                    }
+                }
+            );
+            rules.Add("mdlVoidSurvivor", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+                        ruleType = ItemDisplayRuleType.ParentedPrefab,
+                        followerPrefab = ItemDisplayPrefab,
+                        childName = "CalfL",
+                        localPos = new Vector3(0.10176F, 0.46033F, -0.02201F),
+                        localAngles = new Vector3(5.2009F, 27.75262F, 149.8759F),
+                        localScale = new Vector3(0.42825F, 0.42825F, 0.42825F)
+                    }
+                }
+            );
+
+            return rules;
         }
 
         public static void AddTokens(float TheHermit_BuffDuration, float TheHermit_DamageReduction)
@@ -57,7 +232,7 @@ namespace Hex3Mod.Items
             float TheHermit_DamageReductionReadable = TheHermit_DamageReduction * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "The Hermit");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Hitting an enemy grants you stacking damage reduction.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Hitting an enemy grants you stacking damage reduction. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_DESC", "On hit, grant yourself a <style=cIsUtility>stacking buff</style> that <style=cIsHealing>reduces</style> all incoming damage by <style=cIsHealing>" + TheHermit_DamageReductionReadable + "%</style> for " + TheHermit_BuffDuration + " <style=cStack>(+" + TheHermit_BuffDuration + " per stack)</style> seconds. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"When do you think we'll get outta here?\"" +
         "\n\n\"I don't think we will.\"" +
@@ -85,7 +260,7 @@ namespace Hex3Mod.Items
         "\n\nHe had found a way out, but it was too late to take it.");
         }
 
-        public static void AddHooks(ItemDef itemDefToHooks, float TheHermit_BuffDuration, float TheHermit_DamageReduction) // Insert hooks here
+        private static void AddHooks(ItemDef itemDefToHooks, float TheHermit_BuffDuration, float TheHermit_DamageReduction) // Insert hooks here
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDefToHooks, "PermanentDebuffOnHit");
@@ -97,7 +272,10 @@ namespace Hex3Mod.Items
                     CharacterBody body = damageInfo.attacker.GetComponent<CharacterBody>();
                     if (body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
                     {
-                        body.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * body.inventory.GetItemCount(itemDefToHooks));
+                        if (damageInfo.damageType != DamageType.DoT) // Make sure damage doesn't come from bleeds/burns/etc
+                        {
+                            body.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * body.inventory.GetItemCount(itemDefToHooks));
+                        }
                     }
                 }
             }
@@ -136,16 +314,16 @@ namespace Hex3Mod.Items
         }
 
         public static BuffDef hermitBuff { get; private set; }
-        public static void AddBuffs()
+        public static void AddBuffs() // The Hermit is a bit dangerous in modded because it is a buff, which is boosted by Choc Chip and Hourglass. The results are OP
         {
             hermitBuff = ScriptableObject.CreateInstance<BuffDef>();
-            hermitBuff.buffColor = new Color(0.4f, 0.4f, 0.4f);
+            hermitBuff.buffColor = new Color(1f, 1f, 1f);
             hermitBuff.canStack = true;
             hermitBuff.isDebuff = false;
             hermitBuff.name = "The Hermit's Protection";
             hermitBuff.isHidden = false;
             hermitBuff.isCooldown = false;
-            hermitBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/TheHermit.png"); // Rework this later
+            hermitBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_TheHermit.png"); // Rework this later
             ContentAddition.AddBuffDef(hermitBuff);
         }
 

@@ -14,10 +14,11 @@
 
   <ItemGroup>
     <None Remove="hex3modassets" />
+    <None Remove="vfxpass2" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="hex3modassets" />
+    <EmbeddedResource Include="vfxpass2" />
   </ItemGroup>
 
   <ItemGroup>

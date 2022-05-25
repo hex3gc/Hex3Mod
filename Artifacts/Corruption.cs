@@ -29,14 +29,14 @@ namespace Hex3Mod.Artifacts
             artifact.nameToken = "H3_" + upperName + "_NAME";
             artifact.descriptionToken = "H3_" + upperName + "_DESC";
 
-            artifact.smallIconSelectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/ArtifactOfCorruption_On.png");
-            artifact.smallIconDeselectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/ArtifactOfCorruption_Off.png");
+            artifact.smallIconSelectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_On.png");
+            artifact.smallIconDeselectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_Off.png");
 
             return artifact;
         }
         public static void AddTokens()
         {
-            LanguageAPI.Add("H3_" + upperName + "_NAME", "Artifact of Corruption");
+            LanguageAPI.Add("H3_" + upperName + "_NAME", "Artifact of Bugs");
             LanguageAPI.Add("H3_" + upperName + "_DESC", "Gives you one <style=cIsVoid>Corrupting Parasite</style> each stage.");
         }
 

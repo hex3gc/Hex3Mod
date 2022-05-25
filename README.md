@@ -1,32 +1,66 @@
 # Info
 
-Adds 11 new items to the game:
-* 4 Common
+Adds 1 artifact and 16 new items to the game:
+* 5 Common
 * 2 Uncommon
-* 2 Legendary
-* 4 Void
+* 3 Legendary
+* 6 Void
 
-![Items1](https://i.imgur.com/obxON5Y.png)
+![Items1](https://i.imgur.com/zHOAmGH.png)
 
 Each item has a unique effect and configurable values. Special thanks to the RoR2 Modding Discord for teaching me how to do this.
 
 # To do:
 
 * Create more items
-* Improve and retouch VFX
 * Assess balance and bugginess
 * Ensure mod compatibility
 
-#Bugs
+# Bugs
 
-* Please give feedback/bug reports on Discord: hex3#7952
+* Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
 
 # Changelog
 
-### 0.2.4
+### 0.4.0
+* Added item "Drop Of Necrosis" (Void common)
+* Added item "Spattered Collection" (Void uncommon)
+
+### 0.3.4
+* Added character item displays for all items (No modded character compatibility yet)
+* Empathy no longer triggers from void fog damage
+* Apathy no longer triggers from void fog damage
+* Updated some item icons
+
+### 0.3.3
+* Added item "Elder Mutagen" (Legendary)
+* Mint Condition should no longer prevent Hunter's Harpoon from activating
+
+### 0.3.2
+* Discovery's stack limit should now scale correctly
+* Discovery should no longer add any stacks above its limit
+* Added speed cap for Notice Of Absence (default 500%) to prevent uncontrollably high speeds
+* Fixed some clerical errors
+
+### 0.3.1
+* Added item "400 Tickets" (Common)
+* Added visual and sound effects for Discovery
+* Added sound effects for Scattered Reflection
+* New buff icons for Discovery, The Hermit and Apathy
+
+### 0.3.0
+* VFX Overhaul part 2: New models, icons and shaders for all items
+* Added 'Alternate Mode' and 'No Replication' config options for Corrupting Parasite.
+* Scattered Reflection should no longer attack teammates or proc itself
+
+### 0.2.5
 * Added item "The Hermit" (Void legendary)
 * Adjusted the sizes of some item models
 * Fixed an NRE caused by the Newt
+* Made Apathy's barrier gain cooldown more consistent
+
+### 0.2.4
+* Added artifact "Artifact Of Corruption"
 
 ### 0.2.3 - Void Update, pt 1
 * Added item "Corrupting Parasite". Thanks to kking and conq for giving me the idea for the item and allowing me to use it (Void common)
