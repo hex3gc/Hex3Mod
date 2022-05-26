@@ -13,6 +13,12 @@ using Hex3Mod.Items;
 using Hex3Mod.Artifacts;
 using Hex3Mod.Logging;
 
+/*
+DISCLAIMER
+All of the code in this project is from when I was just starting out, so it is bound to be inefficient/awful to read
+A rewrite is in order, but not today...
+*/
+
 namespace Hex3Mod
 {
     [BepInPlugin(ModGuid, ModName, ModVer)]
@@ -24,7 +30,7 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "0.4.0";
+        public const string ModVer = "0.4.1";
 
         public static AssetBundle MainAssets;
 
@@ -184,7 +190,7 @@ namespace Hex3Mod
             }
 
             var materialAssets = MainAssets.LoadAllAssets<Material>();
-            foreach (Material material in materialAssets) // Oh christ this was annoying
+            foreach (Material material in materialAssets)
             {
                 if (!material.shader.name.StartsWith("Stubbed Hopoo Games"))
                 {

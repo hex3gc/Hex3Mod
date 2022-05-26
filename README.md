@@ -22,6 +22,9 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 0.4.1
+* Updated for new patch
+
 ### 0.4.0
 * Added item "Drop Of Necrosis" (Void common)
 * Added item "Spattered Collection" (Void uncommon)
