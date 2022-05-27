@@ -225,7 +225,7 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float SpatteredCollection_IntervalReduction, float SpatteredCollection_DotChance)
+        public static void AddTokens(float SpatteredCollection_IntervalReduction)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Spattered Collection");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "All of your <style=cIsDamage>damage over time</style> effects are converted into a stronger stacking <style=cIsDamage>Blight</style>. <style=cIsVoid>Corrupts all Scattered Reflections.</style>");
@@ -241,7 +241,7 @@ namespace Hex3Mod.Items
             // Void transformation
             VoidTransformation.CreateTransformation(itemDefToHooks, "ScatteredReflection");
 
-            On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage) =>
+            On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
             {
                 if (attackerObject && attackerObject.GetComponent<CharacterBody> != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().teamComponent)
                 {
@@ -264,16 +264,16 @@ namespace Hex3Mod.Items
                             newInterval = newInterval * SpatteredCollection_IntervalReduction;
                         }
                         DotController.dotDefs[5].interval = newInterval;
-                        orig(self, attackerObject, 5f, DotController.DotIndex.Blight, 1f, maxStacksFromAttacker, null);
+                        orig(self, attackerObject, 5f, DotController.DotIndex.Blight, 1f, maxStacksFromAttacker, null, preUpgradeDotIndex);
                     }
                     else
                     {
-                        orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage);
+                        orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
                     }
                 }
                 else
                 {
-                    orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage);
+                    orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
                 }
             };
 
@@ -305,7 +305,7 @@ namespace Hex3Mod.Items
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(SpatteredCollection_IntervalReduction, SpatteredCollection_DotChance);
+            AddTokens(SpatteredCollection_IntervalReduction);
             AddHooks(itemDefinition, SpatteredCollection_IntervalReduction, SpatteredCollection_DotChance);
         }
     }

@@ -245,7 +245,7 @@ namespace Hex3Mod.Items
             // Void transformation
             VoidTransformation.CreateTransformation(itemDefToHooks, "ShardOfGlass");
 
-            On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage) =>
+            On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
             {
                 if (attackerObject && attackerObject.GetComponent<CharacterBody> != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
                 {
@@ -255,7 +255,7 @@ namespace Hex3Mod.Items
                 {
                     DotController.dotDefs[5].damageCoefficient = 0.2f;
                 }
-                orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage);
+                orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
             };
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>

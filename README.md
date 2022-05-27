@@ -24,6 +24,7 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 ### 0.4.1
 * Updated for new patch
+* Put all the files on GitHub (DISCLAIMER: All of the code in this project is written by someone who learned C# very recently. A rewrite is in order, but not today...)
 
 ### 0.4.0
 * Added item "Drop Of Necrosis" (Void common)
