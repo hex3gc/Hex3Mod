@@ -22,6 +22,9 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 0.4.2
+* ATG Prototype now deals damage based on the hit that procced it, similarly to the ATG Missile Launcher. Its damage should be far more noticeable now.
+
 ### 0.4.1
 * Updated for new patch
 * Put all the files on GitHub (DISCLAIMER: All of the code in this project is written by someone who learned C# very recently. A rewrite is in order, but not today...)

@@ -338,12 +338,6 @@ namespace Hex3Mod.Items
                 }
                 orig(self, damageInfo);
             };
-            /*
-            On.RoR2.Items.ImmuneToDebuffBehavior.OverrideDebuff += (orig, self, buffDef, body) =>
-            {
-                orig(self, buffDef, body);
-            };
-            */
         }
 
         public static BuffDef apathyCooldown { get; private set; }

@@ -227,60 +227,59 @@ namespace Hex3Mod.Items
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "AtG Prototype");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Every ten hits, fire a missile.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "After inflicting <style=cIsUtility>" + hitRequirement + "</style> hits, fire a missile that deals <style=cIsDamage>" + atgDamageStack_Readable + "%</style> <style=cStack>(+" + atgDamageStack_Readable + "% per stack)</style> damage.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "After inflicting <style=cIsUtility>" + hitRequirement + "</style> hits, fire a missile that deals <style=cIsDamage>" + atgDamageStack_Readable + "%</style> <style=cStack>(+" + atgDamageStack_Readable + "% per stack)</style> TOTAL damage.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: AtG Missile Launcher Prototype\nTracking Number: 11******\nEstimated Delivery: 08/15/2056\nShipping Method: Priority\nShipping Address: Cargo Bay 1-A, Terminal 2-A, UES Port\nShipping Details:\n\nThe AtG Missile Launcher MK1 is a staple for our military operations, but like many wrist rockets and shoulder-mounted launchers, it suffers a safety issue with its targeting scheme. As the missiles are heat-seeking, it can often be thrown off by variance in local temperatures, which is a common issue at our deployment locations. This also renders the missiles ineffective against targets who can manipulate cold and ice, which was admittedly unprecedented.\n\nAdditionally, while the ATG has safeguards against seeking its holder, these fall apart when the launcher sustains heavy damage or even a temporary power outage. This has resulted in a number of unfortunate accidents. We'll need to have a look at the AtG's predecessor models, because clearly something was [REDACTED] up along the way.");
         }
 
         private static void AddHooks(ItemDef itemDefToHooks, float atgDamageStack, int hitRequirement) // Insert hooks here
         {
-            void H3_OnHitEnemy(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig, GlobalEventManager self, DamageInfo damageInfo, GameObject victim)
+            BuffIndex atgBuffIndex = new BuffIndex();
+            void GetAtgIndex()
             {
-                orig(self, damageInfo, victim);
-
-                if (damageInfo.procChainMask.HasProc(ProcType.Missile)) return; // Must only activate on proc hits and non-missile hits to avoid cascading too hard
-                if (victim)
+                foreach (BuffDef def in BuffCatalog.buffDefs)
                 {
-                    if (damageInfo.attacker != null && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.procCoefficient > 0f)
+                    if (def == atgCounter)
                     {
-                        CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-
-                        if (attackerBody.inventory)
-                        {
-                            int itemCount = attackerBody.inventory.GetItemCount(itemDefToHooks);
-
-                            if (itemCount > 0)
-                            {
-                                float missileDamage = (attackerBody.baseDamage * atgDamageStack) * itemCount;
-
-                                if (attackerBody.GetBuffCount(atgCounter) == (hitRequirement - 1) || attackerBody.GetBuffCount(atgCounter) > (hitRequirement - 1))
-                                {
-                                    // Fire the missile on the 10th attack, then reset the counter
-
-                                    MissileUtils.FireMissile(
-                                        attackerBody.corePosition,
-                                        attackerBody,
-                                        default,
-                                        victim,
-                                        missileDamage,
-                                        damageInfo.crit,
-                                        GlobalEventManager.CommonAssets.missilePrefab,
-                                        DamageColorIndex.Item,
-                                        true
-                                    );
-
-                                    attackerBody.SetBuffCount(atgCounter.buffIndex, 0);
-                                }
-                                else
-                                {
-                                    attackerBody.SetBuffCount(atgCounter.buffIndex, attackerBody.GetBuffCount(atgCounter) + 1);
-                                }
-                            }
-                        }
+                        atgBuffIndex = def.buffIndex;
                     }
                 }
             }
+            RoR2Application.onLoad += GetAtgIndex;
 
-            On.RoR2.GlobalEventManager.OnHitEnemy += H3_OnHitEnemy;
+            On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
+            {
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody> != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory)
+                {
+                    CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
+                    Inventory attackerInventory = attackerBody.inventory;
+
+                    if (attackerBody.GetBuffCount(atgCounter) == 0)
+                    {
+                        attackerBody.SetBuffCount(atgBuffIndex, 1);
+                    }
+                    if (attackerInventory.GetItemCount(itemDefToHooks) > 0)
+                    {
+                        attackerBody.AddBuff(atgCounter);
+                        if (attackerBody.GetBuffCount(atgCounter) >= hitRequirement)
+                        {
+                            float damageCoefficient = atgDamageStack * (float)attackerInventory.GetItemCount(itemDefToHooks);
+                            float missileDamage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);
+                            MissileUtils.FireMissile(
+                                attackerBody.corePosition, 
+                                attackerBody, 
+                                damageInfo.procChainMask, 
+                                victim, 
+                                missileDamage, 
+                                damageInfo.crit, 
+                                GlobalEventManager.CommonAssets.missilePrefab, 
+                                DamageColorIndex.Item, 
+                                true);
+                            attackerBody.SetBuffCount(atgBuffIndex, 1);
+                        }
+                    }
+                }
+                orig(self, damageInfo, victim);
+            };
         }
 
         public static BuffDef atgCounter { get; private set; }
