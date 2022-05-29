@@ -233,7 +233,7 @@ namespace Hex3Mod.Items
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "The Hermit");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Hitting an enemy grants you stacking damage reduction. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "On hit, grant yourself a <style=cIsUtility>stacking buff</style> that <style=cIsHealing>reduces</style> all incoming damage by <style=cIsHealing>" + TheHermit_DamageReductionReadable + "%</style> for " + TheHermit_BuffDuration + " <style=cStack>(+" + TheHermit_BuffDuration + " per stack)</style> seconds. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "On hit, grant yourself a <style=cIsUtility>stacking buff</style> that <style=cIsHealing>reduces</style> all incoming damage by <style=cIsHealing>" + TheHermit_DamageReductionReadable + "%</style> for " + TheHermit_BuffDuration + " <style=cStack>(+" + TheHermit_BuffDuration + " per stack)</style> seconds. Caps at 60% damage reduction. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"When do you think we'll get outta here?\"" +
         "\n\n\"I don't think we will.\"" +
         "\n\n\"Really? With this again?\"" +
