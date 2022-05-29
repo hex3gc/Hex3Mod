@@ -292,9 +292,9 @@ namespace Hex3Mod.Items
                         {
                             finalDamageReduction += TheHermit_DamageReduction * (1f - finalDamageReduction);
                         }
-                        if (finalDamageReduction > 0.9f) // Cap it at 90% reduction to prevent invincibility
+                        if (finalDamageReduction > 0.6f) // Cap it at 60% reduction to prevent invincibility, while maintaining a meaningful limit
                         {
-                            finalDamageReduction = 0.9f;
+                            finalDamageReduction = 0.6f;
                         }
 
                         damageInfo.damage -= (damageInfo.damage * finalDamageReduction);
