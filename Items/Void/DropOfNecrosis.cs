@@ -262,19 +262,22 @@ namespace Hex3Mod.Items
             {
                 if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody> != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
                 {
-                    if (damageInfo.attacker.GetComponent<CharacterBody>().master && damageInfo.dotIndex != DotController.DotIndex.Blight)
+                    if (damageInfo.attacker.GetComponent<CharacterBody>().master && damageInfo.dotIndex != DotController.DotIndex.Blight && damageInfo.attacker != victim)
                     {
-                        if (Util.CheckRoll(DropOfNecrosis_DotChance, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
+                        if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage && damageInfo.damage > 0f)
                         {
-                            InflictDotInfo inflictDotInfo = new InflictDotInfo
+                            if (Util.CheckRoll(DropOfNecrosis_DotChance, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
                             {
-                                attackerObject = damageInfo.attacker,
-                                victimObject = victim,
-                                dotIndex = DotController.DotIndex.Blight,
-                                duration = 5f,
-                                damageMultiplier = 1f
-                            };
-                            DotController.InflictDot(ref inflictDotInfo);
+                                InflictDotInfo inflictDotInfo = new InflictDotInfo
+                                {
+                                    attackerObject = damageInfo.attacker,
+                                    victimObject = victim,
+                                    dotIndex = DotController.DotIndex.Blight,
+                                    duration = 5f,
+                                    damageMultiplier = 1f
+                                };
+                                DotController.InflictDot(ref inflictDotInfo);
+                            }
                         }
                     }
                 }

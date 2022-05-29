@@ -22,6 +22,11 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 0.4.3
+* ATG Prototype no longer procs on attacks with 0 proc coefficient
+* Fixed Drop of Necrosis and Spattered Collection applying blight to the player
+* Drop of Necrosis and Spattered Collection should no longer apply blight on knockback such as Concussive Mines
+
 ### 0.4.2
 * ATG Prototype now deals damage based on the hit that procced it, similarly to the ATG Missile Launcher. Its damage should be far more noticeable now.
 
