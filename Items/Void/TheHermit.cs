@@ -46,7 +46,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility};
+            item.tags = new ItemTag[]{ ItemTag.Utility };
             item.deprecatedTier = ItemTier.VoidTier3;
             item.canRemove = true;
             item.hidden = false;
@@ -232,8 +232,8 @@ namespace Hex3Mod.Items
             float TheHermit_DamageReductionReadable = TheHermit_DamageReduction * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "The Hermit");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Hitting an enemy grants you stacking damage reduction. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "On hit, grant yourself a <style=cIsUtility>stacking buff</style> that <style=cIsHealing>reduces</style> all incoming damage by <style=cIsHealing>" + TheHermit_DamageReductionReadable + "%</style> for " + TheHermit_BuffDuration + " <style=cStack>(+" + TheHermit_BuffDuration + " per stack)</style> seconds. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Hitting an enemy grants them a curse, reducing the damage they deal. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "On hit, grant your enemy a <style=cDeath>stacking debuff</style> that <style=cDeath>reduces</style> their damage by <style=cDeath>" + TheHermit_DamageReductionReadable + "%</style> up to 75% for <style=cDeath>" + TheHermit_BuffDuration + "</style> <style=cStack>(+" + TheHermit_BuffDuration + " per stack)</style> seconds. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"When do you think we'll get outta here?\"" +
         "\n\n\"I don't think we will.\"" +
         "\n\n\"Really? With this again?\"" +
@@ -265,50 +265,38 @@ namespace Hex3Mod.Items
             // Void transformation
             VoidTransformation.CreateTransformation(itemDefToHooks, "PermanentDebuffOnHit");
 
-            void H3_HermitStack(DamageInfo damageInfo) // Add the stacks of buffs
-            {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null)
-                {
-                    CharacterBody body = damageInfo.attacker.GetComponent<CharacterBody>();
-                    if (body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
-                    {
-                        if (damageInfo.damageType != DamageType.DoT) // Make sure damage doesn't come from bleeds/burns/etc
-                        {
-                            body.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * body.inventory.GetItemCount(itemDefToHooks));
-                        }
-                    }
-                }
-            }
-
-            void H3_HermitReduction(DamageInfo damageInfo, HealthComponent healthComponent)
-            {
-                if (healthComponent.body)
-                {
-                    int buffCount = healthComponent.body.GetBuffCount(hermitBuff);
-                    if (buffCount > 0)
-                    {
-                        float finalDamageReduction = 0f; // Copied from Apathy, ez damage reduction
-                        for (int i = 0; i < buffCount; i++) // For loop so that each item stack reduces damage a bit less
-                        {
-                            finalDamageReduction += TheHermit_DamageReduction * (1f - finalDamageReduction);
-                        }
-                        if (finalDamageReduction > 0.9f) // Cap it at 90% reduction to prevent invincibility
-                        {
-                            finalDamageReduction = 0.9f;
-                        }
-
-                        damageInfo.damage -= (damageInfo.damage * finalDamageReduction);
-                    }
-                }
-            }
-
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
-                if (self.body && !self.body.name.StartsWith("ShopkeeperBody"))
+                // Apply the Hermit's Curse debuff to enemies
+                if (self.gameObject.GetComponent<CharacterBody>() != null && !self.gameObject.GetComponent<CharacterBody>().name.StartsWith("ShopkeeperBody") && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() && damageInfo.attacker.GetComponent<CharacterBody>().inventory)
                 {
-                    H3_HermitStack(damageInfo);
-                    H3_HermitReduction(damageInfo, self);
+                    Inventory attackerInventory = damageInfo.attacker.GetComponent<CharacterBody>().inventory;
+                    CharacterBody victimBody = self.gameObject.GetComponent<CharacterBody>();
+                    int itemCount = attackerInventory.GetItemCount(itemDefToHooks);
+
+                    if (itemCount > 0 && damageInfo.procCoefficient > 0f && !damageInfo.rejected)
+                    {
+                        victimBody.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * itemCount);
+                    }
                 }
+
+                // Reduce damage inflicted by characters with this debuff
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.damage > 0f)
+                {
+                    CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
+                    float finalDamageReduction = 0f;
+
+                    if (damageInfo.attacker.GetComponent<CharacterBody>().GetBuffCount(hermitBuff) > 0)
+                    {
+                        finalDamageReduction += TheHermit_DamageReduction * attackerBody.GetBuffCount(hermitBuff);
+                        if (finalDamageReduction > 0.75f)
+                        {
+                            finalDamageReduction = 0.75f;
+                        }
+                        damageInfo.damage = damageInfo.damage * (1f - finalDamageReduction);
+                    }
+                }
+
                 orig(self, damageInfo);
             };
         }
@@ -319,8 +307,8 @@ namespace Hex3Mod.Items
             hermitBuff = ScriptableObject.CreateInstance<BuffDef>();
             hermitBuff.buffColor = new Color(1f, 1f, 1f);
             hermitBuff.canStack = true;
-            hermitBuff.isDebuff = false;
-            hermitBuff.name = "The Hermit's Protection";
+            hermitBuff.isDebuff = true;
+            hermitBuff.name = "The Hermit's Curse";
             hermitBuff.isHidden = false;
             hermitBuff.isCooldown = false;
             hermitBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_TheHermit.png"); // Rework this later

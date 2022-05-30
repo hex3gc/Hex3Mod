@@ -17,8 +17,7 @@ namespace Hex3Mod.Items
 {
     /*
     Elder Mutagen is a buff to Death Mark and to debuff/buff builds, as if they needed one.
-    On modded saves this might be broken, so let's keep the values low
-    All of these buffs should be time limited
+    It's been reworked in order to make its effect more consistent.
     */
     public class ElderMutagen
     {
@@ -26,7 +25,6 @@ namespace Hex3Mod.Items
         static string itemName = "ElderMutagen"; // Change this name when making a new item
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
-        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ElderMutagenPrefab.prefab");
@@ -47,7 +45,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.Damage, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.Damage };
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
@@ -233,11 +231,11 @@ namespace Hex3Mod.Items
             return new ItemDisplayRuleDict();
         }
 
-        public static void AddTokens(float ElderMutagen_Duration, float ElderMutagen_Chance)
+        public static void AddTokens(float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Elder Mutagen");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your buffs and inflicted debuffs have a chance to induce another, random buff or debuff.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "The <style=cIsUtility>first stack</style> of any <style=cIsHealing>buffs</style> you gain or <style=cDeath>debuffs</style> you inflict have a <style=cIsUtility>" + ElderMutagen_Chance + "%</style> chance to add an additional, random buff or debuff that lasts " + ElderMutagen_Duration + " seconds <style=cStack>(+" + ElderMutagen_Duration + " seconds per stack)</style>.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your hits have a small chance to inflict random debuffs. Every " + ElderMutagen_Interval + " seconds, gain a random buff.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Your hits have a <style=cIsDamage>" + ElderMutagen_Chance + "%</style> chance to inflict a <style=cIsDamage>random debuff</style> that lasts <style=cIsDamage>" + ElderMutagen_Duration + "</style> seconds <style=cStack>(+" + ElderMutagen_Duration + " per stack)</style>. Every " + ElderMutagen_Interval + " seconds, gain a <style=cIsHealing>random buff</style> that lasts <style=cIsHealing>" + ElderMutagen_Duration + "</style> seconds <style=cStack>(+" + ElderMutagen_Duration + " per stack)</style>.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cMono>Lab Dissection Analysis File</style> " +
             "\n\nSubject: Elder Mutagen" +
             "\nTechnician: Alex [REDACTED]" +
@@ -259,12 +257,12 @@ namespace Hex3Mod.Items
             "\n> Timestamping for break");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, ItemDef hiddenItemDefToHooks, float ElderMutagen_Duration, float ElderMutagen_Chance) // Insert hooks here
+        private static void AddHooks(ItemDef itemDefToHooks, float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval) // Insert hooks here
         {
             List<string> mutagenBuffWhitelist = new List<string> // All the buffs that SHOULD be considered for the item
             {
                 // Unknown
-                "The Hermit's Protection", "INS_BUFF_CHEESEWHEEL_NAME", "INS_BUFF_SHOCKED_NAME", "INS_BUFF_WRENCHATTACK_NAME", "INS_BUFF_WRENCHDAMAGE_NAME", "INS_BUFF_WRENCHMOVE_NAME", "Hysteria",
+                "INS_BUFF_CHEESEWHEEL_NAME", "INS_BUFF_SHOCKED_NAME", "INS_BUFF_WRENCHATTACK_NAME", "INS_BUFF_WRENCHDAMAGE_NAME", "INS_BUFF_WRENCHMOVE_NAME", "Hysteria",
                 "Strikes", "EliteReworksSlow80", "TKSATEngiSpeedispenserBuff", "TKSATHealsToDamage", "TKSATPixieArmor", "TKSATPixieAttackSpeed", "TKSATPixieDamage",
                 "TKSATPixieMoveSpeed", "TKSATShrink", "BuffDefScintillatingJet", "BuffDefRecursionBullets", "MysticsItems_AllyDeathRevenge", "MysticsItems_CoffeeBoost",
                 "MysticsItems_Crystallized", "MysticsItems_RhythmCombo",
@@ -275,100 +273,65 @@ namespace Hex3Mod.Items
                 // Definitely works
                 "bdArmorBoost", "bdAttackSpeedOnCrit", "bdBeetleJuice",
                 "bdBleeding", "bdBlight", "bdClayGoo", "bdCloak", "bdCripple", "bdCloakSpeed", "bdCrocoRegen", "bdDeathMark", "bdElephantArmorBoost", "bdEnergized", "bdEntangle",
-                "bdFruiting", "bdFullCrit", "bdHealingDisabled", "bdLifeSteal", "bdLunarSecondaryRoot", "bdMercExpose", "bdNoCooldowns", "bdNullified",
+                "bdFruiting", "bdFullCrit", "bdHealingDisabled", "bdLunarSecondaryRoot", "bdNoCooldowns", "bdNullified",
                 "bdOnFire", "bdOverheat", "bdPoisoned", "bdPulverized", "bdSlow50", "bdSlow60", "bdSlow80", "bdSmallArmorBoost", "bdSuperBleed", "bdTeamWarCry",
                 "bdWarbanner", "bdWarCryBuff", "bdWeak", "bdBodyArmor", "bdMeatRegenBoost", "bdFracture",
-                "bdOutOfCombatArmorBuff", "bdStrongerBurn", "bdKillMoveSpeed", "bdPowerBuff", "bdWhipBoost", "bdTonicBuff"
+                "bdStrongerBurn", "bdKillMoveSpeed", "bdPowerBuff", "bdTonicBuff"
                 // FlatItemBuff and MysticsItems contain DOTs which would be nice to have in this, but I have no clue how to implement them
                 // A problem for another day
             };
 
             List<BuffDef> allBuffDefs = new List<BuffDef> { }; // We need all the existing buffdefs so we can cycle through to look for valid ones
 
-            void MutagenAddbuffs(BuffDef buffDef, CharacterBody body)
+            // Hitting an enemy has a 5% chance of inflicting a random debuff
+            On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (body.teamComponent && body.healthComponent && body.inventory)
+                orig(self, damageInfo, victim);
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() && damageInfo.attacker.GetComponent<CharacterBody>().inventory && victim.GetComponent<CharacterBody>() && damageInfo.attacker.GetComponent<CharacterBody>().master)
                 {
-                    foreach (string buff in mutagenBuffWhitelist)
+                    Inventory attackerInventory = damageInfo.attacker.GetComponent<CharacterBody>().inventory;
+                    CharacterMaster attackerMaster = damageInfo.attacker.GetComponent<CharacterBody>().master;
+                    CharacterBody victimBody = victim.GetComponent<CharacterBody>();
+                    if (attackerInventory.GetItemCount(itemDefToHooks) > 0)
                     {
-                        if (buffDef.name == buff) // If the acquired buff is on the whitelist, do the rest
+                        // Get the first debuff available from a random list
+                        Xoroshiro128Plus seed = new Xoroshiro128Plus(Run.instance.seed);
+                        Util.ShuffleList(mutagenBuffWhitelist, seed);
+                        Util.ShuffleList(allBuffDefs, seed);
+                        foreach (BuffDef i in allBuffDefs)
                         {
-                            Xoroshiro128Plus allBuffDefsSeed = new Xoroshiro128Plus(Run.instance.seed); // For SOME reason DOTs are not treated as debuffs, so we have to make some exceptions
-                            if (buffDef.isDebuff == true || buffDef.name == "bdBleeding" || buffDef.name == "bdBlight" || buffDef.name == "bdOnFire" || buffDef.name == "bdOverheat" || buffDef.name == "bdPoisoned" || buffDef.name == "bdSuperBleed" || buffDef.name == "bdFracture" || buffDef.name == "bdStrongerBurn")
+                            if (i.isDebuff || i.name == "bdBleeding" || i.name == "bdBlight" || i.name == "bdOnFire" || i.name == "bdOverheat" || i.name == "bdPoisoned" || i.name == "bdSuperBleed" || i.name == "bdFracture" || i.name == "bdStrongerBurn" || i.name == "bdVoidFogMild" || i.name == "bdVoidFogStrong" || i.name == "MysticsItems_Crystallized")
                             {
-                                if (body.inventory.GetItemCount(hiddenItemDefToHooks) > 0 && body.teamComponent.teamIndex != TeamIndex.Player) // If body has the hidden item inflicted by the Mutagen, all debuffs will be duplicated
+                                foreach (string debuffName in mutagenBuffWhitelist)
                                 {
-                                    Util.ShuffleList(allBuffDefs, allBuffDefsSeed);
-                                    foreach (BuffDef i in allBuffDefs)
+                                    if (debuffName == i.name)
                                     {
-                                        if (mutagenBuffWhitelist.Contains(i.name))
+                                        if (Util.CheckRoll(ElderMutagen_Chance * damageInfo.procCoefficient, attackerMaster.luck, attackerMaster))
                                         {
-                                            if (i.isDebuff == true || i.name == "bdBleeding" || i.name == "bdBlight" || i.name == "bdOnFire" || i.name == "bdOverheat" || i.name == "bdPoisoned" || i.name == "bdSuperBleed" || i.name == "bdFracture" || i.name == "bdStrongerBurn")
+                                            if (i.name == "bdBleeding" || i.name == "bdBlight" || i.name == "bdOnFire" || i.name == "bdOverheat" || i.name == "bdPoisoned" || i.name == "bdSuperBleed" || i.name == "bdFracture" || i.name == "bdStrongerBurn")
                                             {
-                                                int numberOfPlayers = 0; // Block of code to check the average luckiness of the player team
-                                                float luckAggregate = 0f;
-                                                int mutagenAggregate = 0;
-                                                TeamComponent mutagenLastOwner = new TeamComponent();
-
-                                                foreach (TeamComponent player in TeamComponent.GetTeamMembers(TeamIndex.Player))
+                                                switch (i.name) // Handles given DOTs separately from buffs/debuffs
                                                 {
-                                                    if (player.GetComponent<CharacterBody>() != null && player.GetComponent<CharacterBody>().master && player.GetComponent<CharacterBody>().inventory)
-                                                    {
-                                                        luckAggregate += player.GetComponent<CharacterBody>().master.luck;
-                                                        mutagenAggregate += player.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks);
-                                                        mutagenLastOwner = player;
-                                                        numberOfPlayers += 1;
-                                                    }
+                                                    case "bdBleeding": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Bleed, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdBlight": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Blight, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdOnFire": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Burn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdOverHeat": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.PercentBurn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdPoisoned": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Poison, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdSuperBleed": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.SuperBleed, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdFracture": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Fracture, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdStrongerBurn": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.StrongerBurn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
                                                 }
-                                                float totalLuck = luckAggregate / numberOfPlayers;
-
-                                                if (Util.CheckRoll(ElderMutagen_Chance, totalLuck) == true) // holy moly
-                                                {
-                                                    if (i.name == "bdBleeding" || i.name == "bdBlight" || i.name == "bdOnFire" || i.name == "bdOverheat" || i.name == "bdPoisoned" || i.name == "bdSuperBleed" || i.name == "bdFracture" || i.name == "bdStrongerBurn" )
-                                                    {
-                                                        switch (i.name) // Handles given DOTs separately from buffs/debuffs
-                                                        {
-                                                            case "bdBleeding": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.Bleed, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdBlight": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.Blight, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdOnFire": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.Burn, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdOverHeat": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.PercentBurn, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdPoisoned": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.Poison, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdSuperBleed": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.SuperBleed, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdFracture": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.Fracture, ElderMutagen_Duration * mutagenAggregate); break;
-                                                            case "bdStrongerBurn": DotController.InflictDot(body.gameObject, mutagenLastOwner.gameObject, DotController.DotIndex.StrongerBurn, ElderMutagen_Duration * mutagenAggregate); break;
-                                                        }
-                                                        break;
-                                                    }
-                                                    else
-                                                    {
-                                                        body.AddTimedBuff(i, ElderMutagen_Duration * mutagenAggregate);
-                                                        break;
-                                                    }
-                                                }
-                                                break;
+                                                return;
+                                            }
+                                            else
+                                            {
+                                                victimBody.AddTimedBuff(i, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks));
+                                                return;
                                             }
                                         }
-                                    }
-                                }
-                            }
-                            if (body.inventory.GetItemCount(itemDefToHooks) > 0)
-                            {
-                                if (buffDef.isDebuff == false && buffDef.name != "bdBleeding" && buffDef.name != "bdBlight" && buffDef.name != "bdOnFire" && buffDef.name != "bdOverheat" && buffDef.name != "bdPoisoned" && buffDef.name != "bdSuperBleed" && buffDef.name != "bdFracture" && buffDef.name != "bdStrongerBurn" && buffDef.name != "bdVoidFogMild" && buffDef.name != "bdVoidFogStrong")
-                                {
-                                    Util.ShuffleList(allBuffDefs, allBuffDefsSeed);
-                                    foreach (BuffDef i in allBuffDefs)
-                                    {
-                                        if (mutagenBuffWhitelist.Contains(i.name))
+                                        else
                                         {
-                                            if (i.isDebuff == false && i.name != "bdBleeding" && i.name != "bdBlight" && i.name != "bdOnFire" && i.name != "bdOverheat" && i.name != "bdPoisoned" && i.name != "bdSuperBleed" && i.name != "bdFracture" && i.name != "bdStrongerBurn" && buffDef.name != "bdVoidFogMild" && buffDef.name != "bdVoidFogStrong")
-                                            {
-                                                if (body.master && Util.CheckRoll(ElderMutagen_Chance, body.master.luck))
-                                                {
-                                                    body.AddTimedBuff(i, ElderMutagen_Duration * body.inventory.GetItemCount(itemDefToHooks));
-                                                    break;
-                                                }
-                                                break;
-                                            }
+                                            return;
                                         }
                                     }
                                 }
@@ -376,8 +339,55 @@ namespace Hex3Mod.Items
                         }
                     }
                 }
-            }
+            };
 
+            // Every 15 seconds, add a random buff to the item user
+            On.RoR2.CharacterBody.Update += (orig, self) =>
+            {
+                orig(self);
+                if (self.GetComponent<MutagenItemBehavior>() != null)
+                {
+                    MutagenItemBehavior mutagenBehavior = self.GetComponent<MutagenItemBehavior>();
+                    if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) > 0)
+                    {
+                        mutagenBehavior.buffTimer += Time.deltaTime;
+                        if (mutagenBehavior.buffTimer > ElderMutagen_Interval)
+                        {
+                            // Get the first buff available from a random list
+                            Xoroshiro128Plus seed = new Xoroshiro128Plus(Run.instance.seed);
+                            Util.ShuffleList(mutagenBuffWhitelist, seed);
+                            Util.ShuffleList(allBuffDefs, seed);
+                            foreach (BuffDef i in allBuffDefs)
+                            {
+                                if (!i.isDebuff && i.name != "bdBleeding" && i.name != "bdBlight" && i.name != "bdOnFire" && i.name != "bdOverheat" && i.name != "bdPoisoned" && i.name != "bdSuperBleed" && i.name != "bdFracture" && i.name != "bdStrongerBurn" && i.name != "bdVoidFogMild" && i.name != "bdVoidFogStrong" && i.name != "MysticsItems_Crystallized")
+                                {
+                                    foreach (string buffName in mutagenBuffWhitelist)
+                                    {
+                                        if (buffName == i.name)
+                                        {
+                                            self.AddTimedBuff(i, ElderMutagen_Duration * self.inventory.GetItemCount(itemDefToHooks));
+                                            mutagenBehavior.buffTimer = 0f;
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Whenever the inventory is changed, check for Elder Mutagens and add a MutagenItemBehavior if applicable
+            On.RoR2.CharacterBody.OnInventoryChanged += (orig, self) =>
+            {
+                orig(self);
+                if (self.inventory.GetItemCount(itemDefToHooks) > 0 && self.GetComponent<MutagenItemBehavior>() == null)
+                {
+                    self.AddItemBehavior<MutagenItemBehavior>(self.inventory.GetItemCount(itemDefToHooks));
+                }
+            };
+
+            // Retrieve all buffs in the game- including modded- and put them in a list
             void GetAllBuffs()
             {
                 foreach (BuffDef def in BuffCatalog.buffDefs)
@@ -386,54 +396,20 @@ namespace Hex3Mod.Items
                 }
             }
 
-            On.RoR2.CharacterBody.OnBuffFirstStackGained += (orig, self, buffDef) =>
-            {
-                orig(self, buffDef);
-                MutagenAddbuffs(buffDef, self);
-            };
-
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) => // If the attacker has the Mutagen, add a hidden item to the victim, marking them for debuff duplication
-            {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
-                {
-                    if (self.GetComponent<CharacterBody>() != null && self.GetComponent<CharacterBody>().inventory)
-                    {
-                        self.GetComponent<CharacterBody>().inventory.GiveItem(hiddenItemDefToHooks);
-                    }
-                }
-                orig(self, damageInfo);
-            };
-
             RoR2Application.onLoad += GetAllBuffs;
         }
 
-        public static ItemDef CreateHiddenItem()
+        // Class that each CharacterBody gets to help store their individual buff timers
+        public class MutagenItemBehavior : CharacterBody.ItemBehavior
         {
-            ItemDef item = ScriptableObject.CreateInstance<ItemDef>(); // New hidden item to keep track of who can receive extra debuffs
-
-            item.name = "ElderMutagenHidden";
-            item.nameToken = "H3_" + upperName + "_NAME";
-            item.pickupToken = "H3_" + upperName + "_PICKUP";
-            item.descriptionToken = "H3_" + upperName + "_DESC";
-            item.loreToken = "H3_" + upperName + "_LORE";
-
-            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
-            item.deprecatedTier = ItemTier.NoTier;
-            item.canRemove = false;
-            item.hidden = true;
-
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ElderMutagenPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/ElderMutagen.png");
-
-            return item;
+            public float buffTimer = 0f;
         }
 
-        public static void Initiate(float ElderMutagen_Duration, float ElderMutagen_Chance) // Finally, initiate the item and all of its features
+        public static void Initiate(float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval) // Finally, initiate the item and all of its features
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
-            AddTokens(ElderMutagen_Duration, ElderMutagen_Chance);
-            AddHooks(itemDefinition, hiddenItemDefinition, ElderMutagen_Duration, ElderMutagen_Chance);
+            AddTokens(ElderMutagen_Duration, ElderMutagen_Chance, ElderMutagen_Interval);
+            AddHooks(itemDefinition, ElderMutagen_Duration, ElderMutagen_Chance, ElderMutagen_Interval);
         }
     }
 }

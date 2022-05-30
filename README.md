@@ -6,7 +6,30 @@ Adds 1 artifact and 16 new items to the game:
 * 3 Legendary
 * 6 Void
 
-![Items1](https://i.imgur.com/zHOAmGH.png)
+| Icon  | Description |
+| ------------- | ------------- |
+| | <p align="center">**COMMON**</p> |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569744182747136/ATGPrototype.png" style="width:100px; background:transparent;"/> | **ATG Prototype**<br>After inflicting **10** hits, fire a missile that deals **80%** <sup>(+80% per stack)</sup> TOTAL damage. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569744522481674/BucketList.png" style="width:100px; background:transparent;"/> | **Bucket List**<br>Move **20%** faster <sup>(+20% per stack)</sup>. Reduce this bonus by **75%** during boss fights. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569745575252018/HopooEgg.png" style="width:100px; background:transparent;"/> | **Hopoo Egg**<br>Jump **15%** <sup>(+15% per stack)</sup> higher. While in the air, you can control your movement **10%** more <sup>(+10% per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569678806134785/ShardOfGlass.png" style="width:100px; background:transparent;"/> | **Shard Of Glass**<br>Increase your **base damage** by **7%** <sup>(+7% per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569679498190878/Tickets.png" style="width:100px; background:transparent;"/> | **400 Tickets**<br>The next chest, void cradle, equipment barrel, lunar pod or scavenger bag you open will contain an additional item. **Consumed on use**. |
+| | <p align="center">**UNCOMMON**</p> |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569745340383252/Empathy.png" style="width:100px; background:transparent;"/> | **Empathy**<br>Heal for **5 HP** <sup>(+5 per stack)</sup> when you or an ally takes damage. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569678596436048/ScatteredReflection.png" style="width:100px; background:transparent;"/> | **Scattered Reflection**<br>**Prevent 7%** of all received damage and reflect it back to your attacker, adding an additional **70%** <sup>(+70% per stack)</sup> damage bonus. For every **Shard Of Glass** in your inventory, prevent **0.7%** more damage. |
+| | <p align="center">**LEGENDARY**</p> |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569745810141204/Apathy.png" style="width:100px; background:transparent;"/> | **Apathy**<br>Reduce all damage by **20%** <sup>(+10% per stack)</sup> while you have **barrier**. When you or your allies are hit, grant **3%** <sup>(+2% per stack)</sup> **barrier** to your whole team. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569679716286514/MintCondition.png" style="width:100px; background:transparent;"/> | **Mint Condition**<br>Provides immunity to movement restricting status effects. Gain **20%** <sup>(+40% per stack)</sup> and **1** <sup>+2 per stack</sup> extra jumps. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569677908553819/Mutagen.png" style="width:100px; background:transparent;"/> | **Elder Mutagen**<br>Your hits have a **5%** chance to inflict a **random debuff** that lasts **5** <sup>(+5 per stack)</sup> seconds. Every **15** seconds, gain a **random buff** that lasts **5** <sup>(+5 per stack)</sup> seconds. |
+| | <p align="center">**VOID**</p> |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569678357348442/Parasite.png" style="width:100px; background:transparent;"/> | **Corrupting Parasite**<br>**Corrupts** 1 <sup>(+1 per stack)</sup> item in your inventory into a **random void item** of the same rarity each stage. Prefers more common items. |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569678139260968/NoticeOfAbsence.png" style="width:100px; background:transparent;"/> | **Notice Of Absence**<br>For each **void item** in your inventory, move **3%** faster per stack. **Corrupts all Bucket Lists.**|
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569745118089266/DropOfNecrosis.png" style="width:100px; background:transparent;"/> | **Drop Of Necrosis**<br>Your attacks have a **10%** chance to inflict **Blight**, which deals **10%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569744782536734/Discovery.png" style="width:100px; background:transparent;"/> | **Discovery**<br>Using a world interactable grants **2** points per stack of **regenerating shield** to every player who has this item. Caps at **200 shield** per stack. **Corrupts all Infusions.**|
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569679020036128/SpatteredCollection.png" style="width:100px; background:transparent;"/> | **Spattered Collection**<br>All of your **damage over time** effects are converted to stacking **Blight**, which ticks **10%** faster for each stack of this item owned by your team. **Corrupts all Scattered Reflections.**|
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569679242346516/TheHermit.png" style="width:100px; background:transparent;"/> | **The Hermit**<br>On hit, grant your enemy a **stacking debuff** that **reduces** their damage by **1%** up to 75% for **4** <sup>(+4 per stack)</sup> seconds. **Corrupts all Symbiotic Scorpions.**|
+| | <p align="center">**ARTIFACTS**</p> |
+| <img src="https://cdn.discordapp.com/attachments/980569442889117766/980569743868186704/ArtifactOfCorruption_On.png" style="width:100px; background:transparent;"/> | **Artifact Of Bugs**<br>Gives you one **corrupting parasite** each stage. |
 
 Each item has a unique effect and configurable values. Special thanks to the RoR2 Modding Discord for teaching me how to do this.
 
@@ -21,6 +44,12 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
 
 # Changelog
+
+### 0.4.4 - Reset/change your configs or these changes may not take effect properly.
+* The Hermit rework: Now grants a stacking debuff on hit which reduces the enemy's damage up to 75%.
+* Elder Mutagen rework: Now has a chance to inflict a random debuff on hit, and also grants a random buff every 15 seconds.
+* ATG Prototype damage per stack 100% -> 80%
+* Clarified 400 Tickets' description.
 
 ### 0.4.3
 * ATG Prototype no longer procs on attacks with 0 proc coefficient

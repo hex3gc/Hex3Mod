@@ -24,7 +24,7 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "0.4.3";
+        public const string ModVer = "0.4.4";
 
         public static AssetBundle MainAssets;
 
@@ -48,7 +48,7 @@ namespace Hex3Mod
         public ConfigEntry<float> HopooEgg_AirControlModifier() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Air control multiplier"), 0.1f, new ConfigDescription("Amount of added air control", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> AtgPrototype_Enable() { return Config.Bind<bool>(new ConfigDefinition("Common - ATG Prototype", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> AtgPrototype_Damage() { return Config.Bind<float>(new ConfigDefinition("Common - ATG Prototype", "Damage per stack"), 1f, new ConfigDescription("Multiplier of base damage the missile deals per stack", null, Array.Empty<object>())); }
+        public ConfigEntry<float> AtgPrototype_Damage() { return Config.Bind<float>(new ConfigDefinition("Common - ATG Prototype", "Damage per stack"), 0.8f, new ConfigDescription("Multiplier of base damage the missile deals per stack", null, Array.Empty<object>())); }
         public ConfigEntry<int> AtgPrototype_HitRequirement() { return Config.Bind<int>(new ConfigDefinition("Common - ATG Prototype", "Hits required per missile"), 10, new ConfigDescription("How many hits it should take to fire each missile", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> Tickets_Enable() { return Config.Bind<bool>(new ConfigDefinition("Common - 400 Tickets", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
@@ -77,7 +77,8 @@ namespace Hex3Mod
 
         public ConfigEntry<bool> ElderMutagen_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Elder Mutagen", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> ElderMutagen_Duration() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Duration of received buffs and debuffs"), 5f, new ConfigDescription("How long, in seconds, should each buff/debuff given by this item last per stack", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ElderMutagen_Chance() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Chance to trigger additional buff or debuff"), 15f, new ConfigDescription("Percent chance to trigger an additional buff or debuff. WARNING: Increasing to 100% may cause an infinite loop", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ElderMutagen_Chance() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Chance to add debuff on hit"), 5f, new ConfigDescription("Percent chance to trigger a random debuff on hit.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ElderMutagen_Interval() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Buff interval"), 15f, new ConfigDescription("Interval between random buffs in seconds.", null, Array.Empty<object>())); }
 
         // Void
         public ConfigEntry<bool> CorruptingParasite_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
@@ -103,8 +104,8 @@ namespace Hex3Mod
         public ConfigEntry<float> SpatteredCollection_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Spattered Collection", "Chance to inflict Blight"), 5f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> TheHermit_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - The Hermit", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> TheHermit_BuffDuration() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Buff duration"), 2f, new ConfigDescription("How long in seconds the on-hit buff should last", null, Array.Empty<object>())); }
-        public ConfigEntry<float> TheHermit_DamageReduction() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Buff damage reduction"), 0.005f, new ConfigDescription("Damage reduced by each buff in percent", null, Array.Empty<object>())); }
+        public ConfigEntry<float> TheHermit_BuffDuration() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Debuff duration"), 4f, new ConfigDescription("How long in seconds the on-hit debuff should last", null, Array.Empty<object>())); }
+        public ConfigEntry<float> TheHermit_DamageReduction() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Debuff damage reduction"), 0.01f, new ConfigDescription("Enemy damage reduced by each debuff in percent", null, Array.Empty<object>())); }
 
         public void Awake()
         {
@@ -144,7 +145,7 @@ namespace Hex3Mod
             // Legendary
             if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_Barrier().Value, Apathy_BarrierStack().Value, Apathy_Reduction().Value, Apathy_ReductionStack().Value); }
             if (MintCondition_Enable().Value == true){ MintCondition.Initiate(MintCondition_MoveSpeed().Value, MintCondition_MoveSpeedStack().Value, MintCondition_AddJumps().Value, MintCondition_AddJumpsStack().Value); }
-            if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_Duration().Value, ElderMutagen_Chance().Value); }
+            if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_Duration().Value, ElderMutagen_Chance().Value, ElderMutagen_Interval().Value); }
             // Void
             if (CorruptingParasite_Enable().Value == true){ CorruptingParasite.Initiate(CorruptingParasite_CorruptBossItems().Value, CorruptingParasite_AlternateMode().Value, CorruptingParasite_Replication().Value, CorruptingParasite_AltModeOnlyConvert().Value); }
             if (NoticeOfAbsence_Enable().Value == true){ NoticeOfAbsence.Initiate(NoticeOfAbsence_SpeedBuff().Value, NoticeOfAbsence_MaxSpeedBuff().Value); }

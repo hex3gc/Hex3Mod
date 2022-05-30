@@ -229,7 +229,7 @@ namespace Hex3Mod.Items
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Spattered Collection");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "All of your <style=cIsDamage>damage over time</style> effects are converted into a stronger stacking <style=cIsDamage>Blight</style>. <style=cIsVoid>Corrupts all Scattered Reflections.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "All of your <style=cIsDamage>damage over time</style> effects are converted to stacking <style=cIsDamage>Blight</style>, which ticks <style=cIsDamage>" + ((1f - SpatteredCollection_IntervalReduction) * 100f) + "%</style> faster each stack. <style=cIsVoid>Corrupts all Scattered Reflections.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "All of your <style=cIsDamage>damage over time</style> effects are converted to stacking <style=cIsDamage>Blight</style>, which ticks <style=cIsDamage>" + ((1f - SpatteredCollection_IntervalReduction) * 100f) + "%</style> faster for each stack of this item owned by your team. <style=cIsVoid>Corrupts all Scattered Reflections.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I don't remember my name... I don't, not at all. That's all gone.\"" +
             "\n\n<style=cStack>(Several minutes of silence, broken up by what sounds like shuffles and clattering of glass)</style>" +
             "\n\n\"My collection. It's wonderful, isn't it? I want you to see it. Please, come see my collection... Bubbling, stinging poisons, corrosive to the touch... If you listen closely it's bubbling, here...\"" +

@@ -252,7 +252,7 @@ namespace Hex3Mod.Items
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "400 Tickets");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The next chest you buy will contain an additional item.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "The next chest you buy will contain an additional item. <style=cIsUtility>Consumed on use.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "The next chest, void cradle, equipment barrel, lunar pod or scavenger bag you open will contain an additional item. <style=cIsUtility>Consumed on use.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"Oh yeah, these. They're old tickets from that 'space casino' they tried to open up. While the adults were playing slots or roulette or whatever in the main floor, their kids could go spend their pocket change on the machines downstairs. These are the tickets they'd get as winnings. Could buy- you know- teddy bears and hoverboards and stuff with them.\"" +
             "\n\n\"That's screwed up. Why do you have those?\"" +
             "\n\n\"Well, there's one crucial detail they forgot about before closing up the casino: All the tickets are still valid.\"" +
