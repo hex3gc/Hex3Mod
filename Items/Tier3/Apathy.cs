@@ -303,18 +303,14 @@ namespace Hex3Mod.Items
 
                                 foreach (var ally in allies) // For each team member who has the item off cooldown, add 5% (plus stacks) barrier
                                 {
-                                    if (ally.body && ally.body.inventory && ally.body.inventory.GetItemCount(itemDefToHooks) > 0 && ally.body.GetBuffCount(apathyCooldown) < 1)
+                                    if (!ally.body) continue;
+                                    if (ally.body.inventory && ally.body.inventory.GetItemCount(itemDefToHooks) > 0 && ally.body.GetBuffCount(apathyCooldown) < 1)
                                     {
                                         aggregateBarrier += Apathy_Barrier + (Apathy_BarrierStack * (ally.body.inventory.GetItemCount(itemDefToHooks) - 1));
                                         ally.body.AddTimedBuff(apathyCooldown, 0.5f);
                                     }
-                                }
-                                foreach (var ally in allies)
-                                {
-                                    if (ally.body && ally.body.healthComponent)
-                                    {
-                                       ally.body.healthComponent.AddBarrier(ally.body.maxBarrier * aggregateBarrier); // And grant it to all team members
-                                    }
+                                    if (ally.body.healthComponent)
+                                        ally.body.healthComponent.AddBarrier(ally.body.maxBarrier * aggregateBarrier); // And grant it to all team members
                                 }
                             }
                         }
