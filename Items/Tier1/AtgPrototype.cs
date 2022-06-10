@@ -248,7 +248,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody> != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.procCoefficient > 0f)
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.procCoefficient > 0f)
                 {
                     CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
                     Inventory attackerInventory = attackerBody.inventory;
