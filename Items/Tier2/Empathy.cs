@@ -253,7 +253,7 @@ namespace Hex3Mod.Items
 
                                 foreach (var ally in allies)
                                 {
-                                    if (ally.body.inventory) // For every team member who has this item, heal them
+                                    if (ally.body && ally.body.inventory) // For every team member who has this item, heal them
                                     {
                                         int itemCount = ally.body.inventory.GetItemCount(itemDefToHooks);
                                         if (itemCount > 0)
