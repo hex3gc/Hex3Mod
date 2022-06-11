@@ -1,12 +1,6 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
-using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -234,19 +228,17 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDefToHooks, float BucketList_FullBuff, float BucketList_BuffReduce)
         {
-            float FullBuff = BucketList_FullBuff;
             float ReducedBuff = (BucketList_FullBuff - (BucketList_FullBuff * BucketList_BuffReduce));
 
             // Check every time the RecalculateStatsAPI.GetStatCoefficients activates
             // IF a boss exists, then change the item's argsmultspeed to 0.25x the value
             // ELSE, set it to 1x the value
 
-            void H3_recalcStatsCharacter(CharacterBody character, RecalculateStatsAPI.StatHookEventArgs args)
+            void H3_recalcStatsCharacter(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (character.inventory)
+                if (body.inventory)
                 {
-                    Inventory inventory = character.inventory;
-                    int itemCount = inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = body.inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0)
                     {
                         var monsters = TeamComponent.GetTeamMembers(TeamIndex.Monster);
@@ -255,12 +247,9 @@ namespace Hex3Mod.Items
                             int bossCount = 0;
                             foreach (var monster in monsters)
                             {
-                                if (monster.body)
+                                if (monster.body && monster.body.isBoss)
                                 {
-                                    if (monster.body.isBoss)
-                                    {
-                                        bossCount += 1;
-                                    }
+                                    bossCount += 1;
                                 }
                             }
                             if (bossCount > 0) // Boss present: Reduced buff
@@ -269,7 +258,7 @@ namespace Hex3Mod.Items
                             }
                             else // Boss not present: Full buff
                             {
-                                args.moveSpeedMultAdd += (FullBuff + ((itemCount - 1) * FullBuff));
+                                args.moveSpeedMultAdd += (BucketList_FullBuff + ((itemCount - 1) * BucketList_FullBuff));
                             }
                         }
                     }

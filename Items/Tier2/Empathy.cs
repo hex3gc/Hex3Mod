@@ -1,13 +1,6 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
-using RoR2.Orbs;
-using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -233,58 +226,37 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDefToHooks, float Empathy_HealFor) // Insert hooks here
         {
-            float healFor = Empathy_HealFor;
-
-            void H3_OnHpLost2(HealthComponent healthComponent, DamageInfo damageInfo)
+            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
-                if (healthComponent.body)
+                orig(self, damageInfo);
+                if (self.body && self.body.inventory && self.body.master && !self.body.name.StartsWith("ShopkeeperBody") && self.body.teamComponent && damageInfo.damage > 0f && !damageInfo.rejected)
                 {
-                    if (healthComponent.body.master)
+                    bool isVoidDamage = false;
+                    if (!damageInfo.attacker && !damageInfo.inflictor && damageInfo.damageColorIndex == DamageColorIndex.Void && damageInfo.damageType == (DamageType.BypassArmor | DamageType.BypassBlock))
                     {
-                        CharacterBody body = healthComponent.body;
-                        if (body.teamComponent)
+                        isVoidDamage = true;
+                    }
+                    if (isVoidDamage == false) // If it's not void damage and if it's not the shopkeeper, run the checks
+                    {
+                        if (self.body.teamComponent.teamIndex == TeamIndex.Player || self.body.teamComponent.teamIndex == TeamIndex.Monster || self.body.teamComponent.teamIndex == TeamIndex.Lunar || self.body.teamComponent.teamIndex == TeamIndex.Void)
                         {
-                            TeamIndex teamIndex = body.teamComponent.teamIndex;
-                            int teamIndexInt = Convert.ToInt32(teamIndex);
+                            var allies = TeamComponent.GetTeamMembers(self.body.teamComponent.teamIndex);
 
-                            if ((teamIndexInt >= 0) && (teamIndexInt <= 4))
+                            foreach (var ally in allies)
                             {
-                                var allies = TeamComponent.GetTeamMembers(teamIndex); // Get all members of the damage receiver's team...
-
-                                foreach (var ally in allies)
+                                if (ally.body && ally.body.inventory && ally.body.inventory.GetItemCount(itemDefToHooks) > 0 && ally.body.healthComponent)
                                 {
-                                    if (ally.body.inventory) // For every team member who has this item, heal them
-                                    {
-                                        int itemCount = ally.body.inventory.GetItemCount(itemDefToHooks);
-                                        if (itemCount > 0)
-                                        {
-                                            float healAmount = Empathy_HealFor * itemCount;
-                                            ally.body.healthComponent.Heal(healAmount, default, true);
-                                        }
-                                    }
+                                    ally.body.healthComponent.Heal(Empathy_HealFor * ally.body.inventory.GetItemCount(itemDefToHooks), default, true);
                                 }
                             }
                         }
                     }
-                }
-            }
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
-            {
-                orig(self, damageInfo);
-                if (self.body && !self.body.name.StartsWith("ShopkeeperBody"))
-                {
-                    if (!damageInfo.attacker && !damageInfo.inflictor && damageInfo.damageColorIndex == DamageColorIndex.Void && damageInfo.damageType == (DamageType.BypassArmor | DamageType.BypassBlock))
-                    {
-                        return; // To make sure it doesn't trigger off of void fog
-                    }
-                    H3_OnHpLost2(self, damageInfo);
                 }
             };
         }
 
         public static void Initiate(float Empathy_HealFor) // Finally, initiate the item and all of its features
         {
-            CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(Empathy_HealFor);
             AddHooks(itemDefinition, Empathy_HealFor);

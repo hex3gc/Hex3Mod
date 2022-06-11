@@ -1,14 +1,8 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
-using System;
 using System.Linq;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 
@@ -243,7 +237,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
             {
-                if (attackerObject && attackerObject.GetComponent<CharacterBody> != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().teamComponent)
+                if (attackerObject && attackerObject.GetComponent<CharacterBody>() != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().teamComponent)
                 {
                     int itemCount = attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks);
                     if (itemCount > 0)
@@ -279,7 +273,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody> != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
                 {
                     if (damageInfo.attacker.GetComponent<CharacterBody>().master && damageInfo.dotIndex != DotController.DotIndex.Blight && damageInfo.attacker != victim && damageInfo.damage > 0f)
                     {

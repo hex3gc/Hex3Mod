@@ -33,5 +33,64 @@ namespace Hex3Mod.HelperClasses
 
             return itemDisplayModel;
         }
+
+    }
+    public static class MysticsCompatibility
+    {
+        private static bool? _enabled;
+        public static bool enabled
+        {
+            get
+            {
+                if (_enabled == null)
+                {
+                    _enabled = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.themysticsword.mysticsitems");
+                }
+                return (bool)_enabled;
+            }
+        }
+        public static ItemDef ShopTerminalCard
+        {
+            get
+            {
+                if (_enabled == true)
+                {
+                    return MysticsItems.MysticsItemsContent.Items.MysticsItems_KeepShopTerminalOpen;
+                }
+                else
+                {
+                    return new ItemDef();
+                }
+            }
+        }
+        public static ItemDef ShopTerminalCardConsumed
+        {
+            get
+            {
+                if (_enabled == true)
+                {
+                    return MysticsItems.MysticsItemsContent.Items.MysticsItems_KeepShopTerminalOpenConsumed;
+                }
+                else
+                {
+                    return new ItemDef();
+                }
+            }
+        }
+    }
+    public static class TinkersCompatibility
+    {
+        private static bool? _enabled;
+        public static bool enabled
+        {
+            get
+            {
+                if (_enabled == null)
+                {
+                    _enabled = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.ThinkInvisible.TinkersSatchel");
+                }
+                return (bool)_enabled;
+            }
+        }
     }
 }

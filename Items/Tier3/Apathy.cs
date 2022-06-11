@@ -1,14 +1,7 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
-using RoR2.Orbs;
-using RoR2.Items;
 using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -227,14 +220,9 @@ namespace Hex3Mod.Items
 
         public static void AddTokens(float Apathy_Barrier, float Apathy_BarrierStack, float Apathy_Reduction, float Apathy_ReductionStack)
         {
-            float Apathy_Barrier_Readable = Apathy_Barrier * 100f;
-            float Apathy_BarrierStack_Readable = Apathy_BarrierStack * 100f;
-            float Apathy_Reduction_Readable = Apathy_Reduction * 100f;
-            float Apathy_ReductionStack_Readable = Apathy_ReductionStack * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Apathy");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your barrier is more resistant to damage. Grants barrier to your team when you or your allies are hit.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Reduce ALL incoming damage by <style=cIsUtility>" + Apathy_Reduction_Readable + "%</style> <style=cStack>(+" + Apathy_ReductionStack_Readable + "% per stack)</style> when you have <style=cIsHealing>barrier</style>. When you or your allies are hit, grant <style=cIsUtility>" + Apathy_Barrier_Readable + "%</style> <style=cStack>(+" + Apathy_BarrierStack_Readable + "% per stack)</style> <style=cIsHealing>barrier</style> to your whole team.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("Reduce ALL incoming damage by <style=cIsUtility>{0}%</style> <style=cStack>(+{1}% per stack, diminishing)</style> when you have <style=cIsHealing>barrier</style>. When you or your allies are hit, grant <style=cIsUtility>{2}%</style> <style=cStack>(+{3}% per stack)</style> <style=cIsHealing>barrier</style> to your whole team.", Apathy_Reduction * 100f, Apathy_ReductionStack * 100f, Apathy_Barrier * 100f, Apathy_BarrierStack * 100f));
             LanguageAPI.Add("H3_" + upperName + "_LORE",
                 "\"I can't [REDACTED] believe I'm doing this...\"" +
                 "\n\n\"We'll share the network. We have to.\"" +
@@ -261,79 +249,61 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDefToHooks, float Apathy_Barrier, float Apathy_BarrierStack, float Apathy_Reduction, float Apathy_ReductionStack) // Insert hooks here
         {
-            void H3_OnHpLost3(DamageInfo damageInfo, HealthComponent healthComponent)
-            {
-                if (healthComponent.body) // Another stack of if statements, please. Wait, you're all out? I'll come back on Saturday
-                {
-                    if (healthComponent.body.master)
-                    {
-                        CharacterBody body = healthComponent.body;
-
-                        if (body.inventory) // For every team member who has this item, heal them
-                        {
-                            int itemCount = body.inventory.GetItemCount(itemDefToHooks);
-                            if (itemCount > 0)
-                            {
-                                if (healthComponent.barrier > (body.maxBarrier * 0.1f))
-                                {
-                                    float finalDamageReduction = Apathy_Reduction; // Only reduce damage at >10% barrier to prevent constant barrier tics permanently reducing dmg
-                                    for (int i = 1; i < itemCount; i++) // For loop so that each item stack reduces damage a bit less
-                                    {
-                                        finalDamageReduction += Apathy_ReductionStack * (1f - finalDamageReduction);
-                                    }
-                                    if (finalDamageReduction > 0.9f) // Cap it at 90% reduction to prevent invincibility (Item still stacks barrier, so it's ok)
-                                    {
-                                        finalDamageReduction = 0.9f;
-                                    }
-
-                                    damageInfo.damage -= (damageInfo.damage * finalDamageReduction); // Reduce the hit's damage if barrier is present
-                                }
-                            }
-                        }
-
-                        if (body.teamComponent)
-                        {
-                            TeamIndex teamIndex = body.teamComponent.teamIndex;
-                            int teamIndexInt = Convert.ToInt32(teamIndex);
-
-                            if ((teamIndexInt >= 0) && (teamIndexInt <= 4))
-                            {
-                                var allies = TeamComponent.GetTeamMembers(teamIndex); // Get all members of the damage receiver's team...
-                                float aggregateBarrier = 0f;
-
-                                foreach (var ally in allies) // For each team member who has the item off cooldown, add 5% (plus stacks) barrier
-                                {
-                                    if (ally.body.inventory && ally.body.inventory.GetItemCount(itemDefToHooks) > 0 && ally.body.GetBuffCount(apathyCooldown) < 1)
-                                    {
-                                        aggregateBarrier += Apathy_Barrier + (Apathy_BarrierStack * (ally.body.inventory.GetItemCount(itemDefToHooks) - 1));
-                                        ally.body.AddTimedBuff(apathyCooldown, 0.5f);
-                                    }
-                                }
-                                foreach (var ally in allies)
-                                {
-                                    if (ally.body && ally.body.healthComponent)
-                                    {
-                                       ally.body.healthComponent.AddBarrier(ally.body.maxBarrier * aggregateBarrier); // And grant it to all team members
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
-                if (self.body && !self.body.name.StartsWith("ShopkeeperBody"))
+                if (self.body && self.body.master && self.body.inventory && !self.body.name.StartsWith("ShopkeeperBody") && damageInfo.damage > 0f && !damageInfo.rejected)
                 {
                     bool isVoidDamage = false;
                     if (!damageInfo.attacker && !damageInfo.inflictor && damageInfo.damageColorIndex == DamageColorIndex.Void && damageInfo.damageType == (DamageType.BypassArmor | DamageType.BypassBlock))
                     {
                         isVoidDamage = true;
                     }
-                    if (isVoidDamage == false)
+                    if (isVoidDamage == false) // If it's not void damage and if it's not the shopkeeper (he is a difficult newt to work with), run the checks
                     {
-                        H3_OnHpLost3(damageInfo, self);
+                        var body = self.body;
+                        var inventory = self.body.inventory;
+                        var master = self.body.master;
+                        int itemCount = inventory.GetItemCount(itemDefToHooks);
+
+                        if (itemCount > 0 && self.barrier >= body.maxBarrier * 0.05f) // Apply damage reduction to item holders with enough barrier
+                        {
+                            float finalDamageReduction = Apathy_Reduction;
+                            for (int i = 1; i < itemCount; i++) // Reduce damage by less each stack
+                            {
+                                finalDamageReduction += Apathy_ReductionStack * (1f - finalDamageReduction);
+                            }
+                            if (finalDamageReduction > 0.8f) // Cap at 80% to prevent too much damage reduction
+                            {
+                                finalDamageReduction = 0.8f;
+                            }
+                            damageInfo.damage -= (damageInfo.damage * finalDamageReduction);
+                        }
+
+                        if (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player) // Grant barrier to allies when allies are hit (AI Blacklist means only checking players is necessary)
+                        {
+                            var allies = TeamComponent.GetTeamMembers(TeamIndex.Player);
+                            float aggregateBarrier = 0f;
+
+                            foreach (var ally in allies) // Check how many Apathy items are in the team and add those to the Aggregate Barrier
+                            {
+                                if (!ally.body || !ally.body.healthComponent) continue;
+                                if (ally.body.inventory && ally.body.inventory.GetItemCount(itemDefToHooks) > 0 && ally.body.GetBuffCount(apathyCooldown) < 1)
+                                {
+                                    aggregateBarrier += Apathy_Barrier + (Apathy_BarrierStack * (ally.body.inventory.GetItemCount(itemDefToHooks) - 1));
+                                    ally.body.AddTimedBuff(apathyCooldown, 0.5f);
+                                }
+                            }
+                            if (aggregateBarrier > 0f) // Skip this loop if no apathy items were present
+                            {
+                                foreach (var ally in allies)
+                                {
+                                    if (ally.body && ally.body.healthComponent && ally.body.inventory)
+                                    {
+                                        ally.body.healthComponent.AddBarrier(ally.body.maxBarrier * aggregateBarrier); // And grant it to all team members
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 orig(self, damageInfo);

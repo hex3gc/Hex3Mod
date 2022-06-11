@@ -1,12 +1,6 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
-using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -18,7 +12,7 @@ namespace Hex3Mod.Items
     public class Tickets
     {
         // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "Tickets"; // Change this name when making a new item
+        static string itemName = "FourHundredTickets"; // Change this name when making a new item
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static ItemDef consumedItemDefinition = CreateConsumedItem();
@@ -60,7 +54,6 @@ namespace Hex3Mod.Items
             item.nameToken = "H3_" + upperName + "CONSUMED_NAME";
             item.pickupToken = "H3_" + upperName + "CONSUMED_PICKUP";
             item.descriptionToken = "H3_" + upperName + "CONSUMED_DESC";
-            item.loreToken = "H3_" + upperName + "CONSUMED_LORE";
 
             item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotDuplicate , ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Need to make sure the item can't be given or cloned
             item.deprecatedTier = ItemTier. NoTier;
@@ -261,7 +254,6 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_NAME", "Used Tickets");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "No longer valid.");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer valid.");
-            LanguageAPI.Add("H3_" + upperName + "CONSUMED_LORE", "");
         }
 
         private static void AddHooks(ItemDef itemDefToHooks, ItemDef consumedItemDefToHooks) // Insert hooks here
@@ -287,10 +279,15 @@ namespace Hex3Mod.Items
             {
                 if (self.gameObject == purchasedObject && interactorBody.inventory && interactorBody.inventory.GetItemCount(itemDefToHooks) > 0)
                 {
+                    if (self.gameObject.name == "VoidChest(Clone)")
+                    {
+                        self.dropUpVelocityStrength = 5f;
+                        self.dropForwardVelocityStrength = 25f;
+                    }
                     self.dropCount += 1;
                     interactorBody.inventory.RemoveItem(itemDefToHooks);
                     interactorBody.inventory.GiveItem(consumedItemDefToHooks);
-                    CharacterMasterNotificationQueue.PushItemTransformNotification(interactorBody.master, itemDefToHooks.itemIndex, consumedItemDefToHooks.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                    CharacterMasterNotificationQueue.SendTransformNotification(interactorBody.master, itemDefToHooks.itemIndex, consumedItemDefToHooks.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
                     Util.PlaySound(RouletteChestController.Opening.soundEntryEvent, self.gameObject);
                     purchasedObject = null;
                     interactorBody = null;

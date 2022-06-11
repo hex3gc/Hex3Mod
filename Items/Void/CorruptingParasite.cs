@@ -1,16 +1,9 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -474,7 +467,10 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterMaster.OnServerStageBegin += (orig, self, stage) =>
             {
                 orig(self, stage);
-                ParasiteTradeItems(self);
+                if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) > 0)
+                {
+                    ParasiteTradeItems(self);
+                }
             };
         }
 

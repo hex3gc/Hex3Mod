@@ -1,12 +1,6 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
-using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -248,7 +242,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody> != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.procCoefficient > 0f)
+                if (damageInfo != null && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory != null && damageInfo.procCoefficient > 0f)
                 {
                     CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
                     Inventory attackerInventory = attackerBody.inventory;
@@ -257,7 +251,7 @@ namespace Hex3Mod.Items
                     {
                         attackerBody.SetBuffCount(atgBuffIndex, 1);
                     }
-                    if (attackerInventory.GetItemCount(itemDefToHooks) > 0)
+                    if (attackerInventory.GetItemCount(itemDefToHooks) > 0 && victim)
                     {
                         attackerBody.AddBuff(atgCounter);
                         if (attackerBody.GetBuffCount(atgCounter) >= hitRequirement)

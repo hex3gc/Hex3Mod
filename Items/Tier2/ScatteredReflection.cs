@@ -1,13 +1,7 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
 using RoR2.Orbs;
-using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 
 namespace Hex3Mod.Items
@@ -275,9 +269,9 @@ namespace Hex3Mod.Items
                                 if (itemCount > 0)
                                 {
                                     float percentWithShardBonus = damageReflectPercent + (damageReflectShardStack * shardCount);
-                                    if (percentWithShardBonus > 0.9f) // First, we should cap damage reduction at 90% to prevent total invincibility
+                                    if (percentWithShardBonus > 0.8f) // First, we should cap damage reduction at 80% to prevent total invincibility
                                     {
-                                        percentWithShardBonus = 0.9f;
+                                        percentWithShardBonus = 0.8f;
                                     }
 
                                     // Get the damage we need to do back, and then the damage we must prevent
@@ -324,7 +318,6 @@ namespace Hex3Mod.Items
 
         public static void Initiate(float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus) // Finally, initiate the item and all of its features
         {
-            CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(ScatteredReflection_DamageReflectPercent, ScatteredReflection_DamageReflectShardStack, ScatteredReflection_DamageReflectBonus);
             AddHooks(itemDefinition, ScatteredReflection_DamageReflectPercent, ScatteredReflection_DamageReflectShardStack, ScatteredReflection_DamageReflectBonus);

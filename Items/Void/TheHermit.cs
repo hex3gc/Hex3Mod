@@ -1,15 +1,8 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
 using RoR2.ExpansionManagement;
-using System;
-using System.Runtime;
 using System.Linq;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using VoidItemAPI;
 using Hex3Mod.HelperClasses;
 

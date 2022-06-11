@@ -1,12 +1,6 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using R2API;
-using R2API.Utils;
+﻿using R2API;
 using RoR2;
-using System;
 using UnityEngine;
-using Hex3Mod;
-using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
 using On.EntityStates;
 
@@ -259,7 +253,6 @@ namespace Hex3Mod.Items
 
         public static void Initiate(float HopooEgg_JumpModifier, float HopooEgg_AirControlModifier) // Finally, initiate the item and all of its features
         {
-            CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(HopooEgg_JumpModifier, HopooEgg_AirControlModifier);
             AddHooks(itemDefinition, HopooEgg_JumpModifier, HopooEgg_AirControlModifier);

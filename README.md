@@ -1,8 +1,8 @@
 # Info
 
-Adds 1 artifact and 16 new items to the game:
+Adds 1 artifact and 17 new items to the game:
 * 5 Common
-* 2 Uncommon
+* 3 Uncommon
 * 3 Legendary
 * 6 Void
 
@@ -17,9 +17,10 @@ Adds 1 artifact and 16 new items to the game:
 | | <p align="center">**UNCOMMON**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>Heal for **5 HP** <sup>(+5 per stack)</sup> when you or an ally takes damage. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Prevent 7%** of all received damage and reflect it back to your attacker, adding an additional **70%** <sup>(+70% per stack)</sup> damage bonus. For every **Shard Of Glass** in your inventory, prevent **0.7%** more damage. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/985265706620829716/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pack**<br>**Prevents** your consumable items and equipment from being consumed up to **3** times before breaking. Does not affect **fragile** items. |
 | | <p align="center">**LEGENDARY**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>Reduce all damage by **20%** <sup>(+10% per stack)</sup> while you have **barrier**. When you or your allies are hit, grant **3%** <sup>(+2% per stack)</sup> **barrier** to your whole team. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>Provides immunity to movement restricting status effects. Gain **20%** <sup>(+40% per stack)</sup> and **1** <sup>+2 per stack</sup> extra jumps. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>Reduce all damage by **20%** <sup>(+10% per stack, diminishing)</sup> while you have **barrier**. When you or your allies are hit, grant **3%** <sup>(+2% per stack)</sup> **barrier** to your whole team. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>Provides immunity to movement restricting status effects. Gain **20%** movement speed <sup>(+40% per stack)</sup> and **1** <sup>+2 per stack</sup> extra jumps. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>Your hits have a **5%** chance to inflict a **random debuff** that lasts **5** <sup>(+5 per stack)</sup> seconds. Every **15** seconds, gain a **random buff** that lasts **5** <sup>(+5 per stack)</sup> seconds. |
 | | <p align="center">**VOID**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>**Corrupts** 1 <sup>(+1 per stack)</sup> item in your inventory into a **random void item** of the same rarity each stage. Prefers more common items. |
@@ -44,6 +45,14 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
 
 # Changelog
+
+### 1.0.0
+The mod feels complete enough to give a 1.0 release, so here it is! More features (Boss items, lunars, companion mods, etc.) will come in the future.
+* Added item "Scavenger's Pack"
+* Apathy max damage reduction 90& -> 80%
+* Scattered Reflection max damage reduction 90% -> 80%
+* Optimized multiple items' code (Thanks to Bubbet for pointing out the issues)
+* Using 400 Tickets on Void Chests should no longer drop the two items inside of each other
 
 ### 0.4.5
 * Icons were too big :(

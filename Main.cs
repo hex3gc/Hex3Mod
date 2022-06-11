@@ -3,28 +3,31 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using R2API;
 using R2API.Utils;
-using RoR2;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using Hex3Mod.Items;
 using Hex3Mod.Artifacts;
 using Hex3Mod.Logging;
+using Hex3Mod.HelperClasses;
+using BetterUI;
 
 namespace Hex3Mod
 {
     [BepInPlugin(ModGuid, ModName, ModVer)]
     [BepInDependency(R2API.R2API.PluginGUID, R2API.R2API.PluginVersion)]
     [BepInDependency(VoidItemAPI.VoidItemAPI.MODGUID)]
+    [BepInDependency("com.themysticsword.mysticsitems", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.ThinkInvisible.TinkersSatchel", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("com.xoxfaby.BetterUI", BepInDependency.DependencyFlags.SoftDependency)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2APISubmoduleDependency(nameof(ItemAPI), nameof(LanguageAPI), nameof(RecalculateStatsAPI), nameof(PrefabAPI))]
     public class Main : BaseUnityPlugin
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "0.4.5";
+        public const string ModVer = "1.0.0";
 
         public static AssetBundle MainAssets;
 
@@ -61,6 +64,21 @@ namespace Hex3Mod
 
         public ConfigEntry<bool> Empathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Empathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> Empathy_HealFor() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Healing amount"), 5f, new ConfigDescription("Healing per sustained hit", null, Array.Empty<object>())); }
+
+        public ConfigEntry<bool> ScavengersPack_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
+        public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pack", "Maximum uses"), 3, new ConfigDescription("Times the Scavenger's Pack can be used before breaking.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_RegenerativeScrap() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Regenerating Scrap"), true, new ConfigDescription("Expend Scavenger's Pack charges on Regenerating Scrap.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_Mystic1() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Mystics Items - Cutesy Bow"), true, new ConfigDescription("Expend Scavenger's Pack charges on Cutesy Bow.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_Mystic2() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Mystics Items - Platinum Card"), true, new ConfigDescription("Expend Scavenger's Pack charges on Platinum Card.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> tricorn() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Trophy Hunters Tricorn"), true, new ConfigDescription("Expend Scavenger's Pack charges on Trophy Hunter's Tricorn.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> terminal() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Tinkers Satchel - Command Terminal"), true, new ConfigDescription("Expend Scavenger's Pack charges on Command Terminal.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> elixir() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Power Elixir"), true, new ConfigDescription("Expend Scavenger's Pack charges on Power Elixir.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> tickets() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "400 Tickets"), true, new ConfigDescription("Expend Scavenger's Pack charges on 400 Tickets.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> dios() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Dios Best Friend"), true, new ConfigDescription("Expend Scavenger's Pack charges on Dio's Best Friend.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> larva() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Pluripotent Larva"), true, new ConfigDescription("Expend Scavenger's Pack charges on Pluripotent Larva.", null, Array.Empty<object>())); }
+
+
+        // public ConfigEntry<bool> StarHomeRunner_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Star Home Runner", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
 
         // Legendary
         public ConfigEntry<bool> Apathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Apathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
@@ -110,9 +128,6 @@ namespace Hex3Mod
         public void Awake()
         {
             Log.Init(Logger);
-            Log.LogInfo("Beginning startup functions..."); // Config zone
-            Log.LogInfo("Initializing configs...");
-
             Log.LogInfo("Creating assets...");
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Hex3Mod.vfxpass2"))
             {
@@ -133,20 +148,32 @@ namespace Hex3Mod
                 }
             }
 
+            if (MysticsCompatibility.enabled == true){ Log.LogInfo("Detected Mystic's Items soft dependency"); }
+            else { Log.LogInfo("Did not detect Mystic's Items soft dependency");  }
+            if (TinkersCompatibility.enabled == true) { Log.LogInfo("Detected Tinker's Satchel soft dependency"); }
+            else { Log.LogInfo("Did not detect Tinker's Satchel soft dependency"); }
+
+            Log.LogInfo("Initializing items...");
             // Common
+            Log.LogInfo("Common");
             if (ShardOfGlass_Enable().Value == true){ ShardOfGlass.Initiate(ShardOfGlass_DamageIncrease().Value); }
             if (BucketList_Enable().Value == true){ BucketList.Initiate(BucketList_FullBuff().Value, BucketList_BuffReduce().Value); }
             if (HopooEgg_Enable().Value == true){ HopooEgg.Initiate(HopooEgg_JumpModifier().Value, HopooEgg_AirControlModifier().Value); }
             if (AtgPrototype_Enable().Value == true){ AtgPrototype.Initiate(AtgPrototype_Damage().Value, AtgPrototype_HitRequirement().Value); }
             if (Tickets_Enable().Value == true){ Tickets.Initiate(); }
             // Uncommon
+            Log.LogInfo("Uncommon");
             if (ScatteredReflection_Enable().Value == true){ ScatteredReflection.Initiate(ScatteredReflection_DamageReflectPercent().Value, ScatteredReflection_DamageReflectShardStack().Value, ScatteredReflection_DamageReflectBonus().Value); }
             if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealFor().Value); }
+            if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_RegenerativeScrap().Value, ScavengersPack_Mystic1().Value, ScavengersPack_Mystic2().Value, tricorn().Value, terminal().Value, elixir().Value, tickets().Value, dios().Value, larva().Value); }
+            // if (StarHomeRunner_Enable().Value == true) { StarHomeRunner.Initiate(); }
             // Legendary
+            Log.LogInfo("Legendary");
             if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_Barrier().Value, Apathy_BarrierStack().Value, Apathy_Reduction().Value, Apathy_ReductionStack().Value); }
             if (MintCondition_Enable().Value == true){ MintCondition.Initiate(MintCondition_MoveSpeed().Value, MintCondition_MoveSpeedStack().Value, MintCondition_AddJumps().Value, MintCondition_AddJumpsStack().Value); }
             if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_Duration().Value, ElderMutagen_Chance().Value, ElderMutagen_Interval().Value); }
             // Void
+            Log.LogInfo("Void");
             if (CorruptingParasite_Enable().Value == true){ CorruptingParasite.Initiate(CorruptingParasite_CorruptBossItems().Value, CorruptingParasite_AlternateMode().Value, CorruptingParasite_Replication().Value, CorruptingParasite_AltModeOnlyConvert().Value); }
             if (NoticeOfAbsence_Enable().Value == true){ NoticeOfAbsence.Initiate(NoticeOfAbsence_SpeedBuff().Value, NoticeOfAbsence_MaxSpeedBuff().Value); }
             if (DropOfNecrosis_Enable().Value == true) { DropOfNecrosis.Initiate(DropOfNecrosis_Damage().Value, DropOfNecrosis_DotChance().Value); }
@@ -154,6 +181,7 @@ namespace Hex3Mod
             if (SpatteredCollection_Enable().Value == true) { SpatteredCollection.Initiate(SpatteredCollection_IntervalReduction().Value, SpatteredCollection_DotChance().Value); }
             if (TheHermit_Enable().Value == true){ TheHermit.Initiate(TheHermit_BuffDuration().Value, TheHermit_DamageReduction().Value); }
             // Artifacts
+            Log.LogInfo("Initializing artifacts...");
             ArtifactOfCorruption.Initiate();
 
             Log.LogInfo("Done!");
