@@ -242,7 +242,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo != null && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory != null && damageInfo.procCoefficient > 0f)
+                if (damageInfo != null && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory != null && damageInfo.procCoefficient > 0f && !damageInfo.procChainMask.HasProc(ProcType.Missile))
                 {
                     CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
                     Inventory attackerInventory = attackerBody.inventory;
@@ -254,7 +254,7 @@ namespace Hex3Mod.Items
                     if (attackerInventory.GetItemCount(itemDefToHooks) > 0 && victim)
                     {
                         attackerBody.AddBuff(atgCounter);
-                        if (attackerBody.GetBuffCount(atgCounter) >= hitRequirement)
+                        if (attackerBody.GetBuffCount(atgCounter) >= (hitRequirement + 1))
                         {
                             float damageCoefficient = atgDamageStack * (float)attackerInventory.GetItemCount(itemDefToHooks);
                             float missileDamage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);

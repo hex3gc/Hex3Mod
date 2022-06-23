@@ -279,7 +279,7 @@ namespace Hex3Mod.Items
             {
                 if (self.gameObject == purchasedObject && interactorBody.inventory && interactorBody.inventory.GetItemCount(itemDefToHooks) > 0)
                 {
-                    if (self.gameObject.name == "VoidChest(Clone)")
+                    if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
                     {
                         self.dropUpVelocityStrength = 5f;
                         self.dropForwardVelocityStrength = 25f;

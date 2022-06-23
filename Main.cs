@@ -27,7 +27,7 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "1.0.0";
+        public const string ModVer = "1.0.1";
 
         public static AssetBundle MainAssets;
 

@@ -243,7 +243,7 @@ namespace Hex3Mod.Items
             {
                 if (attackerObject && attackerObject.GetComponent<CharacterBody>() != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
                 {
-                    DotController.dotDefs[5].damageCoefficient = 0.2f + (DropOfNecrosis_Damage * (attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) - 1));
+                    DotController.dotDefs[5].damageCoefficient = 0.2f + (0.2f * (DropOfNecrosis_Damage * (attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) - 1)));
                 }
                 else
                 {
@@ -260,7 +260,7 @@ namespace Hex3Mod.Items
                     {
                         if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage && damageInfo.damage > 0f)
                         {
-                            if (Util.CheckRoll(DropOfNecrosis_DotChance, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
+                            if (Util.CheckRoll(DropOfNecrosis_DotChance * damageInfo.procCoefficient, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
                             {
                                 InflictDotInfo inflictDotInfo = new InflictDotInfo
                                 {

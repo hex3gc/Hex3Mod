@@ -46,6 +46,12 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 1.0.1
+* ATG Prototype no longer procs on missile attacks
+* ATG Prototype now correctly procs every 10 hits instead of every 9
+* Drop Of Necrosis and Spattered Collection now utilize proc coefficients properly
+* Fixed stacks of Drop Of Necrosis adding way too much damage
+
 ### 1.0.0
 The mod feels complete enough to give a 1.0 release, so here it is! More features (Boss items, lunars, companion mods, etc.) will come in the future.
 * Added item "Scavenger's Pack"

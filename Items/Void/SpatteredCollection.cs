@@ -279,7 +279,7 @@ namespace Hex3Mod.Items
                     {
                         if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage)
                         {
-                            if (Util.CheckRoll(SpatteredCollection_DotChance, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
+                            if (Util.CheckRoll(SpatteredCollection_DotChance * damageInfo.procCoefficient, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
                             {
                                 InflictDotInfo inflictDotInfo = new InflictDotInfo
                                 {
