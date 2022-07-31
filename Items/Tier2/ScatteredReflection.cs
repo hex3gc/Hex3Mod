@@ -294,7 +294,7 @@ namespace Hex3Mod.Items
                                         lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
                                         lightningOrb.origin = body.corePosition;
                                         lightningOrb.procChainMask = default(ProcChainMask);
-                                        lightningOrb.procCoefficient = 1f;
+                                        lightningOrb.procCoefficient = 0f;
                                         lightningOrb.range = 0f;
                                         lightningOrb.teamIndex = teamIndex;
                                         lightningOrb.target = enemy.mainHurtBox;
