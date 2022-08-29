@@ -7,16 +7,15 @@ using Hex3Mod.HelperClasses;
 namespace Hex3Mod.Items
 {
     /*
-    Apathy is another item that is intended to buff allies, but this time more directly by granting barrier for every hit sustained.
-    Additionally, the Apathy holder gets damage reduction from all hits on their barrier
-    This item is meant to synergize with other barrier items by increasing their effectiveness, with the passive barrier gain allowing more barrier sustain
+    Apathy was a weird item, and its mechanics were shaky. Thematically, I think it works better as a "send in your allies to do the work" item,
+    synergizing with Empathy with an incentive to keep buying those drones that die all the time. Let me know how it feels to play with this one.
     */
     public class Apathy
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "Apathy"; // Change this name when making a new item
+        static string itemName = "Apathy";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
+        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
@@ -38,7 +37,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.Damage, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
@@ -49,7 +48,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -218,11 +217,17 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float Apathy_Barrier, float Apathy_BarrierStack, float Apathy_Reduction, float Apathy_ReductionStack)
+        // Hidden items should not display at all
+        public static ItemDisplayRuleDict CreateHiddenDisplayRules()
+        {
+            return new ItemDisplayRuleDict();
+        }
+
+        public static void AddTokens(float Apathy_HealthIncrease, float Apathy_DamageIncrease)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Apathy");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your barrier is more resistant to damage. Grants barrier to your team when you or your allies are hit.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("Reduce ALL incoming damage by <style=cIsUtility>{0}%</style> <style=cStack>(+{1}% per stack, diminishing)</style> when you have <style=cIsHealing>barrier</style>. When you or your allies are hit, grant <style=cIsUtility>{2}%</style> <style=cStack>(+{3}% per stack)</style> <style=cIsHealing>barrier</style> to your whole team.", Apathy_Reduction * 100f, Apathy_ReductionStack * 100f, Apathy_Barrier * 100f, Apathy_BarrierStack * 100f));
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Gain a permanent max health and damage buff when an ally is killed, as well as full barrier.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an ally is killed, gain full <style=cIsHealing>barrier</style> and receive a permanent <style=cIsHealing>{0}%</style> <style=cStack>(+{0}% per stack)</style> <style=cIsHealing>max health</style> and <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style> <style=cIsDamage>damage buff</style>.", Apathy_HealthIncrease * 100f, Apathy_DamageIncrease * 100f));
             LanguageAPI.Add("H3_" + upperName + "_LORE",
                 "\"I can't [REDACTED] believe I'm doing this...\"" +
                 "\n\n\"We'll share the network. We have to.\"" +
@@ -247,90 +252,97 @@ namespace Hex3Mod.Items
                 );
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float Apathy_Barrier, float Apathy_BarrierStack, float Apathy_Reduction, float Apathy_ReductionStack) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, ItemDef hiddenItemDef, float Apathy_HealthIncrease, float Apathy_DamageIncrease)
         {
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
+            // Apply stat changes
+            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (self.body && self.body.master && self.body.inventory && !self.body.name.StartsWith("ShopkeeperBody") && damageInfo.damage > 0f && !damageInfo.rejected)
+                if (body.inventory && body.healthComponent && body.inventory.GetItemCount(hiddenItemDef) > 0)
                 {
-                    bool isVoidDamage = false;
-                    if (!damageInfo.attacker && !damageInfo.inflictor && damageInfo.damageColorIndex == DamageColorIndex.Void && damageInfo.damageType == (DamageType.BypassArmor | DamageType.BypassBlock))
+                    int hiddenItemCount = body.inventory.GetItemCount(hiddenItemDef);
+                    if (body.inventory.GetItemCount(itemDef) > 0)
                     {
-                        isVoidDamage = true;
+                        args.damageMultAdd += Apathy_DamageIncrease * hiddenItemCount; // Apply buffs and update buff count
+                        args.healthMultAdd += Apathy_HealthIncrease * hiddenItemCount;
+                        body.SetBuffCount(apathyStacks.buffIndex, hiddenItemCount);
                     }
-                    if (isVoidDamage == false) // If it's not void damage and if it's not the shopkeeper (he is a difficult newt to work with), run the checks
+                    else
                     {
-                        var body = self.body;
-                        var inventory = self.body.inventory;
-                        var master = self.body.master;
-                        int itemCount = inventory.GetItemCount(itemDefToHooks);
+                        body.inventory.RemoveItem(hiddenItemDef, 9999); // If the player doesn't have Apathy, remove all stacks of the hidden item
+                        body.SetBuffCount(apathyStacks.buffIndex, 0);
+                    }
+                }
+            }
 
-                        if (itemCount > 0 && self.barrier >= body.maxBarrier * 0.05f) // Apply damage reduction to item holders with enough barrier
+            // Give temporary barrier and hidden item on ally death
+            // AI blacklisted for performance's sake
+            On.RoR2.DeathRewards.OnKilledServer += (orig, self, damageReport) =>
+            {
+                if (damageReport.attacker && damageReport.victimBody && damageReport.victimBody.teamComponent && damageReport.victimBody.teamComponent.teamIndex == TeamIndex.Player)
+                {
+                    foreach (var ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
+                    {
+                        if (ally.body && ally.body.healthComponent && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0)
                         {
-                            float finalDamageReduction = Apathy_Reduction;
-                            for (int i = 1; i < itemCount; i++) // Reduce damage by less each stack
+                            ally.body.healthComponent.AddBarrier(ally.body.healthComponent.fullBarrier);
+                            ally.body.inventory.GiveItem(hiddenItemDef);
+                            Util.PlaySound(EntityStates.ImpBossMonster.GroundPound.initialAttackSoundString, ally.gameObject);
+                            EffectData effectData = new EffectData
                             {
-                                finalDamageReduction += Apathy_ReductionStack * (1f - finalDamageReduction);
-                            }
-                            if (finalDamageReduction > 0.8f) // Cap at 80% to prevent too much damage reduction
-                            {
-                                finalDamageReduction = 0.8f;
-                            }
-                            damageInfo.damage -= (damageInfo.damage * finalDamageReduction);
-                        }
-
-                        if (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player) // Grant barrier to allies when allies are hit (AI Blacklist means only checking players is necessary)
-                        {
-                            var allies = TeamComponent.GetTeamMembers(TeamIndex.Player);
-                            float aggregateBarrier = 0f;
-
-                            foreach (var ally in allies) // Check how many Apathy items are in the team and add those to the Aggregate Barrier
-                            {
-                                if (!ally.body || !ally.body.healthComponent) continue;
-                                if (ally.body.inventory && ally.body.inventory.GetItemCount(itemDefToHooks) > 0 && ally.body.GetBuffCount(apathyCooldown) < 1)
-                                {
-                                    aggregateBarrier += Apathy_Barrier + (Apathy_BarrierStack * (ally.body.inventory.GetItemCount(itemDefToHooks) - 1));
-                                    ally.body.AddTimedBuff(apathyCooldown, 0.5f);
-                                }
-                            }
-                            if (aggregateBarrier > 0f) // Skip this loop if no apathy items were present
-                            {
-                                foreach (var ally in allies)
-                                {
-                                    if (ally.body && ally.body.healthComponent && ally.body.inventory)
-                                    {
-                                        ally.body.healthComponent.AddBarrier(ally.body.maxBarrier * aggregateBarrier); // And grant it to all team members
-                                    }
-                                }
-                            }
+                                origin = ally.body.corePosition
+                            };
+                            EffectManager.SpawnEffect(EntityStates.VoidMegaCrab.BackWeapon.FireVoidMissiles.muzzleEffectPrefab, effectData, false);
                         }
                     }
                 }
-                orig(self, damageInfo);
+                orig(self, damageReport);
             };
+
+            RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        public static BuffDef apathyCooldown { get; private set; }
-        public static void AddBuffs()
+        public static ItemDef CreateHiddenItem() // Keeps track of Apathy stacks
         {
-            apathyCooldown = ScriptableObject.CreateInstance<BuffDef>();
-            apathyCooldown.buffColor = new Color(1f, 1f, 1f);
-            apathyCooldown.canStack = true;
-            apathyCooldown.isDebuff = false;
-            apathyCooldown.name = "Apathy Barrier Cooldown";
-            apathyCooldown.isHidden = false;
-            apathyCooldown.isCooldown = true;
-            apathyCooldown.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png"); // Change this
-            ContentAddition.AddBuffDef(apathyCooldown);
+            ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+
+            item.name = "ApathyHidden";
+            item.nameToken = "H3_" + upperName + "_NAME";
+            item.pickupToken = "H3_" + upperName + "_PICKUP";
+            item.descriptionToken = "H3_" + upperName + "_DESC";
+            item.loreToken = "H3_" + upperName + "_LORE";
+
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
+            item.deprecatedTier = ItemTier.NoTier;
+            item.canRemove = false;
+            item.hidden = true;
+
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Apathy.png");
+
+            return item;
         }
 
-        public static void Initiate(float Apathy_Barrier, float Apathy_BarrierStack, float Apathy_Reduction, float Apathy_ReductionStack) // Finally, initiate the item and all of its features
+        public static BuffDef apathyStacks { get; private set; }
+        public static void AddBuffs() // Visual indicator of Apathy stacks
         {
-            CreateItem();
+            apathyStacks = ScriptableObject.CreateInstance<BuffDef>();
+            apathyStacks.buffColor = new Color(1f, 1f, 1f);
+            apathyStacks.canStack = true;
+            apathyStacks.isDebuff = false;
+            apathyStacks.name = "Apathy Stacks";
+            apathyStacks.isHidden = false;
+            apathyStacks.isCooldown = false;
+            apathyStacks.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png");
+            ContentAddition.AddBuffDef(apathyStacks);
+        }
+
+        public static void Initiate(float Apathy_HealthIncrease, float Apathy_DamageIncrease)
+        {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(Apathy_Barrier, Apathy_BarrierStack, Apathy_Reduction, Apathy_ReductionStack);
+            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
+            AddTokens(Apathy_HealthIncrease, Apathy_DamageIncrease);
             AddBuffs();
-            AddHooks(itemDefinition, Apathy_Barrier, Apathy_BarrierStack, Apathy_Reduction, Apathy_ReductionStack);
+            AddHooks(itemDefinition, hiddenItemDefinition, Apathy_HealthIncrease, Apathy_DamageIncrease);
         }
     }
 }

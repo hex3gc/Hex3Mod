@@ -13,7 +13,6 @@ namespace Hex3Mod.Items
     */
     public class ScavengersPack
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG.
         static string itemName = "ScavengersPack";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
@@ -39,7 +38,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.CannotDuplicate };
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
@@ -285,18 +284,18 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer useful.");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, ItemDef consumedItemDefToHooks, int ScavengersPack_Uses, bool ScavengersPack_RegenerativeScrap, bool Mystic1, bool Mystic2, bool tricorn, bool terminal, bool elixir, bool tickets, bool dios, bool larva) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef, int ScavengersPack_Uses, bool ScavengersPack_RegenerativeScrap, bool Mystic1, bool Mystic2, bool tricorn, bool terminal, bool elixir, bool tickets, bool dios, bool larva) // Insert hooks here
         {
             // Add or modify our item behavior when the character's inventory changes
             On.RoR2.CharacterBody.OnInventoryChanged += (orig, self) =>
             {
                 orig(self); // Enabling/disabling and stack behaviors/timer
-                if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) > 0)
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                 {
                     if (!self.GetComponent<ScavengerPackBehavior>())
                     {
-                        self.AddItemBehavior<ScavengerPackBehavior>(self.inventory.GetItemCount(itemDefToHooks));
-                        self.GetComponent<ScavengerPackBehavior>().stack = self.inventory.GetItemCount(itemDefToHooks);
+                        self.AddItemBehavior<ScavengerPackBehavior>(self.inventory.GetItemCount(itemDef));
+                        self.GetComponent<ScavengerPackBehavior>().stack = self.inventory.GetItemCount(itemDef);
                         if (MysticsCompatibility.enabled && Mystic2 == true)
                         {
                             self.GetComponent<ScavengerPackBehavior>().platCardEnabled = true;
@@ -304,8 +303,8 @@ namespace Hex3Mod.Items
                     }
                     if (self.GetComponent<ScavengerPackBehavior>())
                     {
-                        self.GetComponent<ScavengerPackBehavior>().stack = self.inventory.GetItemCount(itemDefToHooks);
-                        if (MysticsCompatibility.enabled && self.inventory.GetItemCount(itemDefToHooks) > 0 && Mystic2 == true)
+                        self.GetComponent<ScavengerPackBehavior>().stack = self.inventory.GetItemCount(itemDef);
+                        if (MysticsCompatibility.enabled && self.inventory.GetItemCount(itemDef) > 0 && Mystic2 == true)
                         {
                             if (self.inventory.GetItemCount(MysticsCompatibility.ShopTerminalCardConsumed) > 0)
                             {
@@ -315,14 +314,14 @@ namespace Hex3Mod.Items
                     }
                 }
                 // Regenerating Scrap
-                if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) > 0 && self.inventory.GetItemCount(DLC1Content.Items.RegeneratingScrapConsumed) > 0 && self.master && ScavengersPack_RegenerativeScrap == true)
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0 && self.inventory.GetItemCount(DLC1Content.Items.RegeneratingScrapConsumed) > 0 && self.master && ScavengersPack_RegenerativeScrap == true)
                 {
                     self.master.TryRegenerateScrap();
                     self.inventory.GiveItem(hiddenItemDefinition);
                     TryBreakPack(self, self.inventory);
                     Util.PlaySound(EntityStates.ScavMonster.FindItem.sound, self.gameObject);
                 }
-                if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) <= 0 && self.GetComponent<ScavengerPackBehavior>())
+                if (self.inventory && self.inventory.GetItemCount(itemDef) <= 0 && self.GetComponent<ScavengerPackBehavior>())
                 {
                     self.GetComponent<ScavengerPackBehavior>().enable = false;
                     self.inventory.RemoveItem(hiddenItemDefinition, self.inventory.GetItemCount(hiddenItemDefinition));
@@ -339,12 +338,12 @@ namespace Hex3Mod.Items
                 effectData.SetNetworkedObjectReference(characterBody.gameObject);
                 EffectManager.SpawnEffect(HealthComponent.AssetReferences.crowbarImpactEffectPrefab, effectData, true);
 
-                if (inventory.GetItemCount(itemDefToHooks) > 0 && inventory.GetItemCount(hiddenItemDefinition) >= ScavengersPack_Uses && characterBody.master)
+                if (inventory.GetItemCount(itemDef) > 0 && inventory.GetItemCount(hiddenItemDefinition) >= ScavengersPack_Uses && characterBody.master)
                 {
-                    inventory.RemoveItem(itemDefToHooks);
-                    inventory.GiveItem(consumedItemDefToHooks);
+                    inventory.RemoveItem(itemDef);
+                    inventory.GiveItem(consumeditemDef);
                     inventory.RemoveItem(hiddenItemDefinition, inventory.GetItemCount(hiddenItemDefinition));
-                    CharacterMasterNotificationQueue.SendTransformNotification(characterBody.master, itemDefToHooks.itemIndex, consumedItemDefToHooks.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                    CharacterMasterNotificationQueue.SendTransformNotification(characterBody.master, itemDef.itemIndex, consumeditemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
                 }
             }
 
@@ -352,7 +351,7 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterMasterNotificationQueue.SendTransformNotification_CharacterMaster_ItemIndex_ItemIndex_TransformationType += (orig, master, removedItem, gainedItem, transformationType) =>
             {
                 bool scavPackUsed = false;
-                if (master.GetBody() && master.GetBody().inventory && master.GetBody().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (master.GetBody() && master.GetBody().inventory && master.GetBody().inventory.GetItemCount(itemDef) > 0)
                 {
                     CharacterBody body = master.GetBody();
                     Inventory inventory = master.GetBody().inventory;
@@ -410,7 +409,7 @@ namespace Hex3Mod.Items
             {
                 bool scavPackUsed = false;
 
-                if (master.GetBody() && master.GetBody().inventory && master.GetBody().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (master.GetBody() && master.GetBody().inventory && master.GetBody().inventory.GetItemCount(itemDef) > 0)
                 {
                     CharacterBody body = master.GetBody();
                     Inventory inventory = master.GetBody().inventory;
@@ -437,7 +436,7 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterMasterNotificationQueue.SendTransformNotification_CharacterMaster_EquipmentIndex_EquipmentIndex_TransformationType += (orig, master, removedEquip, gainedEquip, transformationType) =>
             {
                 bool scavPackUsed = false;
-                if (master.GetBody() && master.GetBody().inventory && master.GetBody().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (master.GetBody() && master.GetBody().inventory && master.GetBody().inventory.GetItemCount(itemDef) > 0)
                 {
                     CharacterBody body = master.GetBody();
                     Inventory inventory = master.GetBody().inventory;
@@ -485,7 +484,7 @@ namespace Hex3Mod.Items
                 orig(self, equipmentState, slot);
                 if (TinkersCompatibility.enabled == true && terminal == true)
                 {
-                    if (equipmentState.equipmentIndex == EquipmentIndex.None && equipmentState.charges == 0 && EquipmentCatalog.GetEquipmentDef(currentEquip) && EquipmentCatalog.GetEquipmentDef(currentEquip).name == "TKSATReviveOnce" && self.GetItemCount(itemDefToHooks) > 0 && self.gameObject.GetComponent<CharacterMaster>() && self.gameObject.GetComponent<CharacterMaster>().GetBody())
+                    if (equipmentState.equipmentIndex == EquipmentIndex.None && equipmentState.charges == 0 && EquipmentCatalog.GetEquipmentDef(currentEquip) && EquipmentCatalog.GetEquipmentDef(currentEquip).name == "TKSATReviveOnce" && self.GetItemCount(itemDef) > 0 && self.gameObject.GetComponent<CharacterMaster>() && self.gameObject.GetComponent<CharacterMaster>().GetBody())
                     {
                         CharacterBody body = self.gameObject.GetComponent<CharacterMaster>().GetBody();
                         self.SetEquipmentIndex(currentEquip);
@@ -506,7 +505,7 @@ namespace Hex3Mod.Items
                     if (activatorMaster && activatorMaster.hasBody && activatorMaster.inventory && activatorMaster.inventory.GetItemCount(MysticsCompatibility.ShopTerminalCard) > 0 && context.purchasedObject)
                     {
                         ShopTerminalBehavior shopTerminalBehavior = context.purchasedObject.GetComponent<ShopTerminalBehavior>();
-                        if (shopTerminalBehavior && shopTerminalBehavior.serverMultiShopController && activatorMaster.inventory.GetItemCount(itemDefToHooks) > 0 && activatorMaster.GetBody())
+                        if (shopTerminalBehavior && shopTerminalBehavior.serverMultiShopController && activatorMaster.inventory.GetItemCount(itemDef) > 0 && activatorMaster.GetBody())
                         {
                             activatorMaster.inventory.GiveItem(MysticsCompatibility.ShopTerminalCard);
                             activatorMaster.inventory.RemoveItem(MysticsCompatibility.ShopTerminalCardConsumed);
@@ -547,7 +546,7 @@ namespace Hex3Mod.Items
             }
         }
 
-        public static void Initiate(int ScavengersPack_Uses, bool ScavengersPack_RegenerativeScrap, bool Mystic1, bool Mystic2, bool tricorn, bool terminal, bool elixir, bool tickets, bool dios, bool larva) // Finally, initiate the item and all of its features
+        public static void Initiate(int ScavengersPack_Uses, bool ScavengersPack_RegenerativeScrap, bool Mystic1, bool Mystic2, bool tricorn, bool terminal, bool elixir, bool tickets, bool dios, bool larva)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));

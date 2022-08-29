@@ -11,8 +11,7 @@ namespace Hex3Mod.Items
     */
     public class ShardOfGlass
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "ShardOfGlass"; // Change this name when making a new item
+        static string itemName = "ShardOfGlass";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -35,7 +34,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Damage }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Damage };
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
@@ -46,7 +45,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -225,27 +224,24 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "The essence of a broken body\n\nYou collect the pieces carefully\n\nAn air of arrogance surrounds these shards\n\nYou feel like you can take on the world and never break beneath it");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float DamageIncrease_Config) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float DamageIncrease_Config)
         {
-            float DamageIncrease = DamageIncrease_Config;
-
-            void H3_RecalculateStatsAPI_GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
+            void GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
             {
                 if (sender.inventory)
                 {
-                    Inventory inventory = sender.inventory;
-                    int itemCount = inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = sender.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
-                        args.damageMultAdd += (DamageIncrease * itemCount);
+                        args.damageMultAdd += DamageIncrease_Config * itemCount;
                     }
                 }
             }
 
-            RecalculateStatsAPI.GetStatCoefficients += H3_RecalculateStatsAPI_GetStatCoefficients;
+            RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        public static void Initiate(float DamageIncrease_Config) // Finally, initiate the item and all of its features
+        public static void Initiate(float DamageIncrease_Config)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(DamageIncrease_Config);

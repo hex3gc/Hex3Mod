@@ -14,8 +14,7 @@ namespace Hex3Mod.Items
     */
     public class Discovery
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "Discovery"; // Change this name when making a new item
+        static string itemName = "Discovery";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static ItemDef hiddenItemDefinition = CreateHiddenItem();
@@ -39,7 +38,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Would be useless and complicated on monsters
+            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.VoidTier2;
             item.canRemove = true;
             item.hidden = false;
@@ -51,7 +50,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -243,10 +242,10 @@ namespace Hex3Mod.Items
             "\n\n<style=cStack>I'm so cold...</style>");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, ItemDef hiddenItemDefToHooks, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, ItemDef hiddenitemDef, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
         {
             // Void transformation
-            VoidTransformation.CreateTransformation(itemDefToHooks, "Infusion");
+            VoidTransformation.CreateTransformation(itemDef, "Infusion");
 
             // Easy way to do this: Make a new hidden item, add one each time an interactable is used
             void DiscoveryInteract(Interactor interactor, PurchaseInteraction interaction)
@@ -261,14 +260,14 @@ namespace Hex3Mod.Items
 
                         foreach (var member in bodyTeamMembers)
                         {
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks)))
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenitemDef) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef)))
                             {
-                                member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
-                                if (member.body.inventory.GetItemCount(hiddenItemDefToHooks) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks))
+                                member.body.inventory.GiveItem(hiddenitemDef, member.body.inventory.GetItemCount(itemDef));
+                                if (member.body.inventory.GetItemCount(hiddenitemDef) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef))
                                 {
-                                    for (int i = member.body.inventory.GetItemCount(hiddenItemDefToHooks); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks); i--)
+                                    for (int i = member.body.inventory.GetItemCount(hiddenitemDef); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef); i--)
                                     {
-                                        member.body.inventory.RemoveItem(hiddenItemDefToHooks);
+                                        member.body.inventory.RemoveItem(hiddenitemDef);
                                     }
                                 }
                                 Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
@@ -278,9 +277,9 @@ namespace Hex3Mod.Items
                                 };
                                 EffectManager.SpawnEffect(EntityStates.NullifierMonster.FirePortalBomb.muzzleflashEffectPrefab, effectData, false);
                             }
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) < 1)
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) < 1)
                             {
-                                member.body.inventory.ResetItem(hiddenItemDefToHooks);
+                                member.body.inventory.ResetItem(hiddenitemDef);
                             }
                         }
                     }
@@ -296,14 +295,14 @@ namespace Hex3Mod.Items
 
                     foreach (var member in bodyTeamMembers)
                     {
-                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0 && body.inventory.GetItemCount(hiddenItemDefToHooks) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks)))
+                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenitemDef) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef)))
                         {
-                            member.body.inventory.GiveItem(hiddenItemDefToHooks, member.body.inventory.GetItemCount(itemDefToHooks));
-                            if (member.body.inventory.GetItemCount(hiddenItemDefToHooks) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks))
+                            member.body.inventory.GiveItem(hiddenitemDef, member.body.inventory.GetItemCount(itemDef));
+                            if (member.body.inventory.GetItemCount(hiddenitemDef) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef))
                             {
-                                for (int i = member.body.inventory.GetItemCount(hiddenItemDefToHooks); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDefToHooks); i--)
+                                for (int i = member.body.inventory.GetItemCount(hiddenitemDef); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef); i--)
                                 {
-                                    member.body.inventory.RemoveItem(hiddenItemDefToHooks);
+                                    member.body.inventory.RemoveItem(hiddenitemDef);
                                 }
                             }
                             Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
@@ -319,10 +318,10 @@ namespace Hex3Mod.Items
 
             void DiscoveryRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (body && body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
+                if (body && body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    args.baseShieldAdd += Discovery_ShieldAdd * body.inventory.GetItemCount(hiddenItemDefToHooks);
-                    body.SetBuffCount(discoveryBuff.buffIndex, body.inventory.GetItemCount(hiddenItemDefToHooks));
+                    args.baseShieldAdd += Discovery_ShieldAdd * body.inventory.GetItemCount(hiddenitemDef);
+                    body.SetBuffCount(discoveryBuff.buffIndex, body.inventory.GetItemCount(hiddenitemDef));
                 }
             }
 
@@ -361,7 +360,7 @@ namespace Hex3Mod.Items
         }
 
         public static BuffDef discoveryBuff { get; private set; }
-        public static void AddBuffs() // Just for players to track their discovery stacks
+        public static void AddBuffs()
         {
             discoveryBuff = ScriptableObject.CreateInstance<BuffDef>();
             discoveryBuff.buffColor = new Color(1f, 1f, 1f);
@@ -370,11 +369,11 @@ namespace Hex3Mod.Items
             discoveryBuff.name = "Discovery Shields";
             discoveryBuff.isHidden = false;
             discoveryBuff.isCooldown = false;
-            discoveryBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png"); // Rework this later
+            discoveryBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png");
             ContentAddition.AddBuffDef(discoveryBuff);
         }
 
-        public static void Initiate(float Discovery_ShieldAdd, int Discovery_MaxStacks) // Finally, initiate the item and all of its features
+        public static void Initiate(float Discovery_ShieldAdd, int Discovery_MaxStacks)
         {
             CreateItem();
             CreateHiddenItem();

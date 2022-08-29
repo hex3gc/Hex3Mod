@@ -15,8 +15,7 @@ namespace Hex3Mod.Items
     */
     public class TheHermit
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "TheHermit"; // Change this name when making a new item
+        static string itemName = "TheHermit";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -253,10 +252,10 @@ namespace Hex3Mod.Items
         "\n\nHe had found a way out, but it was too late to take it.");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float TheHermit_BuffDuration, float TheHermit_DamageReduction) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float TheHermit_BuffDuration, float TheHermit_DamageReduction) // Insert hooks here
         {
             // Void transformation
-            VoidTransformation.CreateTransformation(itemDefToHooks, "PermanentDebuffOnHit");
+            VoidTransformation.CreateTransformation(itemDef, "PermanentDebuffOnHit");
 
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
@@ -265,7 +264,7 @@ namespace Hex3Mod.Items
                 {
                     Inventory attackerInventory = damageInfo.attacker.GetComponent<CharacterBody>().inventory;
                     CharacterBody victimBody = self.gameObject.GetComponent<CharacterBody>();
-                    int itemCount = attackerInventory.GetItemCount(itemDefToHooks);
+                    int itemCount = attackerInventory.GetItemCount(itemDef);
 
                     if (itemCount > 0 && damageInfo.procCoefficient > 0f && !damageInfo.rejected)
                     {
@@ -295,7 +294,7 @@ namespace Hex3Mod.Items
         }
 
         public static BuffDef hermitBuff { get; private set; }
-        public static void AddBuffs() // The Hermit is a bit dangerous in modded because it is a buff, which is boosted by Choc Chip and Hourglass. The results are OP
+        public static void AddBuffs()
         {
             hermitBuff = ScriptableObject.CreateInstance<BuffDef>();
             hermitBuff.buffColor = new Color(1f, 1f, 1f);
@@ -304,11 +303,11 @@ namespace Hex3Mod.Items
             hermitBuff.name = "The Hermit's Curse";
             hermitBuff.isHidden = false;
             hermitBuff.isCooldown = false;
-            hermitBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_TheHermit.png"); // Rework this later
+            hermitBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_TheHermit.png");
             ContentAddition.AddBuffDef(hermitBuff);
         }
 
-        public static void Initiate(float TheHermit_BuffDuration, float TheHermit_DamageReduction) // Finally, initiate the item and all of its features
+        public static void Initiate(float TheHermit_BuffDuration, float TheHermit_DamageReduction)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));

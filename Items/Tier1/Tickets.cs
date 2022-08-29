@@ -11,8 +11,7 @@ namespace Hex3Mod.Items
     */
     public class Tickets
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "FourHundredTickets"; // Change this name when making a new item
+        static string itemName = "FourHundredTickets";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static ItemDef consumedItemDefinition = CreateConsumedItem();
@@ -36,7 +35,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Would be useless on AI
+            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
@@ -55,7 +54,7 @@ namespace Hex3Mod.Items
             item.pickupToken = "H3_" + upperName + "CONSUMED_PICKUP";
             item.descriptionToken = "H3_" + upperName + "CONSUMED_DESC";
 
-            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotDuplicate , ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Need to make sure the item can't be given or cloned
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotDuplicate , ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier. NoTier;
             item.canRemove = true;
             item.hidden = false;
@@ -66,7 +65,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -256,7 +255,7 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer valid.");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, ItemDef consumedItemDefToHooks) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef)
         {
             // Store the chest and the character to ensure that the right chest and the right player are getting affected
             GameObject purchasedObject = new GameObject();
@@ -265,7 +264,7 @@ namespace Hex3Mod.Items
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, interactor) =>
             {
                 orig(self, interactor);
-                if (interactor.GetComponent<CharacterBody>() && interactor.GetComponent<CharacterBody>().inventory && interactor.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (interactor.GetComponent<CharacterBody>() && interactor.GetComponent<CharacterBody>().inventory && interactor.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
                 {
                     if (self.isShrine != true)
                     {
@@ -277,17 +276,17 @@ namespace Hex3Mod.Items
 
             On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
             {
-                if (self.gameObject == purchasedObject && interactorBody.inventory && interactorBody.inventory.GetItemCount(itemDefToHooks) > 0)
+                if (self.gameObject == purchasedObject && interactorBody.inventory && interactorBody.inventory.GetItemCount(itemDef) > 0)
                 {
                     if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
                     {
                         self.dropUpVelocityStrength = 5f;
-                        self.dropForwardVelocityStrength = 25f;
+                        self.dropForwardVelocityStrength = 20f;
                     }
                     self.dropCount += 1;
-                    interactorBody.inventory.RemoveItem(itemDefToHooks);
-                    interactorBody.inventory.GiveItem(consumedItemDefToHooks);
-                    CharacterMasterNotificationQueue.SendTransformNotification(interactorBody.master, itemDefToHooks.itemIndex, consumedItemDefToHooks.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                    interactorBody.inventory.RemoveItem(itemDef);
+                    interactorBody.inventory.GiveItem(consumeditemDef);
+                    CharacterMasterNotificationQueue.SendTransformNotification(interactorBody.master, itemDef.itemIndex, consumeditemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
                     Util.PlaySound(RouletteChestController.Opening.soundEntryEvent, self.gameObject);
                     purchasedObject = null;
                     interactorBody = null;
@@ -296,7 +295,7 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate() // Finally, initiate the item and all of its features
+        public static void Initiate()
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));

@@ -14,8 +14,7 @@ namespace Hex3Mod.Items
     */
     public class NoticeOfAbsence
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "NoticeOfAbsence"; // Change this name when making a new item
+        static string itemName = "NoticeOfAbsence";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -50,7 +49,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -229,21 +228,21 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "I'm leaving tomorrow\n\nYou wouldn't understand why\n\n- Alex");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float NoticeOfAbsence_SpeedBuff, float NoticeOfAbsence_MaxSpeedBuff) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float NoticeOfAbsence_SpeedBuff, float NoticeOfAbsence_MaxSpeedBuff)
         {
             // Void transformation
-            VoidTransformation.CreateTransformation(itemDefToHooks, "BucketList");
+            VoidTransformation.CreateTransformation(itemDef, "BucketList");
 
             void NoticeOfAbsenceRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (body.inventory && body.inventory.GetItemCount(itemDefToHooks) > 0)
+                if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
                     float voidItemCount = 0f;
                     voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier1);
                     voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier2);
                     voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier3);
                     voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidBoss);
-                    float finalSpeedBuff = NoticeOfAbsence_SpeedBuff * (voidItemCount * body.inventory.GetItemCount(itemDefToHooks));
+                    float finalSpeedBuff = NoticeOfAbsence_SpeedBuff * (voidItemCount * body.inventory.GetItemCount(itemDef));
                     if (finalSpeedBuff > NoticeOfAbsence_MaxSpeedBuff)
                     {
                         finalSpeedBuff = NoticeOfAbsence_MaxSpeedBuff;
@@ -254,7 +253,7 @@ namespace Hex3Mod.Items
             RecalculateStatsAPI.GetStatCoefficients += NoticeOfAbsenceRecalculateStats;
         }
 
-        public static void Initiate(float NoticeOfAbsence_SpeedBuff, float NoticeOfAbsence_MaxSpeedBuff) // Finally, initiate the item and all of its features
+        public static void Initiate(float NoticeOfAbsence_SpeedBuff, float NoticeOfAbsence_MaxSpeedBuff)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));

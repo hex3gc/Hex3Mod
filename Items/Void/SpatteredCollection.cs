@@ -14,8 +14,7 @@ namespace Hex3Mod.Items
     */
     public class SpatteredCollection
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "SpatteredCollection"; // Change this name when making a new item
+        static string itemName = "SpatteredCollection";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -50,7 +49,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -230,25 +229,25 @@ namespace Hex3Mod.Items
             "\n\n<style=cStack>(Bubbling sounds, mixed with heavy breathing. The audio recording ends shortly after.)</style>");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float SpatteredCollection_IntervalReduction, float SpatteredCollection_DotChance) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float SpatteredCollection_IntervalReduction, float SpatteredCollection_DotChance) // Insert hooks here
         {
             // Void transformation
-            VoidTransformation.CreateTransformation(itemDefToHooks, "ScatteredReflection");
+            VoidTransformation.CreateTransformation(itemDef, "ScatteredReflection");
 
             On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
             {
                 if (attackerObject && attackerObject.GetComponent<CharacterBody>() != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().teamComponent)
                 {
-                    int itemCount = attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
                         int totalItemCount = 0; // To make this easy for me, Spattered Collection stacking will be tracked for the whole team
 
                         foreach (TeamComponent member in TeamComponent.GetTeamMembers(TeamIndex.Player))
                         {
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDefToHooks) > 0)
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0)
                             {
-                                totalItemCount += member.body.inventory.GetItemCount(itemDefToHooks);
+                                totalItemCount += member.body.inventory.GetItemCount(itemDef);
                             }
                         }
 
@@ -273,7 +272,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
                 {
                     if (damageInfo.attacker.GetComponent<CharacterBody>().master && damageInfo.dotIndex != DotController.DotIndex.Blight && damageInfo.attacker != victim && damageInfo.damage > 0f)
                     {
@@ -298,7 +297,7 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float SpatteredCollection_IntervalReduction, float SpatteredCollection_DotChance) // Finally, initiate the item and all of its features
+        public static void Initiate(float SpatteredCollection_IntervalReduction, float SpatteredCollection_DotChance)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));

@@ -27,7 +27,7 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "1.0.1";
+        public const string ModVer = "1.1.0";
 
         public static AssetBundle MainAssets;
 
@@ -47,8 +47,8 @@ namespace Hex3Mod
         public ConfigEntry<float> BucketList_BuffReduce() { return Config.Bind<float>(new ConfigDefinition("Common - Bucket List", "Reduced buff multiplier"), 0.75f, new ConfigDescription("Amount that the speed buff is reduced by while fighting a boss", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> HopooEgg_Enable() { return Config.Bind<bool>(new ConfigDefinition("Common - Hopoo Egg", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> HopooEgg_JumpModifier() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Jump height multiplier"), 0.15f, new ConfigDescription("Percent jump height increase", null, Array.Empty<object>())); }
-        public ConfigEntry<float> HopooEgg_AirControlModifier() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Air control multiplier"), 0.1f, new ConfigDescription("Amount of added air control", null, Array.Empty<object>())); }
+        public ConfigEntry<float> HopooEgg_JumpModifier() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Jump height multiplier"), 0.2f, new ConfigDescription("Percent jump height increase", null, Array.Empty<object>())); }
+        public ConfigEntry<float> HopooEgg_FallDamageReduction() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Fall damage reduction"), 0.15f, new ConfigDescription("How much of all received fall damage is reduced per stack", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> AtgPrototype_Enable() { return Config.Bind<bool>(new ConfigDefinition("Common - ATG Prototype", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> AtgPrototype_Damage() { return Config.Bind<float>(new ConfigDefinition("Common - ATG Prototype", "Damage per stack"), 0.8f, new ConfigDescription("Multiplier of base damage the missile deals per stack", null, Array.Empty<object>())); }
@@ -63,7 +63,7 @@ namespace Hex3Mod
         public ConfigEntry<float> ScatteredReflection_DamageReflectBonus() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Scattered Reflection", "Reflected damage bonus"), 0.7f, new ConfigDescription("Multiplier of how much bonus damage is added to the reflection", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> Empathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Empathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Empathy_HealFor() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Healing amount"), 5f, new ConfigDescription("Healing per sustained hit", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Empathy_HealingFactor() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Healing factor"), 0.05f, new ConfigDescription("Fraction of ally's received damage converted into healing", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> ScavengersPack_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pack", "Maximum uses"), 3, new ConfigDescription("Times the Scavenger's Pack can be used before breaking.", null, Array.Empty<object>())); }
@@ -77,15 +77,10 @@ namespace Hex3Mod
         public ConfigEntry<bool> dios() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Dios Best Friend"), true, new ConfigDescription("Expend Scavenger's Pack charges on Dio's Best Friend.", null, Array.Empty<object>())); }
         public ConfigEntry<bool> larva() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Pluripotent Larva"), true, new ConfigDescription("Expend Scavenger's Pack charges on Pluripotent Larva.", null, Array.Empty<object>())); }
 
-
-        // public ConfigEntry<bool> StarHomeRunner_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Star Home Runner", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-
         // Legendary
         public ConfigEntry<bool> Apathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Apathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_Barrier() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Barrier on receiving damage"), 0.03f, new ConfigDescription("Percentage barrier gained and granted to allies when you or your allies are hit", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_BarrierStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Barrier on receiving damage per stack"), 0.02f, new ConfigDescription("Percentage barrier gained and granted to allies when you or your allies are hit per stack", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_Reduction() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Barrier damage reduction"), 0.2f, new ConfigDescription("Damage reduction while the item holder has barrier", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_ReductionStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Barrier damage reduction per stack"), 0.10f, new ConfigDescription("Damage reduction while the item holder has barrier (Hyperbolic, caps at 90%)", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Apathy_HealthIncrease() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Max health gain on ally death"), 0.05f, new ConfigDescription("Percent max health gained per ally death", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Apathy_DamageIncrease() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Damage increase on ally death"), 0.05f, new ConfigDescription("Percent damage increase per ally death", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> MintCondition_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Mint Condition", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> MintCondition_MoveSpeed() { return Config.Bind<float>(new ConfigDefinition("Legendary - Mint Condition", "Move speed increase"), 0.2f, new ConfigDescription("Base movement speed increase", null, Array.Empty<object>())); }
@@ -97,6 +92,11 @@ namespace Hex3Mod
         public ConfigEntry<float> ElderMutagen_Duration() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Duration of received buffs and debuffs"), 5f, new ConfigDescription("How long, in seconds, should each buff/debuff given by this item last per stack", null, Array.Empty<object>())); }
         public ConfigEntry<float> ElderMutagen_Chance() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Chance to add debuff on hit"), 5f, new ConfigDescription("Percent chance to trigger a random debuff on hit.", null, Array.Empty<object>())); }
         public ConfigEntry<float> ElderMutagen_Interval() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Buff interval"), 15f, new ConfigDescription("Interval between random buffs in seconds.", null, Array.Empty<object>())); }
+
+        public ConfigEntry<bool> DoNotEat_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Do Not Eat", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> DoNotEat_PearlChancePerStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Pearl Chance"), 5f, new ConfigDescription("Percent chance that a Pearl or Irradiant Pearl will drop from a chest.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> DoNotEat_IrradiantChance() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Irradiant Pearl Chance"), 20f, new ConfigDescription("Percent chance that an Irradiant Pearl will drop instead of a Pearl.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> DoNotEat_IrradiantChancePerStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Irradiant Pearl Chance Per Stack"), 5f, new ConfigDescription("Percent chance that an Irradiant Pearl will drop instead of a Pearl (Per stack).", null, Array.Empty<object>())); }
 
         // Void
         public ConfigEntry<bool> CorruptingParasite_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
@@ -114,7 +114,7 @@ namespace Hex3Mod
         public ConfigEntry<float> DropOfNecrosis_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Drop Of Necrosis", "Chance to inflict Blight"), 10f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> Discovery_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Discovery", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Discovery_ShieldAdd() { return Config.Bind<float>(new ConfigDefinition("Void - Discovery", "Shield value"), 2f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Discovery_ShieldAdd() { return Config.Bind<float>(new ConfigDefinition("Void - Discovery", "Shield value"), 3f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>())); }
         public ConfigEntry<int> Discovery_MaxStacks() { return Config.Bind<int>(new ConfigDefinition("Void - Discovery", "Maximum uses"), 100, new ConfigDescription("Maximum interactable uses per stack before shield is no longer granted", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> SpatteredCollection_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Spattered Collection", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
@@ -158,20 +158,20 @@ namespace Hex3Mod
             Log.LogInfo("Common");
             if (ShardOfGlass_Enable().Value == true){ ShardOfGlass.Initiate(ShardOfGlass_DamageIncrease().Value); }
             if (BucketList_Enable().Value == true){ BucketList.Initiate(BucketList_FullBuff().Value, BucketList_BuffReduce().Value); }
-            if (HopooEgg_Enable().Value == true){ HopooEgg.Initiate(HopooEgg_JumpModifier().Value, HopooEgg_AirControlModifier().Value); }
+            if (HopooEgg_Enable().Value == true){ HopooEgg.Initiate(HopooEgg_JumpModifier().Value, HopooEgg_FallDamageReduction().Value); }
             if (AtgPrototype_Enable().Value == true){ AtgPrototype.Initiate(AtgPrototype_Damage().Value, AtgPrototype_HitRequirement().Value); }
             if (Tickets_Enable().Value == true){ Tickets.Initiate(); }
             // Uncommon
             Log.LogInfo("Uncommon");
             if (ScatteredReflection_Enable().Value == true){ ScatteredReflection.Initiate(ScatteredReflection_DamageReflectPercent().Value, ScatteredReflection_DamageReflectShardStack().Value, ScatteredReflection_DamageReflectBonus().Value); }
-            if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealFor().Value); }
+            if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealingFactor().Value, Empathy_HealingDuration().Value); }
             if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_RegenerativeScrap().Value, ScavengersPack_Mystic1().Value, ScavengersPack_Mystic2().Value, tricorn().Value, terminal().Value, elixir().Value, tickets().Value, dios().Value, larva().Value); }
-            // if (StarHomeRunner_Enable().Value == true) { StarHomeRunner.Initiate(); }
             // Legendary
             Log.LogInfo("Legendary");
-            if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_Barrier().Value, Apathy_BarrierStack().Value, Apathy_Reduction().Value, Apathy_ReductionStack().Value); }
+            if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_HealthIncrease().Value, Apathy_DamageIncrease().Value); }
             if (MintCondition_Enable().Value == true){ MintCondition.Initiate(MintCondition_MoveSpeed().Value, MintCondition_MoveSpeedStack().Value, MintCondition_AddJumps().Value, MintCondition_AddJumpsStack().Value); }
             if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_Duration().Value, ElderMutagen_Chance().Value, ElderMutagen_Interval().Value); }
+            if (DoNotEat_Enable().Value == true) { DoNotEat.Initiate(DoNotEat_PearlChancePerStack().Value, DoNotEat_IrradiantChance().Value, DoNotEat_IrradiantChancePerStack().Value); }
             // Void
             Log.LogInfo("Void");
             if (CorruptingParasite_Enable().Value == true){ CorruptingParasite.Initiate(CorruptingParasite_CorruptBossItems().Value, CorruptingParasite_AlternateMode().Value, CorruptingParasite_Replication().Value, CorruptingParasite_AltModeOnlyConvert().Value); }

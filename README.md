@@ -1,9 +1,9 @@
 # Info
 
-Adds 1 artifact and 17 new items to the game:
+Adds 1 artifact and 18 new items to the game:
 * 5 Common
 * 3 Uncommon
-* 3 Legendary
+* 4 Legendary
 * 6 Void
 
 | Icon  | Description |
@@ -11,17 +11,18 @@ Adds 1 artifact and 17 new items to the game:
 | | <p align="center">**COMMON**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891571519548/ATGPrototype.png?raw=true" width=128> | **ATG Prototype**<br>After inflicting **10** hits, fire a missile that deals **80%** <sup>(+80% per stack)</sup> TOTAL damage. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891810619442/BucketList.png?raw=true" width=128> | **Bucket List**<br>Move **20%** faster <sup>(+20% per stack)</sup>. Reduce this bonus by **75%** during boss fights. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890950758420/HopooEgg.png?raw=true" width=128> | **Hopoo Egg**<br>Jump **15%** <sup>(+15% per stack)</sup> higher. While in the air, you can control your movement **10%** more <sup>(+10% per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890950758420/HopooEgg.png?raw=true" width=128> | **Hopoo Egg**<br>Jump **20%** <sup>(+20% per stack)</sup> higher. Reduce fall damage by **15%** <sup>(+15% per stack, diminishing)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Shard Of Glass**<br>Increase your **base damage** by **7%** <sup>(+7% per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987243618364/Tickets.png?raw=true" width=128> | **400 Tickets**<br>The next chest, void cradle, equipment barrel, lunar pod or scavenger bag you open will contain an additional item. **Consumed on use**. |
 | | <p align="center">**UNCOMMON**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>Heal for **5 HP** <sup>(+5 per stack)</sup> when you or an ally takes damage. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>When an ally takes damage, **heal** for **5%** <sup>(+2.5% per stack)</sup> of that damage. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Prevent 7%** of all received damage and reflect it back to your attacker, adding an additional **70%** <sup>(+70% per stack)</sup> damage bonus. For every **Shard Of Glass** in your inventory, prevent **0.7%** more damage. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/985265706620829716/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pack**<br>**Prevents** your consumable items and equipment from being consumed up to **3** times before breaking. Does not affect **fragile** items. |
 | | <p align="center">**LEGENDARY**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>Reduce all damage by **20%** <sup>(+10% per stack, diminishing)</sup> while you have **barrier**. When you or your allies are hit, grant **3%** <sup>(+2% per stack)</sup> **barrier** to your whole team. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>When an ally is killed, gain full **barrier** and receive a permanent **5%** <sup>(+{0}% per stack)</sup> **max health** and **5%** <sup>(+5% per stack)</sup> **damage buff**. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>Provides immunity to movement restricting status effects. Gain **20%** movement speed <sup>(+40% per stack)</sup> and **1** <sup>+2 per stack</sup> extra jumps. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>Your hits have a **5%** chance to inflict a **random debuff** that lasts **5** <sup>(+5 per stack)</sup> seconds. Every **15** seconds, gain a **random buff** that lasts **5** <sup>(+5 per stack)</sup> seconds. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **5%** <sup>(+10% per stack)</sup> chance to also contain a **Pearl** <sup>(80%)</sup> or an **Irradiant Pearl** <sup>(20%, 5% per stack)</sup>. |
 | | <p align="center">**VOID**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>**Corrupts** 1 <sup>(+1 per stack)</sup> item in your inventory into a **random void item** of the same rarity each stage. Prefers more common items. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987939840060/NoticeOfAbsence.png?raw=true" width=128> | **Notice Of Absence**<br>For each **void item** in your inventory, move **3%** faster per stack. **Corrupts all Bucket Lists.**|
@@ -46,6 +47,15 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 1.1.0 - Due to the many changes, deleting or modifying your config file will be necessary.
+* **Added item "Do Not Eat" (Legendary)**
+* **Hopoo Egg rework:** Jump higher and take less fall damage.
+* **Empathy rework:** Heal for a fraction of the damage your allies take.
+* **Apathy rework:** Gain a permanent max health and damage buff when an ally is killed, as well as full barrier.
+* Hopoo egg jump height increase 15% -> 20%
+* Discovery shields per interaction 2 -> 3
+* Scavenger's Pack no longer appears in printers to avoid infinite item duplication
+
 ### 1.0.1
 * ATG Prototype no longer procs on missile attacks
 * ATG Prototype now correctly procs every 10 hits instead of every 9
@@ -55,7 +65,7 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 ### 1.0.0
 The mod feels complete enough to give a 1.0 release, so here it is! More features (Boss items, lunars, companion mods, etc.) will come in the future.
 * Added item "Scavenger's Pack"
-* Apathy max damage reduction 90& -> 80%
+* Apathy max damage reduction 90% -> 80%
 * Scattered Reflection max damage reduction 90% -> 80%
 * Optimized multiple items' code (Thanks to Bubbet for pointing out the issues)
 * Using 400 Tickets on Void Chests should no longer drop the two items inside of each other
@@ -63,7 +73,7 @@ The mod feels complete enough to give a 1.0 release, so here it is! More feature
 ### 0.4.5
 * Icons were too big :(
 
-### 0.4.4 - Reset/change your configs or these changes may not take effect properly.
+### 0.4.4
 * The Hermit rework: Now grants a stacking debuff on hit which reduces the enemy's damage up to 75%.
 * Elder Mutagen rework: Now has a chance to inflict a random debuff on hit, and also grants a random buff every 15 seconds.
 * ATG Prototype damage per stack 100% -> 80%

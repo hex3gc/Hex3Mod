@@ -11,10 +11,9 @@ namespace Hex3Mod.Items
     */
     public class AtgPrototype
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "AtgPrototype"; // Change this name when making a new item
+        static string itemName = "AtgPrototype";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem(); // Must be public for ScatteredReflection to read
+        public static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ATGPrototypePrefab.prefab");
@@ -35,7 +34,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Damage }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Damage };
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
@@ -46,7 +45,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -225,7 +224,7 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: AtG Missile Launcher Prototype\nTracking Number: 11******\nEstimated Delivery: 08/15/2056\nShipping Method: Priority\nShipping Address: Cargo Bay 1-A, Terminal 2-A, UES Port\nShipping Details:\n\nThe AtG Missile Launcher MK1 is a staple for our military operations, but like many wrist rockets and shoulder-mounted launchers, it suffers a safety issue with its targeting scheme. As the missiles are heat-seeking, it can often be thrown off by variance in local temperatures, which is a common issue at our deployment locations. This also renders the missiles ineffective against targets who can manipulate cold and ice, which was admittedly unprecedented.\n\nAdditionally, while the ATG has safeguards against seeking its holder, these fall apart when the launcher sustains heavy damage or even a temporary power outage. This has resulted in a number of unfortunate accidents. We'll need to have a look at the AtG's predecessor models, because clearly something was [REDACTED] up along the way.");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float atgDamageStack, int hitRequirement) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float atgDamageStack, int hitRequirement)
         {
             BuffIndex atgBuffIndex = new BuffIndex();
             void GetAtgIndex()
@@ -251,12 +250,12 @@ namespace Hex3Mod.Items
                     {
                         attackerBody.SetBuffCount(atgBuffIndex, 1);
                     }
-                    if (attackerInventory.GetItemCount(itemDefToHooks) > 0 && victim)
+                    if (attackerInventory.GetItemCount(itemDef) > 0 && victim)
                     {
                         attackerBody.AddBuff(atgCounter);
                         if (attackerBody.GetBuffCount(atgCounter) >= (hitRequirement + 1))
                         {
-                            float damageCoefficient = atgDamageStack * (float)attackerInventory.GetItemCount(itemDefToHooks);
+                            float damageCoefficient = atgDamageStack * (float)attackerInventory.GetItemCount(itemDef);
                             float missileDamage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);
                             MissileUtils.FireMissile(
                                 attackerBody.corePosition, 
@@ -285,13 +284,12 @@ namespace Hex3Mod.Items
             atgCounter.isDebuff = false;
             atgCounter.name = "ATGCounter";
             atgCounter.isHidden = true;
-            atgCounter.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/ATGIcon.png"); // Change this
+            atgCounter.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/ATGIcon.png");
             ContentAddition.AddBuffDef(atgCounter);
         }
 
-        public static void Initiate(float atgDamageStack, int hitRequirement) // Finally, initiate the item and all of its features
+        public static void Initiate(float atgDamageStack, int hitRequirement)
         {
-            CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(atgDamageStack, hitRequirement);
             AddBuffs();

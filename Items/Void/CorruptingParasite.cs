@@ -14,8 +14,7 @@ namespace Hex3Mod.Items
     */
     public class CorruptingParasite
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "CorruptingParasite"; // Change this name when making a new item
+        static string itemName = "CorruptingParasite";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -50,7 +49,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -250,7 +249,7 @@ namespace Hex3Mod.Items
             "\n\nBugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs?");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, bool CorruptingParasite_CorruptBossItems, bool CorruptingParasite_AlternateMode, bool CorruptingParasite_Replication, bool CorruptingParasite_AltModeOnlyConvert) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, bool CorruptingParasite_CorruptBossItems, bool CorruptingParasite_AlternateMode, bool CorruptingParasite_Replication, bool CorruptingParasite_AltModeOnlyConvert) // Insert hooks here
         {
             System.Random parasiteRarityRng = new System.Random(); // Create the random table for choosing the item tier to corrupt. There are 100 items in the array, so one entry = 1% chance
             int[] parasiteRarityTable = new int[100];
@@ -328,7 +327,7 @@ namespace Hex3Mod.Items
 
             void ParasiteTradeItems(CharacterMaster master)
             {
-                int itemCount = master.inventory.GetItemCount(itemDefToHooks);
+                int itemCount = master.inventory.GetItemCount(itemDef);
                 if (itemCount > 0)
                 {
                     // Get every existing item of the 4 void tiers
@@ -394,7 +393,7 @@ namespace Hex3Mod.Items
 
                         if (CorruptingParasite_Replication == false) // If replication is disabled, shuffle the voidtier1 list until we get a non-parasite item
                         {
-                            while (listVoidTier1[0].pickupDef.itemIndex == itemDefToHooks.itemIndex)
+                            while (listVoidTier1[0].pickupDef.itemIndex == itemDef.itemIndex)
                             {
                                 Util.ShuffleList(listVoidTier1, listPlayerItemsSeed);
                             }
@@ -467,14 +466,14 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterMaster.OnServerStageBegin += (orig, self, stage) =>
             {
                 orig(self, stage);
-                if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) > 0)
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                 {
                     ParasiteTradeItems(self);
                 }
             };
         }
 
-        public static void Initiate(bool CorruptingParasite_CorruptBossItems, bool CorruptingParasite_AlternateMode, bool CorruptingParasite_Replication, bool CorruptingParasite_AltModeOnlyConvert) // Finally, initiate the item and all of its features
+        public static void Initiate(bool CorruptingParasite_CorruptBossItems, bool CorruptingParasite_AlternateMode, bool CorruptingParasite_Replication, bool CorruptingParasite_AltModeOnlyConvert)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));

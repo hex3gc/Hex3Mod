@@ -14,8 +14,7 @@ namespace Hex3Mod.Items
     */
     public class DropOfNecrosis
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "DropOfNecrosis"; // Change this name when making a new item
+        static string itemName = "DropOfNecrosis";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -50,7 +49,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -234,16 +233,16 @@ namespace Hex3Mod.Items
             "\n\n<style=cStack>(Audio recording ends abruptly.)</style>");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance) // Insert hooks here
         {
             // Void transformation
-            VoidTransformation.CreateTransformation(itemDefToHooks, "ShardOfGlass");
+            VoidTransformation.CreateTransformation(itemDef, "ShardOfGlass");
 
             On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
             {
-                if (attackerObject && attackerObject.GetComponent<CharacterBody>() != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (attackerObject && attackerObject.GetComponent<CharacterBody>() != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
                 {
-                    DotController.dotDefs[5].damageCoefficient = 0.2f + (0.2f * (DropOfNecrosis_Damage * (attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) - 1)));
+                    DotController.dotDefs[5].damageCoefficient = 0.2f + (0.2f * (DropOfNecrosis_Damage * (attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) - 1)));
                 }
                 else
                 {
@@ -254,7 +253,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDefToHooks) > 0)
+                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
                 {
                     if (damageInfo.attacker.GetComponent<CharacterBody>().master && damageInfo.dotIndex != DotController.DotIndex.Blight && damageInfo.attacker != victim)
                     {
@@ -279,7 +278,7 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance) // Finally, initiate the item and all of its features
+        public static void Initiate(float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));

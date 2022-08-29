@@ -11,8 +11,7 @@ namespace Hex3Mod.Items
     */
     public class MintCondition
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "MintCondition"; // Change this name when making a new item
+        static string itemName = "MintCondition";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -35,7 +34,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ItemTag.Utility}; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Utility };
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
@@ -46,7 +45,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -237,13 +236,13 @@ namespace Hex3Mod.Items
                 "\n\"Lost in transit\" are you joking??? you STILL HAVE the money it has not been refunded. I will sue your [REDACTED] [REDACTED] to mars and back if you keep turning down my calls, believe it you [REDACTED]. You don't know what kind of [REDACTED] youve gotten yourselves into now");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack)
         {
             void H3_MobilityIncreaseRoR(CharacterBody body) // I don't know how to effectively add base move speed, so doing it separately through r2api is the safe option
             {
                 if (body && body.inventory)
                 {
-                    int itemCount = body.inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
                         body.maxJumpCount += MintCondition_AddJumps + (MintCondition_AddJumpsStack * (itemCount - 1));
@@ -255,7 +254,7 @@ namespace Hex3Mod.Items
             {
                 if (body && body.inventory)
                 {
-                    int itemCount = body.inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
                         args.baseMoveSpeedAdd += MintCondition_MoveSpeed + (MintCondition_MoveSpeedStack * (itemCount - 1));
@@ -267,7 +266,7 @@ namespace Hex3Mod.Items
             {
                 if (damageReport.victim && damageReport.victim.body && damageReport.victim.body.inventory)
                 {
-                    int itemCount = damageReport.victim.body.inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = damageReport.victim.body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0 && damageReport.damageInfo != null)
                     {
                         SetStateOnHurt component = damageReport.victim.body.GetComponent<SetStateOnHurt>();
@@ -284,7 +283,7 @@ namespace Hex3Mod.Items
             {
                 if (body && body.master && body.inventory)
                 {
-                    int itemCount = body.inventory.GetItemCount(itemDefToHooks); // Now, for a looong list of all the movement-restricting buffs I could find...
+                    int itemCount = body.inventory.GetItemCount(itemDef); // Now, for a looong list of all the movement-restricting buffs I could find...
                     if (itemCount > 0)
                     {
                         if (receivedBuff.name == "bdBeetleJuice" || receivedBuff.name == "bdClayGoo" || receivedBuff.name == "bdCripple" || receivedBuff.name == "bdNullified" || receivedBuff.name == "bdNullifyStack" || receivedBuff.name == "bdSlow50" || receivedBuff.name == "bdSlow60" || receivedBuff.name == "bdSlow80" || receivedBuff.name == "bdWeak" || receivedBuff.name == "bdLunarSecondaryRoot" || receivedBuff.name == "bdEntangle" || receivedBuff.name == "bdJailerSlow" || receivedBuff.name == "bdJailerTether" || receivedBuff.name == "bdSlow30")
@@ -313,7 +312,7 @@ namespace Hex3Mod.Items
             RecalculateStatsAPI.GetStatCoefficients += H3_MobilityIncreaseR2API;
         }
 
-        public static void Initiate(float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack) // Finally, initiate the item and all of its features
+        public static void Initiate(float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));

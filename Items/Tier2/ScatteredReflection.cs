@@ -12,8 +12,7 @@ namespace Hex3Mod.Items
     */
     public class ScatteredReflection
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "ScatteredReflection"; // Change this name when making a new item
+        static string itemName = "ScatteredReflection";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -36,7 +35,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Damage, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Damage, ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
@@ -47,7 +46,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out... mostly
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
             /*
@@ -58,7 +57,7 @@ namespace Hex3Mod.Items
             itemFollower.distanceDampTime = 0.1f;
             itemFollower.distanceMaxSpeed = 200f;
 
-            Just implement follower behavior in a later update... I'm too tired for this
+            Just implement follower behavior in a later update
             */
 
             ItemDisplayRuleDict rules = new ItemDisplayRuleDict();
@@ -238,7 +237,7 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "An aggregate of shattered souls\n\nLost to the wind and to time\n\nThey form a ward to protect you\n\nThe only one they can follow home");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus) // Insert hooks here
         {
             ItemDef ShardOfGlassDef = ShardOfGlass.CreateItem(); // Might be a better way to do this than to call CreateItem again, but no errors are caused
 
@@ -263,7 +262,7 @@ namespace Hex3Mod.Items
                                 Inventory inventory = body.inventory;
                                 TeamIndex teamIndex = body.teamComponent.teamIndex;
                                 TeamIndex teamIndexEnemy = enemy.teamComponent.teamIndex;
-                                int itemCount = inventory.GetItemCount(itemDefToHooks);
+                                int itemCount = inventory.GetItemCount(itemDef);
                                 int shardCount = inventory.GetItemCount(ShardOfGlassDef);
 
                                 if (itemCount > 0)
@@ -279,7 +278,6 @@ namespace Hex3Mod.Items
                                     float damageReduction = (damageInfo.damage * percentWithShardBonus);
 
                                     // Deal the reflected damage if these conditions are met
-
                                     if (enemy != body && teamIndex != teamIndexEnemy && damageInfo.damageType != DamageType.OutOfBounds)
                                     {
                                         LightningOrb lightningOrb = new LightningOrb();
@@ -316,7 +314,7 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus) // Finally, initiate the item and all of its features
+        public static void Initiate(float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(ScatteredReflection_DamageReflectPercent, ScatteredReflection_DamageReflectShardStack, ScatteredReflection_DamageReflectBonus);

@@ -12,8 +12,7 @@ namespace Hex3Mod.Items
     */
     public class ElderMutagen
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "ElderMutagen"; // Change this name when making a new item
+        static string itemName = "ElderMutagen";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -248,7 +247,7 @@ namespace Hex3Mod.Items
             "\n> Timestamping for break");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval)
         {
             List<string> mutagenBuffWhitelist = new List<string> // All the buffs that SHOULD be considered for the item
             {
@@ -283,7 +282,7 @@ namespace Hex3Mod.Items
                     Inventory attackerInventory = damageInfo.attacker.GetComponent<CharacterBody>().inventory;
                     CharacterMaster attackerMaster = damageInfo.attacker.GetComponent<CharacterBody>().master;
                     CharacterBody victimBody = victim.GetComponent<CharacterBody>();
-                    if (attackerInventory.GetItemCount(itemDefToHooks) > 0)
+                    if (attackerInventory.GetItemCount(itemDef) > 0)
                     {
                         // Get the first debuff available from a random list
                         Xoroshiro128Plus seed = new Xoroshiro128Plus(Run.instance.seed);
@@ -303,20 +302,20 @@ namespace Hex3Mod.Items
                                             {
                                                 switch (i.name) // Handles given DOTs separately from buffs/debuffs
                                                 {
-                                                    case "bdBleeding": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Bleed, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdBlight": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Blight, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdOnFire": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Burn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdOverHeat": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.PercentBurn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdPoisoned": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Poison, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdSuperBleed": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.SuperBleed, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdFracture": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Fracture, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
-                                                    case "bdStrongerBurn": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.StrongerBurn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks)); break;
+                                                    case "bdBleeding": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Bleed, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdBlight": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Blight, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdOnFire": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Burn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdOverHeat": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.PercentBurn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdPoisoned": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Poison, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdSuperBleed": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.SuperBleed, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdFracture": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.Fracture, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
+                                                    case "bdStrongerBurn": DotController.InflictDot(victim, damageInfo.attacker, DotController.DotIndex.StrongerBurn, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef)); break;
                                                 }
                                                 return;
                                             }
                                             else
                                             {
-                                                victimBody.AddTimedBuff(i, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDefToHooks));
+                                                victimBody.AddTimedBuff(i, ElderMutagen_Duration * attackerInventory.GetItemCount(itemDef));
                                                 return;
                                             }
                                         }
@@ -339,7 +338,7 @@ namespace Hex3Mod.Items
                 if (self.GetComponent<MutagenItemBehavior>() != null)
                 {
                     MutagenItemBehavior mutagenBehavior = self.GetComponent<MutagenItemBehavior>();
-                    if (self.inventory && self.inventory.GetItemCount(itemDefToHooks) > 0)
+                    if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                     {
                         mutagenBehavior.buffTimer += Time.deltaTime;
                         if (mutagenBehavior.buffTimer > ElderMutagen_Interval)
@@ -356,7 +355,7 @@ namespace Hex3Mod.Items
                                     {
                                         if (buffName == i.name)
                                         {
-                                            self.AddTimedBuff(i, ElderMutagen_Duration * self.inventory.GetItemCount(itemDefToHooks));
+                                            self.AddTimedBuff(i, ElderMutagen_Duration * self.inventory.GetItemCount(itemDef));
                                             mutagenBehavior.buffTimer = 0f;
                                             return;
                                         }
@@ -372,9 +371,9 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterBody.OnInventoryChanged += (orig, self) =>
             {
                 orig(self);
-                if (self.inventory.GetItemCount(itemDefToHooks) > 0 && self.GetComponent<MutagenItemBehavior>() == null)
+                if (self.inventory.GetItemCount(itemDef) > 0 && self.GetComponent<MutagenItemBehavior>() == null)
                 {
-                    self.AddItemBehavior<MutagenItemBehavior>(self.inventory.GetItemCount(itemDefToHooks));
+                    self.AddItemBehavior<MutagenItemBehavior>(self.inventory.GetItemCount(itemDef));
                 }
             };
 
@@ -396,7 +395,7 @@ namespace Hex3Mod.Items
             public float buffTimer = 0f;
         }
 
-        public static void Initiate(float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval) // Finally, initiate the item and all of its features
+        public static void Initiate(float ElderMutagen_Duration, float ElderMutagen_Chance, float ElderMutagen_Interval)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(ElderMutagen_Duration, ElderMutagen_Chance, ElderMutagen_Interval);

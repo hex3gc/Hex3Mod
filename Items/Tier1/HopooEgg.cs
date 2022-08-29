@@ -7,15 +7,12 @@ using On.EntityStates;
 namespace Hex3Mod.Items
 {
     /*
-    Hopoo Egg increases base jump height and give the player slightly more air control
-    This is to provide an alternative to the Hopoo Feather for upward mobility, as there are few options for some survivors
-    It also synergizes with the feather by increasing the height of each jump
-    The added air control should also be a nice utility
+    Hopoo Egg rework: Increases jump power significantly, and decreases fall damage compensate
+    The air control modifier was janky anyway
     */
     public class HopooEgg
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "HopooEgg"; // Change this name when making a new item
+        static string itemName = "HopooEgg";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -38,7 +35,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility }; // Also change these when making a new item
+            item.tags = new ItemTag[]{ ItemTag.Utility };
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
@@ -49,7 +46,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -218,44 +215,60 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float HopooEgg_JumpModifier, float HopooEgg_AirControlModifier)
+        public static void AddTokens(float HopooEgg_JumpModifier, float HopooEgg_FallDamageReduction)
         {
             float HopooEgg_JumpModifier_Readable = HopooEgg_JumpModifier * 100f;
-            float HopooEgg_AirControlModifier_Readable = HopooEgg_AirControlModifier * 100f;
+            float HopooEgg_FallDamageReduction_Readable = HopooEgg_FallDamageReduction * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Hopoo Egg");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Jump higher and with more control.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Jump <style=cIsUtility>" + HopooEgg_JumpModifier_Readable + "%</style> higher <style=cStack>(+" + HopooEgg_JumpModifier_Readable + "% per stack)</style>. While in the air, you can control your movement <style=cIsUtility>" + HopooEgg_AirControlModifier_Readable + "%</style> more <style=cStack>(+" + HopooEgg_AirControlModifier_Readable + "% per stack)</style>.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Jump higher and take less fall damage.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Jump <style=cIsUtility>" + HopooEgg_JumpModifier_Readable + "%</style> higher <style=cStack>(+" + HopooEgg_JumpModifier_Readable + "% per stack)</style>. Reduce fall damage by <style=cIsUtility>" + HopooEgg_FallDamageReduction_Readable + "%</style> <style=cStack>(+" + HopooEgg_FallDamageReduction_Readable + "% per stack, diminishing)</style>.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"...The hopoo's chicks are independent, being the only Europan nesting birds that hunt for themselves from birth. One is able to leave its nest as a newborn thanks to the low gravity environment, and it is born nimble enough to navigate down any rough terrain that lies between it and its food. This creates a unique problem for many newborn hopoos, however, as they often find themselves unable to go back up. The hopoo, out of reach of its nest, usually becomes nomadic and lives on its lonesome, having forgotten about its home by the time it has grown into an adult. This is where they get their common nickname, the 'hobo bird'.\"\n\n- Europan Wildlife Guide");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float HopooEgg_JumpModifier, float HopooEgg_AirControlModifier) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, float HopooEgg_JumpModifier, float HopooEgg_FallDamageReduction)
         {
-            float jumpModifier = HopooEgg_JumpModifier;
-            float airControlModifier = HopooEgg_AirControlModifier;
-
-            void H3_JumpVelocity(GenericCharacterMain.orig_ApplyJumpVelocity orig, CharacterMotor motor, CharacterBody body, float horiz, float vert, bool vault)
+            // Increase jump power
+            void ApplyJumpVelocity(GenericCharacterMain.orig_ApplyJumpVelocity orig, CharacterMotor motor, CharacterBody body, float horiz, float vert, bool vault)
             {
-                if ((body != null) && (body.inventory != null))
+                if (body && body.inventory)
                 {
-                    int itemCount = body.inventory.GetItemCount(itemDefToHooks);
+                    int itemCount = body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
-                        vert *= 1f + jumpModifier * (float)itemCount;
-                        motor.airControl = 0.25f + (airControlModifier * (float)itemCount);
+                        vert *= 1f + HopooEgg_JumpModifier * (float)itemCount;
                     }
                 }
                 orig.Invoke(motor, body, horiz, vert, vault);
             }
 
-            GenericCharacterMain.ApplyJumpVelocity += new GenericCharacterMain.hook_ApplyJumpVelocity(H3_JumpVelocity);
+            // Decrease fall damage
+            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
+            {
+                // This should disclude all damage other than fall damage
+                if (self.body && self.body.inventory && !damageInfo.rejected && damageInfo.attacker == null && damageInfo.inflictor == null && damageInfo.position == self.body.footPosition && damageInfo.procCoefficient == 0f)
+                {
+                    if (self.body.inventory.GetItemCount(itemDef) > 0)
+                    {
+                        float finalDamage = damageInfo.damage;
+                        for (int i = 0; i < self.body.inventory.GetItemCount(itemDef); i++) // Diminishing fall damage reduction
+                        {
+                            finalDamage -= finalDamage * HopooEgg_FallDamageReduction;
+                        }
+                        damageInfo.damage = finalDamage;
+                    }
+                }
+                orig(self, damageInfo);
+            };
+
+            GenericCharacterMain.ApplyJumpVelocity += new GenericCharacterMain.hook_ApplyJumpVelocity(ApplyJumpVelocity);
         }
 
-        public static void Initiate(float HopooEgg_JumpModifier, float HopooEgg_AirControlModifier) // Finally, initiate the item and all of its features
+        public static void Initiate(float HopooEgg_JumpModifier, float HopooEgg_FallDamageReduction)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(HopooEgg_JumpModifier, HopooEgg_AirControlModifier);
-            AddHooks(itemDefinition, HopooEgg_JumpModifier, HopooEgg_AirControlModifier);
+            AddTokens(HopooEgg_JumpModifier, HopooEgg_FallDamageReduction);
+            AddHooks(itemDefinition, HopooEgg_JumpModifier, HopooEgg_FallDamageReduction);
         }
     }
 }

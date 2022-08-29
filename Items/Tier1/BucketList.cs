@@ -11,8 +11,7 @@ namespace Hex3Mod.Items
     */
     public class BucketList
     {
-        // Create functions here for defining the ITEM, TOKENS, HOOKS and CONFIG. This is simpler than doing it in Main
-        static string itemName = "BucketList"; // Change this name when making a new item
+        static string itemName = "BucketList";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
@@ -35,8 +34,8 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility }; // Also change these when making a new item
-            item.deprecatedTier = ItemTier.Tier1;  // This tier definition apparently causes issues, but it works. Go to this first if there's an error
+            item.tags = new ItemTag[]{ ItemTag.Utility };
+            item.deprecatedTier = ItemTier.Tier1; // Deprecated, consider changing soon
             item.canRemove = true;
             item.hidden = false;
 
@@ -46,7 +45,7 @@ namespace Hex3Mod.Items
             return item;
         }
 
-        public static ItemDisplayRuleDict CreateDisplayRules() // We've figured item displays out!
+        public static ItemDisplayRuleDict CreateDisplayRules()
         {
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
@@ -226,51 +225,43 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "- go to Saturn and see the night lights\n\n- visit grandma\n\n- see Bovine Joni in concert\n\n- try Mercurian Salts (get Jaden to make sure im ok after)\n\n- pet a gip");
         }
 
-        private static void AddHooks(ItemDef itemDefToHooks, float BucketList_FullBuff, float BucketList_BuffReduce)
+        private static void AddHooks(ItemDef itemDef, float BucketList_FullBuff, float BucketList_BuffReduce)
         {
             float ReducedBuff = (BucketList_FullBuff - (BucketList_FullBuff * BucketList_BuffReduce));
 
-            // Check every time the RecalculateStatsAPI.GetStatCoefficients activates
-            // IF a boss exists, then change the item's argsmultspeed to 0.25x the value
-            // ELSE, set it to 1x the value
-
-            void H3_recalcStatsCharacter(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
+            void CheckForBosses(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (body.inventory)
+                if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    int itemCount = body.inventory.GetItemCount(itemDefToHooks);
-                    if (itemCount > 0)
+                    var monsters = TeamComponent.GetTeamMembers(TeamIndex.Monster);
+                    if (monsters != null)
                     {
-                        var monsters = TeamComponent.GetTeamMembers(TeamIndex.Monster);
-                        if (monsters != null)
+                        bool bossFound = false;
+                        foreach (var monster in monsters)
                         {
-                            int bossCount = 0;
-                            foreach (var monster in monsters)
+                            if (monster.body && monster.body.isBoss)
                             {
-                                if (monster.body && monster.body.isBoss)
-                                {
-                                    bossCount += 1;
-                                }
+                                bossFound = true;
+                                break;
                             }
-                            if (bossCount > 0) // Boss present: Reduced buff
-                            {
-                                args.moveSpeedMultAdd += (ReducedBuff + ((itemCount - 1) * ReducedBuff));
-                            }
-                            else // Boss not present: Full buff
-                            {
-                                args.moveSpeedMultAdd += (BucketList_FullBuff + ((itemCount - 1) * BucketList_FullBuff));
-                            }
+                        }
+                        if (bossFound == true) // Boss present: Reduced buff
+                        {
+                            args.moveSpeedMultAdd += (ReducedBuff + ((body.inventory.GetItemCount(itemDef) - 1) * ReducedBuff));
+                        }
+                        else // Boss not present: Full buff
+                        {
+                            args.moveSpeedMultAdd += (BucketList_FullBuff + ((body.inventory.GetItemCount(itemDef) - 1) * BucketList_FullBuff));
                         }
                     }
                 }
             }
 
-            RecalculateStatsAPI.GetStatCoefficients += H3_recalcStatsCharacter;
+            RecalculateStatsAPI.GetStatCoefficients += CheckForBosses;
         }
 
-        public static void Initiate(float BucketList_FullBuff, float BucketList_BuffReduce) // Finally, initiate the item and all of its features
+        public static void Initiate(float BucketList_FullBuff, float BucketList_BuffReduce)
         {
-            CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(BucketList_FullBuff, BucketList_BuffReduce);
             AddHooks(itemDefinition, BucketList_FullBuff, BucketList_BuffReduce);
