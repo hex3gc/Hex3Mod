@@ -63,7 +63,7 @@ namespace Hex3Mod
         public ConfigEntry<float> ScatteredReflection_DamageReflectBonus() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Scattered Reflection", "Reflected damage bonus"), 0.7f, new ConfigDescription("Multiplier of how much bonus damage is added to the reflection", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> Empathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Empathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Empathy_HealingFactor() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Healing factor"), 0.05f, new ConfigDescription("Fraction of ally's received damage converted into healing", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Empathy_HealingFactor() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Healing factor"), 0.2f, new ConfigDescription("Fraction of ally's received damage converted into healing per stack", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> ScavengersPack_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pack", "Maximum uses"), 3, new ConfigDescription("Times the Scavenger's Pack can be used before breaking.", null, Array.Empty<object>())); }
@@ -79,8 +79,8 @@ namespace Hex3Mod
 
         // Legendary
         public ConfigEntry<bool> Apathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Apathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_HealthIncrease() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Max health gain on ally death"), 0.05f, new ConfigDescription("Percent max health gained per ally death", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_DamageIncrease() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Damage increase on ally death"), 0.05f, new ConfigDescription("Percent damage increase per ally death", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Apathy_HealthIncrease() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Max health gain on ally death"), 0.04f, new ConfigDescription("Percent max health gained per ally death", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Apathy_DamageIncrease() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Damage increase on ally death"), 0.04f, new ConfigDescription("Percent damage increase per ally death", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> MintCondition_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Mint Condition", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> MintCondition_MoveSpeed() { return Config.Bind<float>(new ConfigDefinition("Legendary - Mint Condition", "Move speed increase"), 0.2f, new ConfigDescription("Base movement speed increase", null, Array.Empty<object>())); }
@@ -89,9 +89,8 @@ namespace Hex3Mod
         public ConfigEntry<int> MintCondition_AddJumpsStack() { return Config.Bind<int>(new ConfigDefinition("Legendary - Mint Condition", "Additional jumps per stack"), 2, new ConfigDescription("Jump count increase per additional stack", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> ElderMutagen_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Elder Mutagen", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ElderMutagen_Duration() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Duration of received buffs and debuffs"), 5f, new ConfigDescription("How long, in seconds, should each buff/debuff given by this item last per stack", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ElderMutagen_Chance() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Chance to add debuff on hit"), 5f, new ConfigDescription("Percent chance to trigger a random debuff on hit.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ElderMutagen_Interval() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Buff interval"), 15f, new ConfigDescription("Interval between random buffs in seconds.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ElderMutagen_AddDuration() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Added duration to buffs and debuffs"), 3f, new ConfigDescription("How much longer, in seconds, should each buff/debuff affected by this item last per stack", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ElderMutagen_CooldownReduction() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Item cooldown reduction"), 2f, new ConfigDescription("How much shorter, in seconds, should each item cooldown be", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> DoNotEat_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Do Not Eat", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> DoNotEat_PearlChancePerStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Pearl Chance"), 5f, new ConfigDescription("Percent chance that a Pearl or Irradiant Pearl will drop from a chest.", null, Array.Empty<object>())); }
@@ -122,7 +121,7 @@ namespace Hex3Mod
         public ConfigEntry<float> SpatteredCollection_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Spattered Collection", "Chance to inflict Blight"), 5f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> TheHermit_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - The Hermit", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> TheHermit_BuffDuration() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Debuff duration"), 4f, new ConfigDescription("How long in seconds the on-hit debuff should last", null, Array.Empty<object>())); }
+        public ConfigEntry<float> TheHermit_BuffDuration() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Debuff duration"), 5f, new ConfigDescription("How long in seconds the on-hit debuff should last", null, Array.Empty<object>())); }
         public ConfigEntry<float> TheHermit_DamageReduction() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Debuff damage reduction"), 0.01f, new ConfigDescription("Enemy damage reduced by each debuff in percent", null, Array.Empty<object>())); }
 
         public void Awake()
@@ -164,13 +163,13 @@ namespace Hex3Mod
             // Uncommon
             Log.LogInfo("Uncommon");
             if (ScatteredReflection_Enable().Value == true){ ScatteredReflection.Initiate(ScatteredReflection_DamageReflectPercent().Value, ScatteredReflection_DamageReflectShardStack().Value, ScatteredReflection_DamageReflectBonus().Value); }
-            if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealingFactor().Value, Empathy_HealingDuration().Value); }
+            if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealingFactor().Value); }
             if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_RegenerativeScrap().Value, ScavengersPack_Mystic1().Value, ScavengersPack_Mystic2().Value, tricorn().Value, terminal().Value, elixir().Value, tickets().Value, dios().Value, larva().Value); }
             // Legendary
             Log.LogInfo("Legendary");
             if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_HealthIncrease().Value, Apathy_DamageIncrease().Value); }
             if (MintCondition_Enable().Value == true){ MintCondition.Initiate(MintCondition_MoveSpeed().Value, MintCondition_MoveSpeedStack().Value, MintCondition_AddJumps().Value, MintCondition_AddJumpsStack().Value); }
-            if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_Duration().Value, ElderMutagen_Chance().Value, ElderMutagen_Interval().Value); }
+            if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_AddDuration().Value, ElderMutagen_CooldownReduction().Value); }
             if (DoNotEat_Enable().Value == true) { DoNotEat.Initiate(DoNotEat_PearlChancePerStack().Value, DoNotEat_IrradiantChance().Value, DoNotEat_IrradiantChancePerStack().Value); }
             // Void
             Log.LogInfo("Void");

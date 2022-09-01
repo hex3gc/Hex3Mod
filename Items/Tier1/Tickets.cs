@@ -280,7 +280,7 @@ namespace Hex3Mod.Items
                 {
                     if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
                     {
-                        self.dropUpVelocityStrength = 5f;
+                        self.dropUpVelocityStrength = 10f;
                         self.dropForwardVelocityStrength = 20f;
                     }
                     self.dropCount += 1;

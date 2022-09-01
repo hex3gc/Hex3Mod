@@ -227,7 +227,7 @@ namespace Hex3Mod.Items
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Apathy");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Gain a permanent max health and damage buff when an ally is killed, as well as full barrier.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an ally is killed, gain full <style=cIsHealing>barrier</style> and receive a permanent <style=cIsHealing>{0}%</style> <style=cStack>(+{0}% per stack)</style> <style=cIsHealing>max health</style> and <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style> <style=cIsDamage>damage buff</style>.", Apathy_HealthIncrease * 100f, Apathy_DamageIncrease * 100f));
+            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an ally is killed, gain full <style=cIsHealing>barrier</style> and receive a permanent <style=cIsHealing>{0}%</style> <style=cStack>(+{0}% per stack)</style> <style=cIsHealing>max health</style> increase and a <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style> <style=cIsDamage>damage buff</style>.", Apathy_HealthIncrease * 100f, Apathy_DamageIncrease * 100f));
             LanguageAPI.Add("H3_" + upperName + "_LORE",
                 "\"I can't [REDACTED] believe I'm doing this...\"" +
                 "\n\n\"We'll share the network. We have to.\"" +
@@ -276,9 +276,9 @@ namespace Hex3Mod.Items
 
             // Give temporary barrier and hidden item on ally death
             // AI blacklisted for performance's sake
-            On.RoR2.DeathRewards.OnKilledServer += (orig, self, damageReport) =>
+            On.RoR2.GlobalEventManager.OnCharacterDeath += (orig, self, damageReport) =>
             {
-                if (damageReport.attacker && damageReport.victimBody && damageReport.victimBody.teamComponent && damageReport.victimBody.teamComponent.teamIndex == TeamIndex.Player)
+                if (damageReport.attacker && damageReport.victim && damageReport.victim.body && damageReport.victim.body.teamComponent && damageReport.victim.body.teamComponent.teamIndex == TeamIndex.Player)
                 {
                     foreach (var ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                     {

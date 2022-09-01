@@ -1,5 +1,3 @@
-# Info
-
 Adds 1 artifact and 18 new items to the game:
 * 5 Common
 * 3 Uncommon
@@ -15,21 +13,21 @@ Adds 1 artifact and 18 new items to the game:
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Shard Of Glass**<br>Increase your **base damage** by **7%** <sup>(+7% per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987243618364/Tickets.png?raw=true" width=128> | **400 Tickets**<br>The next chest, void cradle, equipment barrel, lunar pod or scavenger bag you open will contain an additional item. **Consumed on use**. |
 | | <p align="center">**UNCOMMON**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>When an ally takes damage, **heal** for **5%** <sup>(+2.5% per stack)</sup> of that damage. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>When an ally takes damage, **heal** for **20%** <sup>(+20% per stack)</sup> of that damage. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Prevent 7%** of all received damage and reflect it back to your attacker, adding an additional **70%** <sup>(+70% per stack)</sup> damage bonus. For every **Shard Of Glass** in your inventory, prevent **0.7%** more damage. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/985265706620829716/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pack**<br>**Prevents** your consumable items and equipment from being consumed up to **3** times before breaking. Does not affect **fragile** items. |
 | | <p align="center">**LEGENDARY**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>When an ally is killed, gain full **barrier** and receive a permanent **5%** <sup>(+{0}% per stack)</sup> **max health** and **5%** <sup>(+5% per stack)</sup> **damage buff**. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>When an ally is killed, gain full **barrier** and receive a permanent **4%** <sup>(+4% per stack)</sup> **max health** increase and a **4%** <sup>(+4% per stack)</sup> **damage buff**. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>Provides immunity to movement restricting status effects. Gain **20%** movement speed <sup>(+40% per stack)</sup> and **1** <sup>+2 per stack</sup> extra jumps. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>Your hits have a **5%** chance to inflict a **random debuff** that lasts **5** <sup>(+5 per stack)</sup> seconds. Every **15** seconds, gain a **random buff** that lasts **5** <sup>(+5 per stack)</sup> seconds. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **5%** <sup>(+10% per stack)</sup> chance to also contain a **Pearl** <sup>(80%)</sup> or an **Irradiant Pearl** <sup>(20%, 5% per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>All **buffs** you receive and **debuff / damage-over-time** effects you inflict last **3** seconds longer <sup>(+3 seconds per stack)</sup>. **Item cooldowns** are **2** seconds shorter. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **5%** <sup>(+5% per stack)</sup> chance to also contain a **Pearl** <sup>(80%)</sup> or an **Irradiant Pearl** <sup>(20%, 5% per stack)</sup>. |
 | | <p align="center">**VOID**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>**Corrupts** 1 <sup>(+1 per stack)</sup> item in your inventory into a **random void item** of the same rarity each stage. Prefers more common items. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987939840060/NoticeOfAbsence.png?raw=true" width=128> | **Notice Of Absence**<br>For each **void item** in your inventory, move **3%** faster per stack. **Corrupts all Bucket Lists.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890485198848/DropOfNecrosis.png?raw=true" width=128> | **Drop Of Necrosis**<br>Your attacks have a **10%** chance to inflict **Blight**, which deals **10%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **2** points per stack of **regenerating shield** to every player who has this item. Caps at **200 shield** per stack. **Corrupts all Infusions.**|
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **3** points per stack of **regenerating shield** to every player who has this item. Caps at **300 shield** per stack. **Corrupts all Infusions.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986677354506/SpatteredCollection.png?raw=true" width=128> | **Spattered Collection**<br>All of your **damage over time** effects are converted to stacking **Blight**, which ticks **10%** faster for each stack of this item owned by your team. **Corrupts all Scattered Reflections.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>On hit, grant your enemy a **stacking debuff** that **reduces** their damage by **1%** up to 75% for **4** <sup>(+4 per stack)</sup> seconds. **Corrupts all Symbiotic Scorpions.**|
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>On hit, grant your enemy a **stacking debuff** that **reduces** their damage by **1%** up to 75% for **5** <sup>(+5 per stack)</sup> seconds. **Corrupts all Symbiotic Scorpions.**|
 | | <p align="center">**ARTIFACTS**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891345047562/ArtifactOfCorruption_On.png?raw=true" width=128> | **Artifact Of Bugs**<br>Gives you one **corrupting parasite** each stage. |
 
@@ -48,13 +46,20 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 # Changelog
 
 ### 1.1.0 - Due to the many changes, deleting or modifying your config file will be necessary.
+A lot of the mechanics in the mod felt too convoluted, and some just didn't feel good to play. In this update I hope to revamp the items in a way that keeps their original purpose, but makes them more consistent and useful. Let me know how I've done!
 * **Added item "Do Not Eat" (Legendary)**
 * **Hopoo Egg rework:** Jump higher and take less fall damage.
 * **Empathy rework:** Heal for a fraction of the damage your allies take.
-* **Apathy rework:** Gain a permanent max health and damage buff when an ally is killed, as well as full barrier.
+* **Apathy rework:** Gain a permanent max health and damage buff when an ally is killed, as well as 50% barrier.
+* **Elder Mutagen rework:** Buffs you receive and debuffs you inflict last longer, and cooldown buffs are shorter.
 * Hopoo egg jump height increase 15% -> 20%
 * Discovery shields per interaction 2 -> 3
+* Scattered Reflection proc coefficient 1 -> 0
+* The Hermit debuff duration 4 -> 5 seconds
 * Scavenger's Pack no longer appears in printers to avoid infinite item duplication
+
+<details>
+<summary>Earlier updates</summary>
 
 ### 1.0.1
 * ATG Prototype no longer procs on missile attacks
@@ -172,3 +177,4 @@ You may need to change your config files for some of these changes to take effec
 
 ### 0.1.0
 * Initial release
+</details>

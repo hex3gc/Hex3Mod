@@ -226,15 +226,11 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDef, float DamageIncrease_Config)
         {
-            void GetStatCoefficients(CharacterBody sender, RecalculateStatsAPI.StatHookEventArgs args)
+            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (sender.inventory)
+                if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    int itemCount = sender.inventory.GetItemCount(itemDef);
-                    if (itemCount > 0)
-                    {
-                        args.damageMultAdd += DamageIncrease_Config * itemCount;
-                    }
+                    args.damageMultAdd += DamageIncrease_Config * body.inventory.GetItemCount(itemDef);
                 }
             }
 

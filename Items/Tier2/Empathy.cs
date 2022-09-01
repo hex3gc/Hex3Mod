@@ -35,7 +35,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // AI Blacklist to avoid infinite healing loops
+            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // AI Blacklist for performance sake
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
@@ -219,16 +219,27 @@ namespace Hex3Mod.Items
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Empathy");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Heal for a fraction of the damage your allies take.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "When an ally takes damage, <style=cIstHealing>heal</style> for <style=cIstHealing>" + Empathy_HealingFactor + "%</style> <style=cStack>(+" + (Empathy_HealingFactor / 2) + "% per stack)</style> of that damage.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "When an ally takes damage, <style=cIsHealing>heal</style> for <style=cIsHealing>" + Empathy_HealingFactor * 100f + "%</style> <style=cStack>(+" + Empathy_HealingFactor * 100f + "% per stack)</style> of that damage.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cEvent>//--AUTO-TRANSCRIPTION FROM UES [Redacted] --//</style>\n\n\"Oh yeah? How does this one work?\"\n\n\"Nanomachines. In response to physical trauma to the body, they get to work immediately and start patching up the wound. They're so tiny you don't even feel it happening.\"\n\n\"Is that... safe?\"\n\n\"What?\"\n\n\"A bunch of little robots in your bloodstream? There's no way that's never caused a problem.\"\n\n\"Well, maybe twenty years ago. It's 2055, technology has come far.\"\n\n\"Huh.\"\n\n\"...Although,\"\n\n\"See, I'm not putting that in my body.\"\n\n\"No, it's no big deal! But- these bots have been known to 'overcorrect'. They operate on a shared network, meaning that if- you and I, for example- both use the same group, then when -you- get hurt, the bots will think I'm hurt too!\"\n\n\"Meaning?\"\n\n\"It's unpredictable, but fascinating. If you get hurt and my body is healthy, they'll still try to 'fix' me, so they'll begin to look for inefficiencies and redundancies. They'll begin removing unneeded vestiges and replacing them with something useful, and when they're done with that, they'll begin creating something new. It's been known to happen-- they'll grow fresh organs that deal with the function of your heart or your liver but using ten times less energy and ten times less space. They'll begin re-organizing everything in your body, and they'll make your skeleton stronger while they're at it. So, really, they're quite helpful.\"\n\n\"And we only have one of these between us.\"\n\n\"Yes.\"\n\n\"...\"\n\n\"...\"\n\n\"I think I'll do the mission alone.\"");
         }
 
         private static void AddHooks(ItemDef itemDef, float Empathy_HealingFactor)
         {
-            // Heal for a fraction of the damage that your allies take (WIP)
+            // Heal for a fraction of the damage that your allies take
             On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
             {
-
+                orig(self, damageInfo);
+                if (!damageInfo.rejected && damageInfo.damage > 0 && self.body && self.body.teamComponent && self.body.teamComponent.teamIndex == TeamIndex.Player)
+                {
+                    foreach (var ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
+                    {
+                        if (ally.body && ally.body.healthComponent && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0)
+                        {
+                            float stackHealFactor = (Empathy_HealingFactor) * (ally.body.inventory.GetItemCount(itemDef) - 1);
+                            ally.body.healthComponent.Heal(damageInfo.damage * (Empathy_HealingFactor + stackHealFactor), new ProcChainMask());
+                        }
+                    }
+                }
             };
         }
 
