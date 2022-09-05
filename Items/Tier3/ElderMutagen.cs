@@ -249,6 +249,7 @@ namespace Hex3Mod.Items
             // Apply mutagen behavior to all enemies who spawn, based on the highest amount of mutagens owned by a player
             On.RoR2.TeamComponent.Start += (orig, self) =>
             {
+                orig(self);
                 if (self.teamIndex != TeamIndex.Player)
                 {
                     int highestMutagenStack = 0;

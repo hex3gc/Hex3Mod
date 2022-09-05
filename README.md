@@ -45,12 +45,15 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 1.1.1
+* Fixed an issue where some enemies were untargetable by Huntress
+
 ### 1.1.0 - Due to the many changes, deleting or modifying your config file will be necessary.
 A lot of the mechanics in the mod felt too convoluted, and some just didn't feel good to play. In this update I hope to revamp the items in a way that keeps their original purpose, but makes them more consistent and useful. Let me know how I've done!
 * **Added item "Do Not Eat" (Legendary)**
 * **Hopoo Egg rework:** Jump higher and take less fall damage.
 * **Empathy rework:** Heal for a fraction of the damage your allies take.
-* **Apathy rework:** Gain a permanent max health and damage buff when an ally is killed, as well as 50% barrier.
+* **Apathy rework:** Gain a permanent max health and damage buff when an ally is killed, as well as full barrier.
 * **Elder Mutagen rework:** Buffs you receive and debuffs you inflict last longer, and cooldown buffs are shorter.
 * Hopoo egg jump height increase 15% -> 20%
 * Discovery shields per interaction 2 -> 3
