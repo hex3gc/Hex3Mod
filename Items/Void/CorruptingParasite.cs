@@ -218,26 +218,18 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(bool CorruptingParasite_AlternateMode, bool CorruptingParasite_AltModeOnlyConvert)
+        public static void AddTokens(bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Corrupting Parasite");
-            if (CorruptingParasite_AlternateMode == true)
+            if (CorruptingParasite_CorruptBossItems == false)
             {
-                if (CorruptingParasite_AltModeOnlyConvert == true)
-                {
-                    LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Corrupts one of your items each stage.");
-                    LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cIsVoid>Corrupts</style> 1 <style=cStack>(+1 per stack)</style> item in your inventory into its <style=cIsVoid>void counterpart</style> each stage. Prefers more common items [60/<style=cIsHealing>30</style>/<style=cIsHealth>5</style>/<style=cShrine>5</style>]%.");
-                }
-                else
-                {
-                    LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Corrupts one of your items each stage.");
-                    LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cIsVoid>Corrupts</style> 1 <style=cStack>(+1 per stack)</style> item in your inventory into its <style=cIsVoid>void counterpart</style> each stage. Prefers more common items [60/<style=cIsHealing>30</style>/<style=cIsHealth>5</style>/<style=cShrine>5</style>]%. If no items with void conversions are available, an item will turn into a <style=cIsVoid>random void item</style>.");
-                }
+                LanguageAPI.Add("H3_" + upperName + "_PICKUP", string.Format("Corrupts {0} of your items into their <style=cIsVoid>void equivalents</style> each stage.", CorruptingParasite_ItemsPerStage));
+                LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("At the start of a stage, <style=cIsVoid>{0} random item(s) will be corrupted into their void equivalent</style> <style=cStack>(+{0} per stack)</style>.", CorruptingParasite_ItemsPerStage));
             }
             else
             {
-                LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Corrupts one of your items into a random void item each stage.");
-                LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cIsVoid>Corrupts</style> 1 <style=cStack>(+1 per stack)</style> item in your inventory into a <style=cIsVoid>random void item</style> of the same rarity each stage. Prefers more common items [60/<style=cIsHealing>30</style>/<style=cIsHealth>5</style>/<style=cShrine>5</style>]%.");
+                LanguageAPI.Add("H3_" + upperName + "_PICKUP", string.Format("Corrupts {0} of your items into their <style=cIsVoid>void equivalents</style> each stage.", CorruptingParasite_ItemsPerStage));
+                LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("At the start of a stage, <style=cIsVoid>{0} random item(s) will be corrupted into their void equivalent</style> <style=cStack>(+{0} per stack)</style>. <style=cShrine>Affects boss items.</style>", CorruptingParasite_ItemsPerStage));
             }
             
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: Bugs" +
@@ -249,236 +241,51 @@ namespace Hex3Mod.Items
             "\n\nBugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs?");
         }
 
-        private static void AddHooks(ItemDef itemDef, bool CorruptingParasite_CorruptBossItems, bool CorruptingParasite_AlternateMode, bool CorruptingParasite_Replication, bool CorruptingParasite_AltModeOnlyConvert) // Insert hooks here
+        private static void AddHooks(ItemDef itemDef, bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
         {
-            System.Random parasiteRarityRng = new System.Random(); // Create the random table for choosing the item tier to corrupt. There are 100 items in the array, so one entry = 1% chance
-            int[] parasiteRarityTable = new int[100];
-
-            // 60% chance common, 30% chance uncommon, 5% chance boss and legendary
-            // 0 = common, 1 = uncommon, 2 = legendary, 3 = boss
-            for (int i = 0; i < parasiteRarityTable.Length; i++)
-            {
-                if (i < 60)
-                {
-                    parasiteRarityTable[i] = 0;
-                }
-                if (i >= 60 & i < 90)
-                {
-                    parasiteRarityTable[i] = 1;
-                }
-                if (CorruptingParasite_CorruptBossItems == true)
-                {
-                    if (i >= 90 & i < 95)
-                    {
-                        parasiteRarityTable[i] = 2;
-                    }
-                    if (i >= 95)
-                    {
-                        parasiteRarityTable[i] = 3;
-                    }
-                }
-                else
-                {
-                    if (i >= 90)
-                    {
-                        parasiteRarityTable[i] = 2;
-                    }
-                }
-            }
-
-            int ParasitePickRarity() // Choose an item from the rarity array at random, then return it
-            {
-                int randomEntry = parasiteRarityRng.Next(parasiteRarityTable.Length);
-                return parasiteRarityTable[randomEntry];
-            }
-
-            /* 
-            Now that we have a rarity picker, we must do two things for each instance of a parasite:
-            1 - Check when the stage advances
-            2 - Pick an item in your inventory at random
-            3 - Pick a void item of the same tier at random
-            4 - Remove the inventory item and add the void item
-            */
-
-            int GetCorruptibleItemCount(List<ItemDef> altModeDefList, CharacterMaster master) // Create method to set alternate mode flag
-            {
-                int finalCorruptibles = 0;
-                foreach (ItemDef.Pair pair in ItemCatalog.GetItemPairsForRelationship(DLC1Content.ItemRelationshipTypes.ContagiousItem))
-                {
-                    if (master.inventory.GetItemCount(pair.itemDef1) > 0) // If we have this item in our inventory, AND it's not a void item, add it to the list of possible conversions
-                    {
-                        if (pair.itemDef1.deprecatedTier != ItemTier.VoidTier1 && pair.itemDef1.deprecatedTier != ItemTier.VoidTier2 && pair.itemDef1.deprecatedTier != ItemTier.VoidTier3 && pair.itemDef1.deprecatedTier != ItemTier.VoidBoss)
-                        {
-                            altModeDefList.Add(pair.itemDef1);
-                            finalCorruptibles += 1;
-                        }
-                    }
-                    if (master.inventory.GetItemCount(pair.itemDef2) > 0)
-                    {
-                        if (pair.itemDef2.deprecatedTier != ItemTier.VoidTier1 && pair.itemDef2.deprecatedTier != ItemTier.VoidTier2 && pair.itemDef2.deprecatedTier != ItemTier.VoidTier3 && pair.itemDef2.deprecatedTier != ItemTier.VoidBoss)
-                        {
-                            altModeDefList.Add(pair.itemDef2);
-                            finalCorruptibles += 1;
-                        }
-                    }
-                }
-                return finalCorruptibles;
-            }
-
-            void ParasiteTradeItems(CharacterMaster master)
-            {
-                int itemCount = master.inventory.GetItemCount(itemDef);
-                if (itemCount > 0)
-                {
-                    // Get every existing item of the 4 void tiers
-                    List<PickupIndex> listVoidTier1 = new List<PickupIndex>(Run.instance.availableVoidTier1DropList);
-                    List<PickupIndex> listVoidTier2 = new List<PickupIndex>(Run.instance.availableVoidTier2DropList);
-                    List<PickupIndex> listVoidTier3 = new List<PickupIndex>(Run.instance.availableVoidTier3DropList);
-                    List<PickupIndex> listVoidTierBoss = new List<PickupIndex>(Run.instance.availableVoidBossDropList);
-                    // Get list of items in the player's inventory
-                    List<ItemIndex> listPlayerItems = new List<ItemIndex>(master.inventory.itemAcquisitionOrder);
-                    // And get a random list of the player's items to draw from
-                    Xoroshiro128Plus listPlayerItemsSeed = new Xoroshiro128Plus(Run.instance.seed);
-
-                    for (int i = 0; i < itemCount;) // For each parasite...
-                    {
-                        int validItemCount = master.inventory.GetTotalItemCountOfTier(ItemTier.Tier1) + master.inventory.GetTotalItemCountOfTier(ItemTier.Tier2) + master.inventory.GetTotalItemCountOfTier(ItemTier.Tier3) + master.inventory.GetTotalItemCountOfTier(ItemTier.Boss);
-                        List<ItemDef> altModeDefList = new List<ItemDef>();
-
-                        if (validItemCount < 1) // If no items are available to corrupt, break the loop to begin with
-                        {
-                            break;
-                        }
-
-                        if (CorruptingParasite_AlternateMode == true)
-                        {
-                            if (GetCorruptibleItemCount(altModeDefList, master) > 0) // Activate alt mode if there are any items to corrupt
-                            {
-                                Util.ShuffleList(altModeDefList, listPlayerItemsSeed);
-                                ItemDef amdCandidate = altModeDefList.First();
-                                foreach (ItemDef.Pair pair in ItemCatalog.GetItemPairsForRelationship(DLC1Content.ItemRelationshipTypes.ContagiousItem))
-                                {
-                                    if (pair.itemDef1 == altModeDefList.First())
-                                    {
-                                        master.inventory.RemoveItem(amdCandidate);
-                                        master.inventory.GiveItem(pair.itemDef2);
-                                        CharacterMasterNotificationQueue.PushItemTransformNotification(master, amdCandidate.itemIndex, pair.itemDef2.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                                        i++;
-                                        break;
-                                    }
-                                    if (pair.itemDef2 == altModeDefList.First())
-                                    {
-                                        master.inventory.RemoveItem(amdCandidate);
-                                        master.inventory.GiveItem(pair.itemDef1);
-                                        CharacterMasterNotificationQueue.PushItemTransformNotification(master, amdCandidate.itemIndex, pair.itemDef1.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                                        i++;
-                                        break;
-                                    }
-                                }
-                                continue;
-                            }
-                            if (GetCorruptibleItemCount(altModeDefList, master) == 0 && CorruptingParasite_AltModeOnlyConvert == true)
-                            {
-                                break;
-                            }
-                        }
-
-                        // Shuffle all of the lists
-                        Util.ShuffleList(listPlayerItems, listPlayerItemsSeed);
-                        Util.ShuffleList(listVoidTier1, listPlayerItemsSeed);
-                        Util.ShuffleList(listVoidTier2, listPlayerItemsSeed);
-                        Util.ShuffleList(listVoidTier3, listPlayerItemsSeed);
-                        Util.ShuffleList(listVoidTierBoss, listPlayerItemsSeed);
-                        int chosenRarity = ParasitePickRarity();
-
-                        if (CorruptingParasite_Replication == false) // If replication is disabled, shuffle the voidtier1 list until we get a non-parasite item
-                        {
-                            while (listVoidTier1[0].pickupDef.itemIndex == itemDef.itemIndex)
-                            {
-                                Util.ShuffleList(listVoidTier1, listPlayerItemsSeed);
-                            }
-                        }
-
-                        if (chosenRarity == 0) // If common
-                        {
-                            foreach (ItemIndex eachItem in listPlayerItems)
-                            {
-                                ItemDef eachItemDef = ItemCatalog.GetItemDef(eachItem);
-                                if (eachItemDef.deprecatedTier == ItemTier.Tier1)
-                                {
-                                    master.inventory.RemoveItem(eachItemDef);
-                                    master.inventory.GiveItem(listVoidTier1[0].pickupDef.itemIndex);
-                                    CharacterMasterNotificationQueue.PushItemTransformNotification(master, eachItem, listVoidTier1[0].pickupDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                                    i++;
-                                    break;
-                                }
-                            }
-                        }
-                        if (chosenRarity == 1) // If uncommon
-                        {
-                            foreach (ItemIndex eachItem in listPlayerItems)
-                            {
-                                ItemDef eachItemDef = ItemCatalog.GetItemDef(eachItem);
-                                if (eachItemDef.deprecatedTier == ItemTier.Tier2)
-                                {
-                                    master.inventory.RemoveItem(eachItemDef);
-                                    master.inventory.GiveItem(listVoidTier2[0].pickupDef.itemIndex);
-                                    CharacterMasterNotificationQueue.PushItemTransformNotification(master, eachItem, listVoidTier2[0].pickupDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                                    i++;
-                                    break;
-                                }
-                            }
-                        }
-                        if (chosenRarity == 2) // If legendary
-                        {
-                            foreach (ItemIndex eachItem in listPlayerItems)
-                            {
-                                ItemDef eachItemDef = ItemCatalog.GetItemDef(eachItem);
-                                if (eachItemDef.deprecatedTier == ItemTier.Tier3)
-                                {
-                                    master.inventory.RemoveItem(eachItemDef);
-                                    master.inventory.GiveItem(listVoidTier3[0].pickupDef.itemIndex);
-                                    CharacterMasterNotificationQueue.PushItemTransformNotification(master, eachItem, listVoidTier3[0].pickupDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                                    i++;
-                                    break;
-                                }
-                            }
-                        }
-                        if (chosenRarity == 3) // If boss
-                        {
-                            foreach (ItemIndex eachItem in listPlayerItems)
-                            {
-                                ItemDef eachItemDef = ItemCatalog.GetItemDef(eachItem);
-                                if (eachItemDef.deprecatedTier == ItemTier.Boss)
-                                {
-                                    master.inventory.RemoveItem(eachItemDef);
-                                    master.inventory.GiveItem(listVoidTierBoss[0].pickupDef.itemIndex);
-                                    CharacterMasterNotificationQueue.PushItemTransformNotification(master, eachItem, listVoidTierBoss[0].pickupDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                                    i++;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             On.RoR2.CharacterMaster.OnServerStageBegin += (orig, self, stage) =>
             {
                 orig(self, stage);
                 if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                 {
-                    ParasiteTradeItems(self);
+                    Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.stageRng.nextUlong);
+                    int itemsLeft = self.inventory.GetItemCount(itemDef) * CorruptingParasite_ItemsPerStage;
+                    List<ItemIndex> itemList = self.inventory.itemAcquisitionOrder;
+                    Util.ShuffleList(itemList, rng);
+                    rng.Next();
+
+                    foreach (ItemIndex item in itemList)
+                    {
+                        if (itemsLeft <= 0)
+                        {
+                            break;
+                        }
+                        if (!CorruptingParasite_CorruptBossItems && ItemCatalog.GetItemDef(item).tier == ItemTier.Boss)
+                        {
+                            continue;
+                        }
+                        foreach (ItemDef.Pair pair in ItemCatalog.GetItemPairsForRelationship(DLC1Content.ItemRelationshipTypes.ContagiousItem))
+                        {
+                            if (pair.itemDef1 == ItemCatalog.GetItemDef(item))
+                            {
+                                self.inventory.RemoveItem(item);
+                                self.inventory.GiveItem(pair.itemDef2);
+                                CharacterMasterNotificationQueue.PushItemTransformNotification(self, item, pair.itemDef2.itemIndex, CharacterMasterNotificationQueue.TransformationType.ContagiousVoid);
+                                itemsLeft--;
+                                break;
+                            }
+                        }
+                    }
                 }
             };
         }
 
-        public static void Initiate(bool CorruptingParasite_CorruptBossItems, bool CorruptingParasite_AlternateMode, bool CorruptingParasite_Replication, bool CorruptingParasite_AltModeOnlyConvert)
+        public static void Initiate(bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(CorruptingParasite_AlternateMode, CorruptingParasite_AltModeOnlyConvert);
-            AddHooks(itemDefinition, CorruptingParasite_CorruptBossItems, CorruptingParasite_AlternateMode, CorruptingParasite_Replication, CorruptingParasite_AltModeOnlyConvert);
+            AddTokens(CorruptingParasite_CorruptBossItems, CorruptingParasite_ItemsPerStage);
+            AddHooks(itemDefinition, CorruptingParasite_CorruptBossItems, CorruptingParasite_ItemsPerStage);
         }
     }
 }

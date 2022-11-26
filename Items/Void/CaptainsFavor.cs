@@ -33,7 +33,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility };
+            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
@@ -223,7 +223,24 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDef, float CaptainsFavor_InteractableIncrease)
         {
-
+            void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene orig, SceneDirector self)
+            {
+                int favorCount = 0;
+                foreach (PlayerCharacterMasterController playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                {
+                    if (playerCharacterMasterController.master && playerCharacterMasterController.master.inventory)
+                    {
+                        favorCount += playerCharacterMasterController.master.inventory.GetItemCount(itemDef);
+                    }
+                }
+                if (favorCount > 0)
+                {
+                    float extraCredits = self.interactableCredit * (CaptainsFavor_InteractableIncrease * favorCount);
+                    self.interactableCredit += (int)extraCredits;
+                }
+                orig(self);
+            }
+            On.RoR2.SceneDirector.PopulateScene += SceneDirector_PopulateScene;
         }
 
         public static void Initiate(float CaptainsFavor_InteractableIncrease)

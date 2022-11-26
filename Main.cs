@@ -81,6 +81,7 @@ namespace Hex3Mod
         public ConfigEntry<bool> ScavengersPack_FourHundredTickets() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "HEX3MOD: 400 Tickets"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_OneTicket() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "HEX3MOD: One Ticket"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_ShopCard() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "MYSTICS ITEMS: Platinum Card"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_CuteBow() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "MYSTICS ITEMS: Cutesy Bow"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_ClockworkMechanism() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLAVOID: Clockwork Mechanism"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_Vials() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLAVOID: Enhancement Vials"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_BrokenChopsticks() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "HOLYCRAPFORKISBACK: Sharp Chopsticks"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
@@ -119,10 +120,8 @@ namespace Hex3Mod
 
         // Void
         public ConfigEntry<bool> CorruptingParasite_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> CorruptingParasite_CorruptBossItems() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Corrupt boss items"), true, new ConfigDescription("Allows the parasite to corrupt boss items", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> CorruptingParasite_AlternateMode() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Enable alternate mode"), false, new ConfigDescription("The parasite will first corrupt any item with available void conversions into their void counterparts. If none are available, it will revert to its normal behavior.", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> CorruptingParasite_AltModeOnlyConvert() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Alternate Mode: No random items"), false, new ConfigDescription("If the parasite can't find any items to convert to their void counterparts on Alternate Mode, it will do nothing instead.", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> CorruptingParasite_Replication() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Enable replication"), true, new ConfigDescription("The parasite can create more parasites.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> CorruptingParasite_CorruptBossItems() { return Config.Bind<bool>(new ConfigDefinition("Void - Corrupting Parasite", "Corrupt boss items"), false, new ConfigDescription("Allows the parasite to corrupt boss items", null, Array.Empty<object>())); }
+        public ConfigEntry<int> CorruptingParasite_ItemsPerStage() { return Config.Bind<int>(new ConfigDefinition("Void - Corrupting Parasite", "Items per stage"), 1, new ConfigDescription("Number of items corrupted each stage", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> NoticeOfAbsence_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Notice Of Absence", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> NoticeOfAbsence_SpeedBuff() { return Config.Bind<float>(new ConfigDefinition("Void - Notice Of Absence", "Speed multiplier"), 0.03f, new ConfigDescription("Percentage of base speed per void item", null, Array.Empty<object>())); }
@@ -133,7 +132,7 @@ namespace Hex3Mod
         public ConfigEntry<float> DropOfNecrosis_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Drop Of Necrosis", "Chance to inflict Blight"), 10f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> CaptainsFavor_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Captains Favor", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> CaptainsFavor_InteractableIncrease() { return Config.Bind<float>(new ConfigDefinition("Void - Captains Favor", "Interactables increase"), 15f, new ConfigDescription("Percentage value that interactable credits should be increased by.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> CaptainsFavor_InteractableIncrease() { return Config.Bind<float>(new ConfigDefinition("Void - Captains Favor", "Interactables increase"), 10f, new ConfigDescription("Percentage value that interactable credits should be increased by.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> Discovery_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Discovery", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> Discovery_ShieldAdd() { return Config.Bind<float>(new ConfigDefinition("Void - Discovery", "Shield value"), 3f, new ConfigDescription("Shield added per world interactable used", null, Array.Empty<object>())); }
@@ -195,7 +194,7 @@ namespace Hex3Mod
             Log.LogInfo("Uncommon");
             if (ScatteredReflection_Enable().Value == true){ ScatteredReflection.Initiate(ScatteredReflection_DamageReflectPercent().Value, ScatteredReflection_DamageReflectShardStack().Value, ScatteredReflection_DamageReflectBonus().Value); }
             if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealingFactor().Value); }
-            if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_PowerElixir().Value, ScavengersPack_DelicateWatch().Value, ScavengersPack_Dios().Value, ScavengersPack_VoidDios().Value, ScavengersPack_RustedKey().Value, ScavengersPack_EncrustedKey().Value, ScavengersPack_FourHundredTickets().Value, ScavengersPack_OneTicket().Value, ScavengersPack_ShopCard().Value, ScavengersPack_ClockworkMechanism().Value, ScavengersPack_Vials().Value, ScavengersPack_BrokenChopsticks().Value, ScavengersPack_AbyssalCartridge().Value, ScavengersPack_Singularity().Value); }
+            if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_PowerElixir().Value, ScavengersPack_DelicateWatch().Value, ScavengersPack_Dios().Value, ScavengersPack_VoidDios().Value, ScavengersPack_RustedKey().Value, ScavengersPack_EncrustedKey().Value, ScavengersPack_FourHundredTickets().Value, ScavengersPack_OneTicket().Value, ScavengersPack_ShopCard().Value, ScavengersPack_CuteBow().Value, ScavengersPack_ClockworkMechanism().Value, ScavengersPack_Vials().Value, ScavengersPack_BrokenChopsticks().Value, ScavengersPack_AbyssalCartridge().Value, ScavengersPack_Singularity().Value); }
             if (TheUnforgivable_Enable().Value == true) { TheUnforgivable.Initiate(TheUnforgivable_Interval().Value); }
             if (OverkillOverdrive_Enable().Value == true) { OverkillOverdrive.Initiate(OverkillOverdrive_ZoneIncrease().Value, OverkillOverdrive_AltMode().Value); }
             // Legendary
@@ -207,7 +206,7 @@ namespace Hex3Mod
             if (TaxManStatement_Enable().Value == true) { TaxManStatement.Initiate(TaxManStatement_ChanceToInflict().Value, TaxManStatement_DamagePerTax().Value, TaxManStatement_BaseGoldPerTax().Value); }
             // Void
             Log.LogInfo("Void");
-            if (CorruptingParasite_Enable().Value == true){ CorruptingParasite.Initiate(CorruptingParasite_CorruptBossItems().Value, CorruptingParasite_AlternateMode().Value, CorruptingParasite_Replication().Value, CorruptingParasite_AltModeOnlyConvert().Value); }
+            if (CorruptingParasite_Enable().Value == true){ CorruptingParasite.Initiate(CorruptingParasite_CorruptBossItems().Value, CorruptingParasite_ItemsPerStage().Value); }
             if (NoticeOfAbsence_Enable().Value == true){ NoticeOfAbsence.Initiate(NoticeOfAbsence_SpeedBuff().Value, NoticeOfAbsence_MaxSpeedBuff().Value); }
             if (DropOfNecrosis_Enable().Value == true) { DropOfNecrosis.Initiate(DropOfNecrosis_Damage().Value, DropOfNecrosis_DotChance().Value); }
             if (CaptainsFavor_Enable().Value == true) { CaptainsFavor.Initiate(CaptainsFavor_InteractableIncrease().Value); }
@@ -229,14 +228,12 @@ namespace Hex3Mod
             TODO
             New Items
             - The Tax Man's Statement
-            - Captain's Favor
             - One Ticket
 
             Reworks
             - Empathy
             - Apathy
             - Elder Mutagen
-            - Corrupting Parasite
             - Drop of Necrosis
             - Spattered Collection
             - The Hermit

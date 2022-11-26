@@ -263,7 +263,7 @@ namespace Hex3Mod.Items
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Scavenger's Pack");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "When an item is consumed, replace it with a brand new one. Occurs up to " + ScavengersPack_Uses + " times.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pack is empty.", ScavengersPack_Uses));
+            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed or broken</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pack is empty.", ScavengersPack_Uses));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"What are these?\"" +
             "\n\n\"I think they're... Eclipse sneakers?\"" +
             "\n\nAlex and Jolene had just cleaned up following their daily slaughter of local wildlife. The more keen-eyed of the two had discovered something lying on the ground beside one of the bodies, and insisted that Jolene (the stronger of the two) take it back to their ship. What she had found turned out to be a small pouch full of knick-knacks and artifacts, all with seemingly no purpose." +
@@ -284,7 +284,7 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer useful.");
         }
 
-        private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef, ItemDef hiddenItemDef, int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
+        private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef, ItemDef hiddenItemDef, int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_CuteBow, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
         {
             var itemPairs = new Dictionary<string, string> // Consumed item - Consumable item
             {
@@ -298,6 +298,7 @@ namespace Hex3Mod.Items
                 { "TreasureCacheConsumed", "TreasureCache" }, // WolfoQOL
                 { "TreasureCacheVoidConsumed", "TreasureCacheVoid" },
                 { "MysticsItems_KeepShopTerminalOpenConsumed", "MysticsItems_KeepShopTerminalOpen" }, // MysticsItems
+                { "MysticsItems_LimitedArmorBroken", "MysticsItems_LimitedArmor" },
                 { "ITEM_BROKEN_MESS", "ITEM_CLOCKWORK_ITEM" }, // VanillaVoid
                 { "ITEM_EMPTY_VIALS", "ITEM_EHANCE_VIALS_ITEM" },
                 { "HCFB_ITEM_BROKEN_CHOPSTICKS", "HCFB_ITEM_CHOPSTICKS" }, // Fork Is Back
@@ -315,6 +316,7 @@ namespace Hex3Mod.Items
             if (!ScavengersPack_FourHundredTickets) { itemPairs.Remove("FourHundredTicketsConsumed"); }
             if (!ScavengersPack_OneTicket) { itemPairs.Remove("OneTicketConsumed"); }
             if (!ScavengersPack_ShopCard) { itemPairs.Remove("MysticsItems_KeepShopTerminalOpenConsumed"); }
+            if (!ScavengersPack_CuteBow) { itemPairs.Remove("MysticsItems_LimitedArmorBroken"); }
             if (!ScavengersPack_ClockworkMechanism) { itemPairs.Remove("ITEM_BROKEN_MESS"); }
             if (!ScavengersPack_Vials) { itemPairs.Remove("ITEM_EMPTY_VIALS"); }
             if (!ScavengersPack_BrokenChopsticks) { itemPairs.Remove("HCFB_ITEM_BROKEN_CHOPSTICKS"); }
@@ -357,13 +359,13 @@ namespace Hex3Mod.Items
             On.RoR2.Inventory.RpcItemAdded += Inventory_RpcItemAdded;
         }
 
-        public static void Initiate(int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
+        public static void Initiate(int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_CuteBow, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));
             ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
             AddTokens(ScavengersPack_Uses);
-            AddHooks(itemDefinition, consumedItemDefinition, hiddenItemDefinition, ScavengersPack_Uses, ScavengersPack_PowerElixir, ScavengersPack_DelicateWatch, ScavengersPack_Dios, ScavengersPack_VoidDios, ScavengersPack_RustedKey, ScavengersPack_EncrustedKey, ScavengersPack_FourHundredTickets, ScavengersPack_OneTicket, ScavengersPack_ShopCard, ScavengersPack_ClockworkMechanism, ScavengersPack_Vials, ScavengersPack_BrokenChopsticks, ScavengersPack_AbyssalCartridge, ScavengersPack_Singularity);
+            AddHooks(itemDefinition, consumedItemDefinition, hiddenItemDefinition, ScavengersPack_Uses, ScavengersPack_PowerElixir, ScavengersPack_DelicateWatch, ScavengersPack_Dios, ScavengersPack_VoidDios, ScavengersPack_RustedKey, ScavengersPack_EncrustedKey, ScavengersPack_FourHundredTickets, ScavengersPack_OneTicket, ScavengersPack_ShopCard, ScavengersPack_CuteBow, ScavengersPack_ClockworkMechanism, ScavengersPack_Vials, ScavengersPack_BrokenChopsticks, ScavengersPack_AbyssalCartridge, ScavengersPack_Singularity);
         }
     }
 }

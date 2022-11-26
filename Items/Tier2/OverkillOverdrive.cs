@@ -256,7 +256,6 @@ namespace Hex3Mod.Items
                 return totalItemAmount * (OverkillOverdrive_ZoneIncrease / 100f);
             }
 
-            // Changes to zone behaviors
             // General holdout zones
             void HoldoutZoneController_OnEnable(On.RoR2.HoldoutZoneController.orig_OnEnable orig, HoldoutZoneController self)
             {
@@ -266,6 +265,7 @@ namespace Hex3Mod.Items
                     self.baseRadius += self.baseRadius * FindTotalMultiplier();
                 }
             }
+
             // Shrine of the Forest
             void ShrineHealingBehavior_SetWardEnabled(On.RoR2.ShrineHealingBehavior.orig_SetWardEnabled orig, ShrineHealingBehavior self, bool enableWard)
             {
@@ -275,6 +275,7 @@ namespace Hex3Mod.Items
                 }
                 orig(self, enableWard);
             }
+
             // Focus Crystal
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
@@ -298,12 +299,14 @@ namespace Hex3Mod.Items
                     });
                 }
             };
+
             // Buff Wards
             void BuffWard_Start(On.RoR2.BuffWard.orig_Start orig, BuffWard self)
             {
                 self.radius += (self.radius * FindTotalMultiplier());
                 orig(self);
             }
+
             // Bustling Fungus
             IL.RoR2.Items.MushroomBodyBehavior.FixedUpdate += (il) =>
             {
@@ -319,6 +322,7 @@ namespace Hex3Mod.Items
                     });
                 }
             };
+
             // Interstellar Desk Plant
             void DeskPlantController_Awake(On.RoR2.DeskPlantController.orig_Awake orig, DeskPlantController self)
             {
@@ -326,6 +330,7 @@ namespace Hex3Mod.Items
                 self.radiusIncreasePerStack = 5f + (5f * FindTotalMultiplier());
                 orig(self);
             }
+
             // Void Fields Cells?
 
             // Captain Beacons?
