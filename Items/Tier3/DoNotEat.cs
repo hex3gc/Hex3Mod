@@ -219,18 +219,18 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance, float DoNotEat_IrradiantChancePerStack)
+        public static void AddTokens(float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Do Not Eat");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Chests may also contain a pearl.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Chests have a <style=cShrine>" + DoNotEat_PearlChancePerStack + "%</style> <style=cStack>(+" + DoNotEat_PearlChancePerStack + "% per stack)</style> chance to also contain a <style=cShrine>Pearl</style> <style=cStack>(" + (100f - DoNotEat_IrradiantChance) + "%)</style> or an <style=cShrine>Irradiant Pearl</style> <style=cStack>(" + DoNotEat_IrradiantChance + "%, " + DoNotEat_IrradiantChancePerStack + "% per stack)</style>.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Chests have a <style=cShrine>" + DoNotEat_PearlChancePerStack + "%</style> <style=cStack>(+" + DoNotEat_PearlChancePerStack + "% per stack)</style> chance to also contain a <style=cShrine>Pearl</style> or an <style=cShrine>Irradiant Pearl</style>.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "You know those little silica packets that say \"Do Not Eat\" on them? Or, should I say 'silica' at all?\n\n" +
                 "You see, I'm a skeptic. When the government tells me that something is dangerous, I will do it. When the government tells me there's nothing wrong, I won't believe them. The government tells me to wear protective equipment to work, I shrug it off-- and the funny thing is, I'm usually right! When was the last time a mask or a seatbelt did anything but make you uncomfortable?\n\n" +
                 "So when the government says, \"Do Not Eat\", my only logical choice is to eat. There must be something in there they don't *want* us to eat, for whatever reason... a chemical that counteracts flouridic mind control, perhaps? Something that decalcifies the pituitary gland? A cure for toxoplasmosis or even cancer? Nobody knows because nobody is willing to find out. As you know- my subscribers- that's a job for me.\n\n" +
                 "I've ordered 100 individual packs of Mercurian seaweed, each of which should contain a silica packet. I'll cut them open, pour out those little mysterious orbs and season my meals with them. My workplace is sending me out to a remote system so I won't be able to post for a while, but give me just a few months and I will reward you with the truth. Watch this space...");
         }
 
-        private static void AddHooks(ItemDef itemDef, float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance, float DoNotEat_IrradiantChancePerStack)
+        private static void AddHooks(ItemDef itemDef, float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance)
         {
             On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
             {
@@ -250,12 +250,12 @@ namespace Hex3Mod.Items
                             }
                         }
                     }
-                    if (totalItems > 0 && Util.CheckRoll(DoNotEat_PearlChancePerStack * totalItems, highestLuck)) // 10% chance per stack
+                    if (totalItems > 0 && Util.CheckRoll(DoNotEat_PearlChancePerStack * totalItems, highestLuck))
                     {
                         float angle = 360f / ((float)self.dropCount);
                         Vector3 vector = Vector3.up * (self.dropUpVelocityStrength / 2) + self.dropTransform.forward * 0f;
                         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
-                        if (Util.CheckRoll(DoNotEat_IrradiantChance + (DoNotEat_IrradiantChancePerStack * (totalItems - 1)))) // 10% chance to drop an Irradiant Pearl, 5% per stack
+                        if (Util.CheckRoll(DoNotEat_IrradiantChance))
                         {
                             PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.ShinyPearl.itemIndex), self.dropTransform.position + Vector3.up * 1.5f, vector);
                         }
@@ -270,11 +270,11 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance, float DoNotEat_IrradiantChancePerStack)
+        public static void Initiate(float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(DoNotEat_PearlChancePerStack, DoNotEat_IrradiantChance, DoNotEat_IrradiantChancePerStack);
-            AddHooks(itemDefinition, DoNotEat_PearlChancePerStack, DoNotEat_IrradiantChance, DoNotEat_IrradiantChancePerStack);
+            AddTokens(DoNotEat_PearlChancePerStack, DoNotEat_IrradiantChance);
+            AddHooks(itemDefinition, DoNotEat_PearlChancePerStack, DoNotEat_IrradiantChance);
         }
     }
 }

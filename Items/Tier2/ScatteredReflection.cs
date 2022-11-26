@@ -232,86 +232,61 @@ namespace Hex3Mod.Items
             float ScatteredReflection_DamageReflectBonus_Readable = ScatteredReflection_DamageReflectBonus * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Scattered Reflection");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Reflect some of the damage you take back to attackers. Reflect more with each Shard Of Glass you own.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cWorldEvent>Prevent</style> <style=cIsUtility>" + ScatteredReflection_DamageReflectPercent_Readable + "%</style> of all received damage and reflect it back to your attacker, adding an additional <style=cIsDamage>" + ScatteredReflection_DamageReflectBonus_Readable + "%</style> <style=cStack>(+" + ScatteredReflection_DamageReflectBonus_Readable + "% per stack)</style> damage bonus. For every <style=cWorldEvent>Shard Of Glass</style> in your inventory, prevent <style=cIsUtility>" + ScatteredReflection_DamageReflectShardStack_Readable + "%</style> more damage.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Reflect some of the damage you take back to attackers. Reflect more with each <style=cWorldEvent>Shard Of Glass</style> you own.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Reflect {0}% of all received damage</style> back to your attacker, magnifying it by <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style>. For every <style=cIsUtility>Shard Of Glass</style> in your inventory, <style=cIsUtility>reflect {2}%</style> <style=cStack>(+{2}% per stack)</style> <style=cIsUtility>more damage</style>.", ScatteredReflection_DamageReflectPercent_Readable, ScatteredReflection_DamageReflectBonus_Readable, ScatteredReflection_DamageReflectShardStack_Readable));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "An aggregate of shattered souls\n\nLost to the wind and to time\n\nThey form a ward to protect you\n\nThe only one they can follow home");
         }
 
         private static void AddHooks(ItemDef itemDef, float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus) // Insert hooks here
         {
-            ItemDef ShardOfGlassDef = ShardOfGlass.CreateItem(); // Might be a better way to do this than to call CreateItem again, but no errors are caused
-
-            float damageReflectPercent = ScatteredReflection_DamageReflectPercent;
-            float damageReflectShardStack = ScatteredReflection_DamageReflectShardStack;
-            float damageReflectBonus = ScatteredReflection_DamageReflectBonus;
-
-            void H3_OnHpLost(DamageInfo damageInfo, HealthComponent healthComponent)
+            void TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
             {
-                if (healthComponent.body && healthComponent.body.master && healthComponent.body.teamComponent) // Those darned pots...
+                if (self.body && self.body.master && self.body.teamComponent && self.body.inventory && self.body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    CharacterBody body = healthComponent.body;
-                    if (body.teamComponent.teamIndex >= 0 && body.gameObject)
+                    CharacterBody body = self.body;
+                    Inventory inventory = body.inventory;
+                    int itemCount = inventory.GetItemCount(itemDef);
+                    int shardCount = 0;
+                    if (ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex("ShardOfGlass")) != null) // If shard is not present, nothing will be affected
                     {
-                        if (body.inventory && damageInfo.attacker) // And also make sure that there's an attacker in the first place...
-                        {
-                            GameObject enemyGameObject = damageInfo.attacker;
+                        shardCount = inventory.GetItemCount(ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex("ShardOfGlass")));
+                    }
 
-                            if (enemyGameObject.GetComponent<CharacterBody>() && enemyGameObject.GetComponent<CharacterBody>().teamComponent) // AND that they have a body/teamindex...
-                            {
-                                CharacterBody enemy = enemyGameObject.GetComponent<CharacterBody>();
-                                Inventory inventory = body.inventory;
-                                TeamIndex teamIndex = body.teamComponent.teamIndex;
-                                TeamIndex teamIndexEnemy = enemy.teamComponent.teamIndex;
-                                int itemCount = inventory.GetItemCount(itemDef);
-                                int shardCount = inventory.GetItemCount(ShardOfGlassDef);
-
-                                if (itemCount > 0)
-                                {
-                                    float percentWithShardBonus = damageReflectPercent + (damageReflectShardStack * shardCount);
-                                    if (percentWithShardBonus > 0.8f) // First, we should cap damage reduction at 80% to prevent total invincibility
-                                    {
-                                        percentWithShardBonus = 0.8f;
-                                    }
-
-                                    // Get the damage we need to do back, and then the damage we must prevent
-                                    float damageValue = ((damageInfo.damage + (damageInfo.damage * percentWithShardBonus)) + (damageInfo.damage * (damageReflectBonus * itemCount)));
-                                    float damageReduction = (damageInfo.damage * percentWithShardBonus);
-
-                                    // Deal the reflected damage if these conditions are met
-                                    if (enemy != body && teamIndex != teamIndexEnemy && damageInfo.damageType != DamageType.OutOfBounds)
-                                    {
-                                        LightningOrb lightningOrb = new LightningOrb();
-                                        lightningOrb.attacker = body.gameObject;
-                                        lightningOrb.bouncedObjects = null;
-                                        lightningOrb.bouncesRemaining = 0;
-                                        lightningOrb.damageCoefficientPerBounce = 1f;
-                                        lightningOrb.damageColorIndex = DamageColorIndex.Item;
-                                        lightningOrb.damageValue = damageValue;
-                                        lightningOrb.damageType = DamageType.OutOfBounds;
-                                        lightningOrb.isCrit = false;
-                                        lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
-                                        lightningOrb.origin = body.corePosition;
-                                        lightningOrb.procChainMask = default(ProcChainMask);
-                                        lightningOrb.procCoefficient = 0f;
-                                        lightningOrb.range = 0f;
-                                        lightningOrb.teamIndex = teamIndex;
-                                        lightningOrb.target = enemy.mainHurtBox;
-                                        OrbManager.instance.AddOrb(lightningOrb);
-                                        Util.PlaySound(EntityStates.BrotherMonster.Weapon.FireLunarShards.fireSound, body.gameObject);
-                                    }
-                                    // Finally, reduce the damage dealt to the item holder
-                                    damageInfo.damage -= damageReduction;
-                                }
-                            }
+                    // If all anti-nullref checks are passed, perform actions
+                    if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody enemyBody) && enemyBody.teamComponent && body != enemyBody && body.teamComponent.teamIndex != enemyBody.teamComponent.teamIndex && damageInfo.damage > 0.1f)
+                    {
+                        shardCount *= inventory.GetItemCount(itemDef); // Stacks of Scattered Reflection now strengthen the synergy
+                        float totalReflectPercent = ScatteredReflection_DamageReflectPercent + (shardCount * ScatteredReflection_DamageReflectShardStack);
+                        if (totalReflectPercent > 0.9f)
+                        { 
+                            totalReflectPercent = 0.9f; // Prevent damage capped at 90%
                         }
+                        float damageReflected = damageInfo.damage * totalReflectPercent;
+                        damageInfo.damage -= damageReflected;
+
+                        LightningOrb lightningOrb = new LightningOrb();
+                        lightningOrb.attacker = body.gameObject;
+                        lightningOrb.bouncedObjects = null;
+                        lightningOrb.bouncesRemaining = 0;
+                        lightningOrb.damageCoefficientPerBounce = 1f;
+                        lightningOrb.damageColorIndex = DamageColorIndex.Item;
+                        lightningOrb.damageValue = damageReflected + ((damageReflected * ScatteredReflection_DamageReflectBonus) * itemCount);
+                        lightningOrb.damageType = DamageType.Generic;
+                        lightningOrb.isCrit = false;
+                        lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
+                        lightningOrb.origin = body.corePosition;
+                        lightningOrb.procChainMask = default(ProcChainMask);
+                        lightningOrb.procCoefficient = 0f;
+                        lightningOrb.range = 0f;
+                        lightningOrb.teamIndex = body.teamComponent.teamIndex;
+                        lightningOrb.target = enemyBody.mainHurtBox;
+                        OrbManager.instance.AddOrb(lightningOrb);
+                        Util.PlaySound(EntityStates.BrotherMonster.Weapon.FireLunarShards.fireSound, body.gameObject);
                     }
                 }
-            }
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
-            {
                 orig(self, damageInfo);
-                H3_OnHpLost(damageInfo, self); // Hook into the damage report that occurs whenever damage is dealt to a body
-            };
+            }
+            On.RoR2.HealthComponent.TakeDamage += TakeDamage;
         }
 
         public static void Initiate(float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus)

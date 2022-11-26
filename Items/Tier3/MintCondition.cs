@@ -221,7 +221,7 @@ namespace Hex3Mod.Items
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Mint Condition");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "You are immune to movement restricting status effects. Gain movement speed and extra jumps.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Provides immunity to all movement restricting status effects. Gain <style=cIsUtility>" + MintCondition_MoveSpeed_Readable + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack_Readable + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack + " per stack)</style> extra jumps.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cIsUtility>Provides immunity to all movement restricting status effects</style>. Gain <style=cIsUtility>" + MintCondition_MoveSpeed_Readable + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack_Readable + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack + " per stack)</style> extra jumps.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", 
                 "\nOrder: Eclipse 380 Boosts(Mint Condition)" +
                 "\nTracking Number: 240******" +

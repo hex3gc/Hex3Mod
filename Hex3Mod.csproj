@@ -35,8 +35,14 @@
     <Reference Include="MMHOOK_RoR2">
       <HintPath>libs\MMHOOK_RoR2.dll</HintPath>
     </Reference>
-    <Reference Include="MysticsItemsPlugin">
-      <HintPath>libs\SoftDependencies\MysticsItemsPlugin.dll</HintPath>
+    <Reference Include="Mono.Cecil">
+      <HintPath>libs\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>libs\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>libs\MonoMod.Utils.dll</HintPath>
     </Reference>
     <Reference Include="R2API">
       <HintPath>libs\R2API.dll</HintPath>
@@ -44,11 +50,11 @@
     <Reference Include="RoR2">
       <HintPath>libs\RoR2.dll</HintPath>
     </Reference>
-    <Reference Include="TinkersSatchel">
-      <HintPath>libs\SoftDependencies\TinkersSatchel.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Addressables">
       <HintPath>libs\Unity.Addressables.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>libs\Unity.ResourceManager.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>libs\UnityEngine.dll</HintPath>
