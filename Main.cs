@@ -128,8 +128,8 @@ namespace Hex3Mod
         public ConfigEntry<float> NoticeOfAbsence_MaxSpeedBuff() { return Config.Bind<float>(new ConfigDefinition("Void - Notice Of Absence", "Maximum speed multiplier"), 5f, new ConfigDescription("Maximum speed multiplier, 500% by default. This is to avoid uncontrollably high speeds during void-focused runs.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> DropOfNecrosis_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Drop Of Necrosis", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> DropOfNecrosis_Damage() { return Config.Bind<float>(new ConfigDefinition("Void - Drop Of Necrosis", "Added damage per stack"), 0.1f, new ConfigDescription("What fraction of base Blight damage is added to Blight per stack.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> DropOfNecrosis_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Drop Of Necrosis", "Chance to inflict Blight"), 10f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> DropOfNecrosis_Damage() { return Config.Bind<float>(new ConfigDefinition("Void - Drop Of Necrosis", "Added damage per stack"), 0.05f, new ConfigDescription("What fraction of base Blight damage is added to Blight per stack.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> DropOfNecrosis_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Drop Of Necrosis", "Chance to inflict Blight"), 5f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> CaptainsFavor_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Captains Favor", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> CaptainsFavor_InteractableIncrease() { return Config.Bind<float>(new ConfigDefinition("Void - Captains Favor", "Interactables increase"), 10f, new ConfigDescription("Percentage value that interactable credits should be increased by.", null, Array.Empty<object>())); }
@@ -139,8 +139,8 @@ namespace Hex3Mod
         public ConfigEntry<int> Discovery_MaxStacks() { return Config.Bind<int>(new ConfigDefinition("Void - Discovery", "Maximum uses"), 100, new ConfigDescription("Maximum interactable uses per stack before shield is no longer granted", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> SpatteredCollection_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - Spattered Collection", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> SpatteredCollection_IntervalReduction() { return Config.Bind<float>(new ConfigDefinition("Void - Spattered Collection", "Damage interval multiplier"), 0.9f, new ConfigDescription("For each stack of Spattered Collection, multiply time between DoT ticks by this much (Hyperbolic).", null, Array.Empty<object>())); }
-        public ConfigEntry<float> SpatteredCollection_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Spattered Collection", "Chance to inflict Blight"), 5f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> SpatteredCollection_ArmorReduction() { return Config.Bind<float>(new ConfigDefinition("Void - Spattered Collection", "Armor reduction per stack"), 2f, new ConfigDescription("For each stack of Spattered Collection, reduce enemies' armor by this much per stack of Blight.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> SpatteredCollection_DotChance() { return Config.Bind<float>(new ConfigDefinition("Void - Spattered Collection", "Chance to inflict Blight"), 10f, new ConfigDescription("Added percent chance of inflicting Blight on hit.", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> TheHermit_Enable() { return Config.Bind<bool>(new ConfigDefinition("Void - The Hermit", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> TheHermit_BuffDuration() { return Config.Bind<float>(new ConfigDefinition("Void - The Hermit", "Debuff duration"), 5f, new ConfigDescription("How long in seconds the on-hit debuff should last", null, Array.Empty<object>())); }
@@ -211,7 +211,7 @@ namespace Hex3Mod
             if (DropOfNecrosis_Enable().Value == true) { DropOfNecrosis.Initiate(DropOfNecrosis_Damage().Value, DropOfNecrosis_DotChance().Value); }
             if (CaptainsFavor_Enable().Value == true) { CaptainsFavor.Initiate(CaptainsFavor_InteractableIncrease().Value); }
             if (Discovery_Enable().Value == true){ Discovery.Initiate(Discovery_ShieldAdd().Value, Discovery_MaxStacks().Value); }
-            if (SpatteredCollection_Enable().Value == true) { SpatteredCollection.Initiate(SpatteredCollection_IntervalReduction().Value, SpatteredCollection_DotChance().Value); }
+            if (SpatteredCollection_Enable().Value == true) { SpatteredCollection.Initiate(SpatteredCollection_ArmorReduction().Value, SpatteredCollection_DotChance().Value); }
             if (TheHermit_Enable().Value == true){ TheHermit.Initiate(TheHermit_BuffDuration().Value, TheHermit_DamageReduction().Value); }
             // Lunar
             Log.LogInfo("Lunar");
@@ -234,8 +234,6 @@ namespace Hex3Mod
             - Empathy
             - Apathy
             - Elder Mutagen
-            - Drop of Necrosis
-            - Spattered Collection
             - The Hermit
             */
 

@@ -25,21 +25,21 @@ Adds 1 artifact and 26 new items to the game:
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555785277452410/TheUnforgivable.png?raw=true" width=128> | **The Unforgivable**<br>Activate your **on-kill effects** at your location **once** <sup>(+1 per stack)</sup> every **8** seconds. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555785277452410/TheUnforgivable.png?raw=true" width=128> | **Overkill Overdrive**<br>Amplify the radius of your **area buffs** and **holdout zones** by **20%** <sup>(+20% per stack)</sup>. |
 | | <p align="center">**LEGENDARY**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>**When an enemy dies within 20m** <sup>(+10m per stack)</sup> of you, gain a stack of Apathy. After reaching **30** stacks, **enter a frenzy** which grants you **+50% movement speed**, **attack speed** and **regeneration** for **5 seconds**. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>**When an enemy dies within 20m** <sup>(+10m per stack)</sup> of you, gain a stack of Apathy. After reaching **15** stacks, **enter a frenzy** which grants you **+50% movement speed**, **attack speed** and **rapid regeneration** for **5 seconds**. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>**Provides immunity to movement restricting status effects**. Gain **20%** movement speed <sup>(+40% per stack)</sup> and **1** <sup>(+2 per stack)</sup> extra jumps. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new creature type** grants a permanent **4% max health** and **4 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all creature types. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **4% max health** and **4 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. | <details><summary>Unlock</summary>During a single run, kill 20 unique monster species.</details> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **8%** <sup>(+8% per stack)</sup> chance to also contain a **Pearl** or an **Irradiant Pearl**. | <details><summary>Unlock</summary>Carry eight or more pearls at a time.</details> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **The Tax Man's Statement**<br>Your attacks have a **5%** chance <sup>(+5% per stack)</sup> to apply **Taxation**. Taxed enemies are permanently **affected whenever they use an ability**, taking **5%** of their health as damage <sup>(Halved against bosses)</sup> and surrendering **2** gold to the player <sup>(Scales over time)</sup>. |
 | | <p align="center">**VOID**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>At the start of a stage, **1 random item will be corrupted into its void equivalent** <sup>(+1 per stack)</sup>. | <details><summary>Unlock</summary>Enter the Void Locus and activate all four signals.</details> |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>At the start of each stage, **1 random item will be corrupted into its void equivalent** <sup>(+1 per stack)</sup>. | <details><summary>Unlock</summary>Enter the Void Locus and activate all four signals.</details> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987939840060/NoticeOfAbsence.png?raw=true" width=128> | **Notice Of Absence**<br>**Become invisible for 8 seconds** <sup>(+8 per stack)</sup> whenever a boss spawns. **Corrupts all Bucket Lists.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890485198848/DropOfNecrosis.png?raw=true" width=128> | **Drop Of Necrosis**<br>Your attacks have a **5%** chance to inflict **Blight**, which deals **5%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890485198848/DropOfNecrosis.png?raw=true" width=128> | **Drop Of Necrosis**<br>Your attacks have a **5%** <sup>(+5% per stack)</sup> chance to inflict **Blight**, which deals **5%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **The Captain's Favor**<br>Stages contain **10%** <sup>(+10% per stack)</sup> more interactables. **Corrupts all 400 Tickets.** |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **3** points per stack of **regenerating shield** to every player who has this item. Caps at **300 shield** per stack. **Corrupts all Infusions.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986677354506/SpatteredCollection.png?raw=true" width=128> | **Spattered Collection**<br>Your **bleed effects** are converted to **Blight**, which now **reduces enemies' armor by 2** <sup>(+2 per stack)</sup> for each stack. **Corrupts all Scattered Reflections.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>Taking damage grants a **stacking damage resistance of 5%**. Lasts for **10 seconds** <sup>(+5 per stack)</sup>. **Corrupts all Symbiotic Scorpions.**|
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986677354506/SpatteredCollection.png?raw=true" width=128> | **Spattered Collection**<br>Your attacks have a **5%** chance to inflict **Blight**, which now **reduces enemies' armor by 2** <sup>(+2 per stack)</sup> for each stack. **Corrupts all Scattered Reflections.**|
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>Taking damage grants a **stacking damage resistance of 5%** that lasts for **10 seconds** <sup>(+5 per stack)</sup>. **Corrupts all Symbiotic Scorpions.**|
 | | <p align="center">**LUNAR**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555784782528542/OneTicket.png?raw=true" width=128> | **One Ticket**<br> | <details><summary>Unlock</summary>Use a roll of 400 Tickets to double the contents of a Scavenger's bag.</details> |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555784782528542/OneTicket.png?raw=true" width=128> | **One Ticket**<br>This ticket grants **legendary items** when deposited into a **cleansing pool**: One for each stage fully cleared while holding it. **ALL enemies spawn as Perfected Elites while it is in your inventory.** |
 | | <p align="center">**LUNAR EQUIPMENT**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Blood Of The Lamb**<br>Purge **6** of your items for a random **boss item.** | <details><summary>Unlock</summary>While carrying 10 or more living sacrifices, obliterate yourself at the obelisk.</details> |
 | | <p align="center">**ARTIFACTS**</p> |
@@ -72,14 +72,14 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * **Added achievement "We're Rich!":** Unlocks Miner's Helmet
 * **Added achievement "I'll Be Taking That":** Unlocks Scavenger's Pack
 * **Added achievement "Is It Edible?":** Unlocks Do Not Eat
+* **Added achievement "Incredible Monsters & Where To Locate Them":** Unlocks Elder Mutagen
 * **Added achievement "From The Depths":** Unlocks Corrupting Parasite
-* **Added achievement "All Mine":** Unlocks One Ticket
 * **Added achievement "0000000000":** Unlocks Blood Of The Lamb
 * **Empathy rework:** Heal for a small amount whenever a nearby enemy is hit.
 * **Apathy rework:** Power up after seeing enough violence.
 * **Elder Mutagen:** Kill new types of creatures to evolve.
 * **Corrupting Parasite rework:** Corrupts an item into its void equivalent every stage.
-* **Spattered Collection rework:** Convert all of your bleed effects into Blight. Each stack of Blight slightly reduces your enemies' armor.
+* **Spattered Collection rework:** Your attacks may inflict a potent Blight which melts through enemies' armor.
 * **The Hermit rework:** Getting hit grants stacking damage resistance.
 * 400 Tickets no longer appears in printers.
 * 400 Tickets now tracks separately for each player, preventing rare unintended behavior.
@@ -87,9 +87,11 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * Cleaned up Scattered Reflection's code so that it doesn't unnecessarily duplicate Shard Of Glass's itemdef.
 * Scavenger's Pack code is much cleaner. Now replaces with a new item rather than preventing consumption, and also works on fragile items.
 * Scavenger's Pack item restoration is fully configurable, and supports more modded items.
+* Scavenger's Pack now displays as a buff how many uses are left in one's pack.
 * Do Not Eat drop chance 5% -> 8%
 * Do Not Eat no longer stacks irradiant pearl chance.
-* Drop Of Necrosis chance and damage bonus 10% -> 5%
+* Do Not Eat can now be scrapped properly.
+* Drop Of Necrosis chance and damage bonuses 10% -> 5%
 
 <details>
 <summary>Earlier updates</summary>

@@ -286,6 +286,8 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef, ItemDef hiddenItemDef, int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_CuteBow, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
         {
+            int notificationsToClear = 0;
+
             var itemPairs = new Dictionary<string, string> // Consumed item - Consumable item
             {
                 { "RegeneratingScrapConsumed", "RegeneratingScrap" }, // Vanilla
@@ -334,7 +336,6 @@ namespace Hex3Mod.Items
                     {
                         self.RemoveItem(itemIndex); // Restore 1 broken item
                         self.GiveItemString(value);
-                        CharacterMasterNotificationQueue.PushItemTransformNotification(master, itemIndex, ItemCatalog.FindItemIndex(value), CharacterMasterNotificationQueue.TransformationType.Default);
 
                         Util.PlaySound(EntityStates.ScavMonster.FindItem.sound, self.gameObject); // Play effects
                         EffectData effectData = new EffectData
@@ -343,8 +344,10 @@ namespace Hex3Mod.Items
                         };
                         effectData.SetNetworkedObjectReference(self.gameObject);
                         EffectManager.SpawnEffect(HealthComponent.AssetReferences.crowbarImpactEffectPrefab, effectData, true);
+                        notificationsToClear++;
 
                         self.GiveItem(hiddenItemDef);
+
                         if (self.GetItemCount(hiddenItemDef) >= ScavengersPack_Uses) // Give empty pack if uses over 3, reset hidden items
                         {
                             self.RemoveItem(itemDef);
@@ -354,9 +357,47 @@ namespace Hex3Mod.Items
                         }
                     }
                 }
+
+                if (self.gameObject.TryGetComponent(out CharacterMaster master1) && master1.GetBody())
+                {
+                    if (self.GetItemCount(itemDef) > 0)
+                    {
+                        master1.GetBody().SetBuffCount(scavengerUses.buffIndex, ScavengersPack_Uses - self.GetItemCount(hiddenItemDef));
+                    }
+                    else
+                    {
+                        master1.GetBody().RemoveBuff(scavengerUses.buffIndex);
+                    }
+                }
             }
 
+            // Prevent consumable notifications
+            void CharacterMasterNotificationQueue_PushItemTransformNotification(On.RoR2.CharacterMasterNotificationQueue.orig_PushItemTransformNotification orig, CharacterMaster characterMaster, ItemIndex oldIndex, ItemIndex newIndex, CharacterMasterNotificationQueue.TransformationType transformationType)
+            {
+                if (notificationsToClear > 0 && transformationType == CharacterMasterNotificationQueue.TransformationType.Default && itemPairs.ContainsKey(ItemCatalog.GetItemDef(newIndex).name))
+                {
+                    notificationsToClear--;
+                    return;
+                }
+                orig(characterMaster, oldIndex, newIndex, transformationType);
+            }
+
+            On.RoR2.CharacterMasterNotificationQueue.PushItemTransformNotification += CharacterMasterNotificationQueue_PushItemTransformNotification;
             On.RoR2.Inventory.RpcItemAdded += Inventory_RpcItemAdded;
+        }
+
+        public static BuffDef scavengerUses { get; private set; }
+        public static void AddBuffs() // Shows how many uses are left in a pack
+        {
+            scavengerUses = ScriptableObject.CreateInstance<BuffDef>();
+            scavengerUses.buffColor = new Color(1f, 1f, 1f);
+            scavengerUses.canStack = true;
+            scavengerUses.isDebuff = false;
+            scavengerUses.name = "Scavenger's Pack Uses Left";
+            scavengerUses.isHidden = false;
+            scavengerUses.isCooldown = false;
+            scavengerUses.iconSprite = LoadSprite();
+            ContentAddition.AddBuffDef(scavengerUses);
         }
 
         public static void Initiate(int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_CuteBow, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
@@ -364,6 +405,7 @@ namespace Hex3Mod.Items
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));
             ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
+            AddBuffs();
             AddTokens(ScavengersPack_Uses);
             AddHooks(itemDefinition, consumedItemDefinition, hiddenItemDefinition, ScavengersPack_Uses, ScavengersPack_PowerElixir, ScavengersPack_DelicateWatch, ScavengersPack_Dios, ScavengersPack_VoidDios, ScavengersPack_RustedKey, ScavengersPack_EncrustedKey, ScavengersPack_FourHundredTickets, ScavengersPack_OneTicket, ScavengersPack_ShopCard, ScavengersPack_CuteBow, ScavengersPack_ClockworkMechanism, ScavengersPack_Vials, ScavengersPack_BrokenChopsticks, ScavengersPack_AbyssalCartridge, ScavengersPack_Singularity);
         }

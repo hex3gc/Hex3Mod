@@ -2,6 +2,7 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using VoidItemAPI;
 
 namespace Hex3Mod.Items
 {
@@ -215,7 +216,7 @@ namespace Hex3Mod.Items
 
         public static void AddTokens(float CaptainsFavor_InteractableIncrease)
         {
-            LanguageAPI.Add("H3_" + upperName + "_NAME", "The Captain's Favor");
+            LanguageAPI.Add("H3_" + upperName + "_NAME", "Captain's Favor");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Future stages will contain more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
             LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Stages contain <style=cShrine>{0}%</style> <style=cStack>(+{0}% per stack)</style> more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>", CaptainsFavor_InteractableIncrease));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "");
@@ -223,6 +224,9 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDef, float CaptainsFavor_InteractableIncrease)
         {
+            // Void transformation
+            VoidTransformation.CreateTransformation(itemDef, "FourHundredTickets");
+
             void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene orig, SceneDirector self)
             {
                 int favorCount = 0;
@@ -235,7 +239,7 @@ namespace Hex3Mod.Items
                 }
                 if (favorCount > 0)
                 {
-                    float extraCredits = self.interactableCredit * (CaptainsFavor_InteractableIncrease * favorCount);
+                    float extraCredits = self.interactableCredit * ((CaptainsFavor_InteractableIncrease / 100f) * favorCount);
                     self.interactableCredit += (int)extraCredits;
                 }
                 orig(self);

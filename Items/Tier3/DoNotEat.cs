@@ -41,7 +41,7 @@ namespace Hex3Mod.Items
 
             item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.Healing };
             item.deprecatedTier = ItemTier.Tier3;
-            item.canRemove = false;
+            item.canRemove = true;
             item.hidden = false;
 
             item.pickupModelPrefab = LoadPrefab();

@@ -250,7 +250,7 @@ namespace Hex3Mod.Items
                 {
                     Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.stageRng.nextUlong);
                     int itemsLeft = self.inventory.GetItemCount(itemDef) * CorruptingParasite_ItemsPerStage;
-                    List<ItemIndex> itemList = self.inventory.itemAcquisitionOrder;
+                    List<ItemIndex> itemList = new List<ItemIndex>(self.inventory.itemAcquisitionOrder);
                     Util.ShuffleList(itemList, rng);
                     rng.Next();
 

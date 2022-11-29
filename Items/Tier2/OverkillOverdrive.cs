@@ -280,7 +280,7 @@ namespace Hex3Mod.Items
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
                 orig(self);
-                if (self.TryGetComponent(out NearbyDamageBonusBodyBehavior behavior))
+                if (self.TryGetComponent(out NearbyDamageBonusBodyBehavior behavior) == true && behavior.isActiveAndEnabled)
                 {
                     float scaledSize = 1 + (1 * FindTotalMultiplier());
                     behavior.nearbyDamageBonusIndicator.transform.localScale = new Vector3(scaledSize, scaledSize, scaledSize);

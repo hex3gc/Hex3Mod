@@ -10,7 +10,6 @@ namespace Hex3Mod.Items
 {
     /*
     The void item counterpart for Scattered Reflection. Meant to be paired with Drop Of Necrosis for a blight build, allowing damage scaling in a fully void build
-    Replaces your DOTs with blight, but makes Blight stronger.
     */
     public class DropOfNecrosis
     {
@@ -37,7 +36,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Damage, ItemTag.AIBlacklist };
+            item.tags = new ItemTag[]{ ItemTag.Damage };
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
@@ -221,14 +220,14 @@ namespace Hex3Mod.Items
         public static void AddTokens(float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Drop Of Necrosis");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your attacks have a chance to inflict <style=cIsDamage>Blight</style>. Blight deals more damage for each stack. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Your attacks have a " + DropOfNecrosis_DotChance + "% chance to inflict <style=cIsDamage>Blight</style>, which deals <style=cIsDamage>" + (DropOfNecrosis_Damage * 100f) + "%</style> more damage for each additional stack of this item. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your attacks have a chance to inflict <style=cIsDamage>Blight</style> with slightly increased damage. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Your attacks have a " + DropOfNecrosis_DotChance + "% <style=cStack>(+" + DropOfNecrosis_DotChance + "% per stack)</style> chance to inflict <style=cIsDamage>Blight</style>, which deals <style=cIsDamage>" + (DropOfNecrosis_Damage * 100f) + "%</style> more damage for each additional stack of this item. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I think I was... exploring? I... my spyglass is...\"" +
             "\n\n<style=cStack>(Silence for 30 seconds)</style>" +
             "\n\n\"Right, it's gone. All that's left is... hm.\"" +
             "\n\n<style=cStack>(Silence for several minutes)</style>" +
             "\n\n\"There's... there was a big loud sound, and-- poison, poison poured from the walls... purple, stinging poison.\"" +
-            "\n\n<style=cStack>(The sound of rushing water is heard, source unknown. He continues talking throughout.)</style>" +
+            "\n\n<style=cStack>(The clinking of what is assumed to be filled glass bottles and cups is heard.)</style>" +
             "\n\n\"Ahhh... yes, that's... mmm, my poisons. You will not find my poisons... my collection-- it's mine, mine forever. You wouldn't appreciate them.\"" +
             "\n\n<style=cStack>(Audio recording ends abruptly.)</style>");
         }
@@ -240,26 +239,22 @@ namespace Hex3Mod.Items
 
             On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
             {
-                if (attackerObject && attackerObject.GetComponent<CharacterBody>() != null && attackerObject.GetComponent<CharacterBody>().inventory && attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
+                if (dotIndex == DotController.DotIndex.Blight && attackerObject && attackerObject.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    DotController.dotDefs[5].damageCoefficient = 0.2f + (0.2f * (DropOfNecrosis_Damage * (attackerObject.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) - 1)));
-                }
-                else
-                {
-                    DotController.dotDefs[5].damageCoefficient = 0.2f;
+                    damageMultiplier += DropOfNecrosis_Damage * body.inventory.GetItemCount(itemDef);
                 }
                 orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
             };
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory && damageInfo.attacker.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
+                if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody body1) && body1.inventory && body1.inventory.GetItemCount(itemDef) > 0)
                 {
-                    if (damageInfo.attacker.GetComponent<CharacterBody>().master && damageInfo.dotIndex != DotController.DotIndex.Blight && damageInfo.attacker != victim)
+                    if (body1.master && damageInfo.dotIndex != DotController.DotIndex.Blight && damageInfo.attacker != victim)
                     {
                         if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage && damageInfo.damage > 0f)
                         {
-                            if (Util.CheckRoll(DropOfNecrosis_DotChance * damageInfo.procCoefficient, damageInfo.attacker.GetComponent<CharacterBody>().master.luck) == true)
+                            if (Util.CheckRoll((DropOfNecrosis_DotChance * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck) == true)
                             {
                                 InflictDotInfo inflictDotInfo = new InflictDotInfo
                                 {
