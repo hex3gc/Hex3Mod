@@ -215,60 +215,34 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float HopooEgg_JumpModifier, float HopooEgg_FallDamageReduction)
+        public static void AddTokens(float HopooEgg_JumpModifier)
         {
             float HopooEgg_JumpModifier_Readable = HopooEgg_JumpModifier * 100f;
-            float HopooEgg_FallDamageReduction_Readable = HopooEgg_FallDamageReduction * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Hopoo Egg");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Jump higher and take less fall damage.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Jump <style=cIsUtility>" + HopooEgg_JumpModifier_Readable + "%</style> higher <style=cStack>(+" + HopooEgg_JumpModifier_Readable + "% per stack)</style>. Reduce fall damage by <style=cIsUtility>" + HopooEgg_FallDamageReduction_Readable + "%</style> <style=cStack>(+" + HopooEgg_FallDamageReduction_Readable + "% per stack, diminishing)</style>.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "Jump <style=cIsUtility>" + HopooEgg_JumpModifier_Readable + "%</style> higher <style=cStack>(+" + HopooEgg_JumpModifier_Readable + "% per stack)</style>. <style=cIsUtility>Take reduced fall damage.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"...The hopoo's chicks are independent, being the only Europan nesting birds that hunt for themselves from birth. One is able to leave its nest as a newborn thanks to the low gravity environment, and it is born nimble enough to navigate down any rough terrain that lies between it and its food. This creates a unique problem for many newborn hopoos, however, as they often find themselves unable to go back up. The hopoo, out of reach of its nest, usually becomes nomadic and lives on its lonesome, having forgotten about its home by the time it has grown into an adult. This is where they get their common nickname, the 'hobo bird'.\"\n\n- Europan Wildlife Guide");
         }
 
-        private static void AddHooks(ItemDef itemDef, float HopooEgg_JumpModifier, float HopooEgg_FallDamageReduction)
+        private static void AddHooks(ItemDef itemDef, float HopooEgg_JumpModifier)
         {
-            // Increase jump power
-            void ApplyJumpVelocity(GenericCharacterMain.orig_ApplyJumpVelocity orig, CharacterMotor motor, CharacterBody body, float horiz, float vert, bool vault)
+            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (body && body.inventory)
+                if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    int itemCount = body.inventory.GetItemCount(itemDef);
-                    if (itemCount > 0)
-                    {
-                        vert *= 1f + HopooEgg_JumpModifier * (float)itemCount;
-                    }
+                    args.jumpPowerMultAdd += HopooEgg_JumpModifier;
                 }
-                orig.Invoke(motor, body, horiz, vert, vault);
             }
 
-            // Decrease fall damage
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
-            {
-                // This should disclude all damage other than fall damage
-                if (self.body && self.body.inventory && !damageInfo.rejected && damageInfo.attacker == null && damageInfo.inflictor == null && damageInfo.position == self.body.footPosition && damageInfo.procCoefficient == 0f)
-                {
-                    if (self.body.inventory.GetItemCount(itemDef) > 0)
-                    {
-                        float finalDamage = damageInfo.damage;
-                        for (int i = 0; i < self.body.inventory.GetItemCount(itemDef); i++) // Diminishing fall damage reduction
-                        {
-                            finalDamage -= finalDamage * HopooEgg_FallDamageReduction;
-                        }
-                        damageInfo.damage = finalDamage;
-                    }
-                }
-                orig(self, damageInfo);
-            };
-
-            GenericCharacterMain.ApplyJumpVelocity += new GenericCharacterMain.hook_ApplyJumpVelocity(ApplyJumpVelocity);
+            RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        public static void Initiate(float HopooEgg_JumpModifier, float HopooEgg_FallDamageReduction)
+        public static void Initiate(float HopooEgg_JumpModifier)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(HopooEgg_JumpModifier, HopooEgg_FallDamageReduction);
-            AddHooks(itemDefinition, HopooEgg_JumpModifier, HopooEgg_FallDamageReduction);
+            AddTokens(HopooEgg_JumpModifier);
+            AddHooks(itemDefinition, HopooEgg_JumpModifier);
         }
     }
 }

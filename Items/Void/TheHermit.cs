@@ -28,6 +28,11 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/TheHermit.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadBuffSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_TheHermit.png");
+            return pickupIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -300,10 +305,10 @@ namespace Hex3Mod.Items
             hermitBuff.buffColor = new Color(1f, 1f, 1f);
             hermitBuff.canStack = true;
             hermitBuff.isDebuff = true;
-            hermitBuff.name = "The Hermit's Curse";
+            hermitBuff.name = "The Hermit's Protection";
             hermitBuff.isHidden = false;
             hermitBuff.isCooldown = false;
-            hermitBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_TheHermit.png");
+            hermitBuff.iconSprite = LoadBuffSprite();
             ContentAddition.AddBuffDef(hermitBuff);
         }
 
@@ -311,8 +316,8 @@ namespace Hex3Mod.Items
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(TheHermit_BuffDuration, TheHermit_DamageReduction);
             AddBuffs();
+            AddTokens(TheHermit_BuffDuration, TheHermit_DamageReduction);
             AddHooks(itemDefinition, TheHermit_BuffDuration, TheHermit_DamageReduction);
         }
     }

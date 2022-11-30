@@ -45,7 +45,6 @@ namespace Hex3Mod
 
         public ConfigEntry<bool> HopooEgg_Enable() { return Config.Bind<bool>(new ConfigDefinition("Common - Hopoo Egg", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> HopooEgg_JumpModifier() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Jump height multiplier"), 0.2f, new ConfigDescription("Percent jump height increase", null, Array.Empty<object>())); }
-        public ConfigEntry<float> HopooEgg_FallDamageReduction() { return Config.Bind<float>(new ConfigDefinition("Common - Hopoo Egg", "Fall damage reduction"), 0.15f, new ConfigDescription("How much of all received fall damage is reduced per stack", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> AtgPrototype_Enable() { return Config.Bind<bool>(new ConfigDefinition("Common - ATG Prototype", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> AtgPrototype_Damage() { return Config.Bind<float>(new ConfigDefinition("Common - ATG Prototype", "Damage per stack"), 0.8f, new ConfigDescription("Multiplier of base damage the missile deals per stack", null, Array.Empty<object>())); }
@@ -148,10 +147,6 @@ namespace Hex3Mod
 
         // Lunar
         public ConfigEntry<bool> OneTicket_Enable() { return Config.Bind<bool>(new ConfigDefinition("Lunar - One Ticket", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<int> OneTicket_ItemIncrease() { return Config.Bind<int>(new ConfigDefinition("Lunar - One Ticket", "Chest Drop Increase"), 5, new ConfigDescription("Amount of extra items your next chest contains", null, Array.Empty<object>())); }
-        public ConfigEntry<float> OneTicket_MovementBuff() { return Config.Bind<float>(new ConfigDefinition("Lunar - One Ticket", "Enemy movement speed buff"), 50f, new ConfigDescription("While you're holding the ticket, enemies are this percentage faster", null, Array.Empty<object>())); }
-        public ConfigEntry<float> OneTicket_AttackSpeedBuff() { return Config.Bind<float>(new ConfigDefinition("Lunar - One Ticket", "Enemy attack speed buff"), 100f, new ConfigDescription("While you're holding the ticket, enemies attack this percentage faster", null, Array.Empty<object>())); }
-        public ConfigEntry<float> OneTicket_CooldownReduction() { return Config.Bind<float>(new ConfigDefinition("Lunar - One Ticket", "Enemy cooldown reduction"), 50f, new ConfigDescription("While you're holding the ticket, enemies' cooldowns are reduced by this percentage", null, Array.Empty<object>())); }
 
         // Lunar Equipment
         public ConfigEntry<bool> BloodOfTheLamb_Enable() { return Config.Bind<bool>(new ConfigDefinition("Lunar Equipment - Blood Of The Lamb", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
@@ -185,7 +180,7 @@ namespace Hex3Mod
             Log.LogInfo("Common");
             if (ShardOfGlass_Enable().Value == true){ ShardOfGlass.Initiate(ShardOfGlass_DamageIncrease().Value); }
             if (BucketList_Enable().Value == true){ BucketList.Initiate(BucketList_FullBuff().Value, BucketList_BuffReduce().Value); }
-            if (HopooEgg_Enable().Value == true){ HopooEgg.Initiate(HopooEgg_JumpModifier().Value, HopooEgg_FallDamageReduction().Value); }
+            if (HopooEgg_Enable().Value == true){ HopooEgg.Initiate(HopooEgg_JumpModifier().Value); }
             if (AtgPrototype_Enable().Value == true){ AtgPrototype.Initiate(AtgPrototype_Damage().Value, AtgPrototype_HitRequirement().Value); }
             if (Tickets_Enable().Value == true){ Tickets.Initiate(); }
             if (Balance_Enable().Value == true) { Balance.Initiate(Balance_MaxDodge().Value); }
@@ -215,7 +210,7 @@ namespace Hex3Mod
             if (TheHermit_Enable().Value == true){ TheHermit.Initiate(TheHermit_BuffDuration().Value, TheHermit_DamageReduction().Value); }
             // Lunar
             Log.LogInfo("Lunar");
-            if (OneTicket_Enable().Value == true) { OneTicket.Initiate(OneTicket_ItemIncrease().Value, OneTicket_MovementBuff().Value, OneTicket_AttackSpeedBuff().Value, OneTicket_CooldownReduction().Value); }
+            if (OneTicket_Enable().Value == true) { OneTicket.Initiate(); }
             // Lunar Equipment
             Log.LogInfo("Lunar Equipment");
             if (BloodOfTheLamb_Enable().Value == true) { BloodOfTheLamb.Initiate(BloodOfTheLamb_ItemsTaken().Value); }
@@ -226,15 +221,20 @@ namespace Hex3Mod
             /*
             
             TODO
+
+            Models
+            Item Displays
+
             New Items
             - The Tax Man's Statement
-            - One Ticket
 
             Reworks
             - Empathy
             - Apathy
             - Elder Mutagen
+            - Notice Of Absence
             - The Hermit
+
             */
 
             Log.LogInfo("Done!");

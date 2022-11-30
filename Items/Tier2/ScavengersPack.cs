@@ -28,6 +28,11 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ScavengersPack.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadBuffSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ScavengersPack.png");
+            return pickupIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -59,7 +64,7 @@ namespace Hex3Mod.Items
 
             item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotDuplicate, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Need to make sure the item can't be given or cloned
             item.deprecatedTier = ItemTier.NoTier;
-            item.canRemove = true;
+            item.canRemove = false;
             item.hidden = false;
 
             item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScavengersPackPrefab.prefab");
@@ -396,7 +401,7 @@ namespace Hex3Mod.Items
             scavengerUses.name = "Scavenger's Pack Uses Left";
             scavengerUses.isHidden = false;
             scavengerUses.isCooldown = false;
-            scavengerUses.iconSprite = LoadSprite();
+            scavengerUses.iconSprite = LoadBuffSprite();
             ContentAddition.AddBuffDef(scavengerUses);
         }
 

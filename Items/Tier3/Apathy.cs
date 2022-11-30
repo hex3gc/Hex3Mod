@@ -26,6 +26,11 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Apathy.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadBuffSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png");
+            return pickupIconSprite;
+        }
 
         public static ItemDef CreateItem()
         {
@@ -44,6 +49,26 @@ namespace Hex3Mod.Items
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
+
+            return item;
+        }
+        public static ItemDef CreateHiddenItem() // Keeps track of Apathy stacks
+        {
+            ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+
+            item.name = "ApathyHidden";
+            item.nameToken = "H3_" + upperName + "_NAME";
+            item.pickupToken = "H3_" + upperName + "_PICKUP";
+            item.descriptionToken = "H3_" + upperName + "_DESC";
+            item.loreToken = "H3_" + upperName + "_LORE";
+
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
+            item.deprecatedTier = ItemTier.NoTier;
+            item.canRemove = false;
+            item.hidden = true;
+
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Apathy.png");
 
             return item;
         }
@@ -301,27 +326,6 @@ namespace Hex3Mod.Items
             RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        public static ItemDef CreateHiddenItem() // Keeps track of Apathy stacks
-        {
-            ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
-
-            item.name = "ApathyHidden";
-            item.nameToken = "H3_" + upperName + "_NAME";
-            item.pickupToken = "H3_" + upperName + "_PICKUP";
-            item.descriptionToken = "H3_" + upperName + "_DESC";
-            item.loreToken = "H3_" + upperName + "_LORE";
-
-            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
-            item.deprecatedTier = ItemTier.NoTier;
-            item.canRemove = false;
-            item.hidden = true;
-
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Apathy.png");
-
-            return item;
-        }
-
         public static BuffDef apathyStacks { get; private set; }
         public static void AddBuffs() // Visual indicator of Apathy stacks
         {
@@ -332,7 +336,7 @@ namespace Hex3Mod.Items
             apathyStacks.name = "Apathy Stacks";
             apathyStacks.isHidden = false;
             apathyStacks.isCooldown = false;
-            apathyStacks.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png");
+            apathyStacks.iconSprite = LoadBuffSprite();
             ContentAddition.AddBuffDef(apathyStacks);
         }
 

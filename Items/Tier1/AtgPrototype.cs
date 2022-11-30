@@ -226,19 +226,6 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDef, float atgDamageStack, int hitRequirement)
         {
-            BuffIndex atgBuffIndex = new BuffIndex();
-            void GetAtgIndex()
-            {
-                foreach (BuffDef def in BuffCatalog.buffDefs)
-                {
-                    if (def == atgCounter)
-                    {
-                        atgBuffIndex = def.buffIndex;
-                    }
-                }
-            }
-            RoR2Application.onLoad += GetAtgIndex;
-
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
                 if (damageInfo != null && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory != null && damageInfo.procCoefficient > 0f && !damageInfo.procChainMask.HasProc(ProcType.Missile))
@@ -248,7 +235,7 @@ namespace Hex3Mod.Items
 
                     if (attackerBody.GetBuffCount(atgCounter) == 0)
                     {
-                        attackerBody.SetBuffCount(atgBuffIndex, 1);
+                        attackerBody.SetBuffCount(atgCounter.buffIndex, 1);
                     }
                     if (attackerInventory.GetItemCount(itemDef) > 0 && victim)
                     {
@@ -267,7 +254,7 @@ namespace Hex3Mod.Items
                                 GlobalEventManager.CommonAssets.missilePrefab, 
                                 DamageColorIndex.Item, 
                                 true);
-                            attackerBody.SetBuffCount(atgBuffIndex, 1);
+                            attackerBody.SetBuffCount(atgCounter.buffIndex, 1);
                         }
                     }
                 }
@@ -284,15 +271,15 @@ namespace Hex3Mod.Items
             atgCounter.isDebuff = false;
             atgCounter.name = "ATGCounter";
             atgCounter.isHidden = true;
-            atgCounter.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Materials/Icons/ATGIcon.png");
+            atgCounter.iconSprite = LoadSprite();
             ContentAddition.AddBuffDef(atgCounter);
         }
 
         public static void Initiate(float atgDamageStack, int hitRequirement)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(atgDamageStack, hitRequirement);
             AddBuffs();
+            AddTokens(atgDamageStack, hitRequirement);
             AddHooks(itemDefinition, atgDamageStack, hitRequirement);
         }
     }

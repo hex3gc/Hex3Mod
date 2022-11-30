@@ -2,25 +2,35 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.Diagnostics;
+using System.ComponentModel;
 
 namespace Hex3Mod.Items
 {
     /*
     Four Hundred Tickets' cooler older cousin
-    Should put players in a risk/reward situation where they have to survive a very strong wave of enemies, but if they do they could possibly get 6 legendaries from one chest.
-    ( Or 60 items from a scav pack, but don't tell them that)
+    Making a Tickets variant that granted extra items was too OP in many situations, so this iteration forces you to deal with a heavy downside before a big reward
     */
     public class OneTicket
     {
         static string itemName = "OneTicket";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
+        public static ItemDef consumedItemDefinition = CreateConsumedItem();
+        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OneTicketPrefab.prefab");
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket.png");
+            return pickupIconSprite;
+        }
+        public static Sprite LoadBuffSprite()
         {
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket.png");
             return pickupIconSprite;
@@ -42,6 +52,41 @@ namespace Hex3Mod.Items
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
+
+            return item;
+        }
+        public static ItemDef CreateConsumedItem()
+        {
+            ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+
+            item.name = itemName + "Consumed";
+            item.nameToken = "H3_" + upperName + "CONSUMED_NAME";
+            item.pickupToken = "H3_" + upperName + "CONSUMED_PICKUP";
+            item.descriptionToken = "H3_" + upperName + "CONSUMED_DESC";
+
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotDuplicate, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
+            item.deprecatedTier = ItemTier.NoTier;
+            item.canRemove = false;
+            item.hidden = false;
+
+            item.pickupModelPrefab = LoadPrefab();
+            item.pickupIconSprite = LoadSprite();
+
+            return item;
+        }
+        public static ItemDef CreateHiddenItem()
+        {
+            ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+
+            item.name = itemName + "Hidden";
+            item.nameToken = "H3_" + upperName + "HIDDEN_NAME";
+            item.pickupToken = "H3_" + upperName + "HIDDEN_NAME";
+            item.descriptionToken = "H3_" + upperName + "HIDDEN_NAME";
+
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotDuplicate, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist }; // Need to make sure the item can't be given or cloned
+            item.deprecatedTier = ItemTier.NoTier;
+            item.canRemove = false;
+            item.hidden = true;
 
             return item;
         }
@@ -215,11 +260,16 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(int OneTicket_ItemIncrease, float OneTicket_MovementBuff, float OneTicket_AttackSpeedBuff, float OneTicket_CooldownReduction)
+        public static ItemDisplayRuleDict CreateHiddenDisplayRules()
+        {
+            return new ItemDisplayRuleDict();
+        }
+
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "One Ticket");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The next chest, void cradle or lunar pod you open will contain <style=cIsUtility>" + OneTicket_ItemIncrease + "x</style> the amount of items... <style=cDeath>BUT enemies will hunt you relentlessly for your ticket.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("The next chest, void cradle or lunar pod you open will contain <style=cIsUtility>{0}x</style> more items. <style=cDeath>All enemies become Enraged while you're holding the ticket</style>, gaining <style=cDeath>{1}%</style> movement speed, <style=cDeath>{2}%</style> attack speed and <style=cDeath>{3}%</style> cooldown reduction.", OneTicket_ItemIncrease, OneTicket_MovementBuff, OneTicket_AttackSpeedBuff, OneTicket_CooldownReduction));
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Clearing stages increases this ticket's value, which can be exchanged at a <style=cShrine>cleansing pool</style> for <style=cDeath>legendary items</style>... <style=cDeath>but ALL enemies become Perfected Elites while you're holding it.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "This ticket grants <style=cDeath>legendary items</style> when deposited into a <style=cShrine>cleansing pool</style>: One <style=cStack>(+1 per stack)</style> for each stage cleared while holding it. <style=cDeath>ALL enemies spawn as Perfected Elites while it is in your inventory, and become stronger with additional stacks.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"A REAL Moon-Casino ticket!\"" +
             "\n\n\"You know how rare these things are? I could sell this for thousands- no- MILLIONS online... maybe more...\"" +
             "\n\n\"Wait- you? No, I found it first.\"" +
@@ -231,16 +281,136 @@ namespace Hex3Mod.Items
             "\n\nThe remaining contents of the log are deemed too graphic to show to the Board. Both employees were found dead days later, with the 'ticket' in question missing. So, now that we have a lead: How shall we proceed with the reclamation?");
         }
 
-        private static void AddHooks(ItemDef itemDef, int OneTicket_ItemIncrease, float OneTicket_MovementBuff, float OneTicket_AttackSpeedBuff, float OneTicket_CooldownReduction)
+        private static void AddHooks(ItemDef itemDef, ItemDef consumedItemDef, ItemDef hiddenItemDef)
         {
+            // Give a hidden item every stage to ensure the player has been holding the ticket since the stage began
+            void CharacterMaster_OnServerStageBegin(On.RoR2.CharacterMaster.orig_OnServerStageBegin orig, CharacterMaster self, Stage stage)
+            {
+                orig(self, stage);
+                if (stage.sceneDef && stage.sceneDef.sceneType == SceneType.Stage && self.inventory && self.inventory.GetItemCount(itemDef) > 0)
+                {
+                    self.inventory.GiveItem(hiddenItemDef, self.inventory.GetItemCount(itemDef));
+                }
+            }
 
+            // Set One Ticket buffs and buff enemy stats
+            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
+            {
+                if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
+                {
+                    if (body.inventory.GetItemCount(hiddenItemDef) > 0)
+                    {
+                        body.SetBuffCount(ticketStacks.buffIndex, body.inventory.GetItemCount(hiddenItemDef));
+                    }
+                    else
+                    {
+                        body.RemoveBuff(ticketStacks.buffIndex);
+                    }
+                }
+                else
+                {
+                    body.RemoveBuff(ticketStacks.buffIndex);
+                }
+
+                int ticketsInExistence = Util.GetItemCountGlobal(itemDef.itemIndex, true);
+                if (ticketsInExistence > 0 && body.inventory && body.teamComponent && (body.teamComponent.teamIndex == TeamIndex.Monster | body.teamComponent.teamIndex == TeamIndex.Lunar | body.teamComponent.teamIndex == TeamIndex.Void))
+                {
+                    args.damageMultAdd += 2f + (2f * (ticketsInExistence - 1));
+                    args.healthMultAdd += 4f + (4f * (ticketsInExistence - 1));
+                }
+            }
+
+            // If One Ticket is present while activating with Cleansing Pool, run a special method
+            void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
+            {
+                if (self.costType == CostTypeIndex.LunarItemOrEquipment && activator.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0 && body.master)
+                {
+                    Inventory inventory = body.inventory;
+                    if (inventory.GetItemCount(hiddenItemDef) <= 0)
+                    {
+                        orig(self, activator);
+                    }
+                    else
+                    {
+                        Chat.AddMessage("<style=cIsUtility>You are rewarded for risks taken.</style>");
+
+                        Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.stageRng.nextUlong);
+                        List<PickupIndex> listOfLegendaries = new List<PickupIndex>();
+                        List<PickupIndex> listOfDrops = new List<PickupIndex>();
+                        listOfLegendaries = Run.instance.availableTier3DropList;
+
+                        // Get a list of legendaries to drop
+                        for (int i = 0; i < body.inventory.GetItemCount(hiddenItemDef) * body.inventory.GetItemCount(itemDef); i++)
+                        {
+                            rng.Next();
+                            Util.ShuffleList(listOfLegendaries, rng);
+                            listOfDrops.Add(listOfLegendaries.First());
+                        }
+
+                        // Drop legendaries around the pool
+                        Transform transform = self.transform;
+                        float angle = 360f / (float)listOfDrops.Count;
+                        Vector3 vector = Vector3.up * 20f + transform.forward * 2f;
+                        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
+                        for (int i = 0; i < listOfDrops.Count; i++)
+                        {
+                            PickupDropletController.CreatePickupDroplet(listOfDrops[i], transform.position + Vector3.up * 1.5f, vector);
+                            vector = rotation * vector;
+                        }
+
+                        // Remove all ticket-related items
+                        inventory.RemoveItem(itemDef, inventory.GetItemCount(itemDef));
+                        inventory.RemoveItem(hiddenItemDef, inventory.GetItemCount(hiddenItemDef));
+                        CharacterMasterNotificationQueue.SendTransformNotification(body.master, itemDef.itemIndex, consumedItemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                        PurchaseInteraction.CreateItemTakenOrb(body.corePosition, self.gameObject, itemDef.itemIndex);
+                        body.RemoveBuff(ticketStacks.buffIndex);
+                    }
+                }
+                else
+                {
+                    orig(self, activator);
+                }
+            }
+
+            // Spawn enemies as Perfected elites
+            void CharacterBody_Start(On.RoR2.CharacterBody.orig_Start orig, CharacterBody self)
+            {
+                int ticketsInExistence = Util.GetItemCountGlobal(itemDef.itemIndex, true);
+                if (ticketsInExistence > 0 && self.inventory && self.teamComponent && (self.teamComponent.teamIndex == TeamIndex.Monster | self.teamComponent.teamIndex == TeamIndex.Lunar | self.teamComponent.teamIndex == TeamIndex.Void))
+                {
+                    self.inventory.SetEquipmentIndex(RoR2Content.Equipment.AffixLunar.equipmentIndex);
+                }
+                orig(self);
+            }
+
+            On.RoR2.CharacterMaster.OnServerStageBegin += CharacterMaster_OnServerStageBegin;
+            RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
+            On.RoR2.CharacterBody.Start += CharacterBody_Start;
         }
 
-        public static void Initiate(int OneTicket_ItemIncrease, float OneTicket_MovementBuff, float OneTicket_AttackSpeedBuff, float OneTicket_CooldownReduction)
+        public static BuffDef ticketStacks { get; private set; }
+        public static void AddBuffs() // Shows how many uses are left in a pack
+        {
+            ticketStacks = ScriptableObject.CreateInstance<BuffDef>();
+            ticketStacks.buffColor = new Color(1f, 1f, 1f);
+            ticketStacks.canStack = true;
+            ticketStacks.isDebuff = false;
+            ticketStacks.name = "One Ticket Value";
+            ticketStacks.isHidden = false;
+            ticketStacks.isCooldown = false;
+            ticketStacks.iconSprite = LoadBuffSprite();
+            ContentAddition.AddBuffDef(ticketStacks);
+        }
+
+        public static void Initiate()
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(OneTicket_ItemIncrease, OneTicket_MovementBuff, OneTicket_AttackSpeedBuff, OneTicket_CooldownReduction);
-            AddHooks(itemDefinition, OneTicket_ItemIncrease, OneTicket_MovementBuff, OneTicket_AttackSpeedBuff, OneTicket_CooldownReduction);
+            ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));
+            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
+            AddBuffs();
+            AddTokens();
+            AddHooks(itemDefinition, consumedItemDefinition, hiddenItemDefinition);
         }
     }
 }

@@ -28,6 +28,11 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Discovery.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadBuffSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png");
+            return pickupIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -46,6 +51,26 @@ namespace Hex3Mod.Items
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
+
+            return item;
+        }
+        public static ItemDef CreateHiddenItem()
+        {
+            ItemDef item = ScriptableObject.CreateInstance<ItemDef>(); // New hidden item to keep track of stacks, like infusion
+
+            item.name = "DiscoveryHidden";
+            item.nameToken = "H3_" + upperName + "_NAME";
+            item.pickupToken = "H3_" + upperName + "_PICKUP";
+            item.descriptionToken = "H3_" + upperName + "_DESC";
+            item.loreToken = "H3_" + upperName + "_LORE";
+
+            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
+            item.deprecatedTier = ItemTier.NoTier;
+            item.canRemove = false;
+            item.hidden = true;
+
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Discovery.png");
 
             return item;
         }
@@ -338,27 +363,6 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static ItemDef CreateHiddenItem()
-        {
-            ItemDef item = ScriptableObject.CreateInstance<ItemDef>(); // New hidden item to keep track of stacks, like infusion
-
-            item.name = "DiscoveryHidden";
-            item.nameToken = "H3_" + upperName + "_NAME";
-            item.pickupToken = "H3_" + upperName + "_PICKUP";
-            item.descriptionToken = "H3_" + upperName + "_DESC";
-            item.loreToken = "H3_" + upperName + "_LORE";
-
-            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
-            item.deprecatedTier = ItemTier.NoTier;
-            item.canRemove = false;
-            item.hidden = true;
-
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Discovery.png");
-
-            return item;
-        }
-
         public static BuffDef discoveryBuff { get; private set; }
         public static void AddBuffs()
         {
@@ -369,7 +373,7 @@ namespace Hex3Mod.Items
             discoveryBuff.name = "Discovery Shields";
             discoveryBuff.isHidden = false;
             discoveryBuff.isCooldown = false;
-            discoveryBuff.iconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png");
+            discoveryBuff.iconSprite = LoadBuffSprite();
             ContentAddition.AddBuffDef(discoveryBuff);
         }
 
