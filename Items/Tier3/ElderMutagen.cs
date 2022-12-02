@@ -3,12 +3,13 @@ using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using System.Linq;
 
 namespace Hex3Mod.Items
 {
     /*
-    A rework to the Elder Mutagen as I felt its purpose was too convoluted and its mechanics too janky. 
-    I'd rather make it a simple item that supports certain builds neatly.
+    Two reworks in a row, huh?
+    I wanted a max hp / regen item because those stats are underrated. Ramps up in a unique way to make lunar seers slightly more useful
     */
     public class ElderMutagen
     {
@@ -25,6 +26,11 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ElderMutagen.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadBuffSprite()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ElderMutagen.png");
+            return pickupIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -35,7 +41,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.Damage, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist}; // AI blacklist for simplicity and performance. May change later
+            item.tags = new ItemTag[]{ ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist};
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
@@ -215,13 +221,13 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float ElderMutagen_AddDuration, float ElderMutagen_CooldownReduction)
+        public static void AddTokens(float ElderMutagen_MaxHealthAdd, float ElderMutagen_RegenAdd)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Elder Mutagen");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Buffs you receive and debuffs you inflict last longer.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "All <style=cIsUtility>buffs</style> you receive and <style=cIsDamage>debuff / damage-over-time</style> effects you inflict last <style=cIsUtility>" + ElderMutagen_AddDuration + "</style> seconds longer <style=cStack>(+" + ElderMutagen_AddDuration + " per stack)</style>. <style=cIsUtility>Cooldown buffs</style> are <style=cIsUtility>" + ElderMutagen_CooldownReduction + "</style> seconds shorter.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Gain permanent max health and regen for each unique monster species killed.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Killing a new monster species grants a permanent <style=cIsHealing>{0}% max health</style> and <style=cIsHealing>{1} hp/s regeneration bonus</style>. Each stack allows you to gain this bonus <style=cIsHealing>1</style> more time from all species.", ElderMutagen_MaxHealthAdd * 100f, ElderMutagen_RegenAdd));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cMono>Lab Dissection Analysis File</style> " +
-            "\n\nSubject: Strange Mutagen" +
+            "\n\nSubject: Strange Blob" +
             "\nTechnician: Alex [REDACTED]" +
             "\nTable Spec: Table" +
             "\nNotes:" +
@@ -241,82 +247,104 @@ namespace Hex3Mod.Items
             "\n> Timestamping for break");
         }
 
-        private static void AddHooks(ItemDef itemDef, float ElderMutagen_AddDuration, float ElderMutagen_CooldownReduction)
+        private static void AddHooks(ItemDef itemDef, float ElderMutagen_MaxHealthAdd, float ElderMutagen_RegenAdd)
         {
-            // Known Quirks:
-            // - When you pick up a mutagen, any already-existing monsters will not receive longer debuffs (DOTs work). Changing this would be a hit to performance, so I kept it as-is
-
-            // Apply mutagen behavior to all enemies who spawn, based on the highest amount of mutagens owned by a player
-            On.RoR2.TeamComponent.Start += (orig, self) =>
+            // On kill, add the victim's name to the dictionary
+            void DeathRewards_OnKilledServer(On.RoR2.DeathRewards.orig_OnKilledServer orig, DeathRewards self, DamageReport damageReport)
             {
-                orig(self);
-                if (self.teamIndex != TeamIndex.Player)
+                orig(self, damageReport);
+                if (damageReport.attackerBody && damageReport.victimBody && damageReport.attackerBody.inventory && damageReport.attackerBody.master && damageReport.attackerBody.master.playerCharacterMasterController)
                 {
-                    int highestMutagenStack = 0;
-                    foreach (var player in TeamComponent.GetTeamMembers(TeamIndex.Player))
+                    if (damageReport.attackerBody.inventory.GetItemCount(itemDef) <= 0)
                     {
-                        if (player.body && player.body.inventory && player.body.inventory.GetItemCount(itemDef) > highestMutagenStack)
+                        if (damageReport.attackerBody.master.playerCharacterMasterController.gameObject.GetComponent<MutagenBehavior>())
                         {
-                            highestMutagenStack = player.body.inventory.GetItemCount(itemDef);
+                            UnityEngine.Object.Destroy(damageReport.attackerBody.master.playerCharacterMasterController.gameObject.GetComponent<MutagenBehavior>());
+                        }
+                        return;
+                    }
+                    Inventory inventory = damageReport.attackerBody.inventory;
+                    PlayerCharacterMasterController masterController = damageReport.attackerBody.master.playerCharacterMasterController;
+                    if (!masterController.gameObject.GetComponent<MutagenBehavior>())
+                    {
+                        masterController.gameObject.AddComponent<MutagenBehavior>();
+                    }
+                    MutagenBehavior behavior = masterController.gameObject.GetComponent<MutagenBehavior>();
+                    var speciesDict = behavior.speciesDict;
+                    string speciesName = damageReport.victimBody.name.Replace("(Clone)", "").Trim();
+
+                    if (!speciesDict.ContainsKey(speciesName))
+                    {
+                        speciesDict.Add(speciesName, 1);
+                        damageReport.attackerBody.RecalculateStats();
+                    }
+                    else
+                    {
+                        if (speciesDict[speciesName] < inventory.GetItemCount(itemDef))
+                        {
+                            speciesDict[speciesName]++;
+                            damageReport.attackerBody.RecalculateStats();
                         }
                     }
-                    if (highestMutagenStack > 0)
+                }
+            }
+
+            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
+            {
+                if (body.master && body.master.playerCharacterMasterController)
+                {
+                    if (body.master.playerCharacterMasterController.gameObject.TryGetComponent(out MutagenBehavior mutagenBehavior))
                     {
-                        self.body.AddItemBehavior<MutagenItemBehavior>(1);
-                        self.body.GetComponent<MutagenItemBehavior>().buffAddTime = highestMutagenStack * ElderMutagen_AddDuration;
+                        args.baseRegenAdd += ElderMutagen_RegenAdd * mutagenBehavior.GetSpeciesKilledNumber();
+                        args.healthMultAdd += ElderMutagen_MaxHealthAdd * mutagenBehavior.GetSpeciesKilledNumber();
+                        body.SetBuffCount(mutagenStacks.buffIndex, mutagenBehavior.GetSpeciesKilledNumber());
+                    }
+                    else
+                    {
+                        body.SetBuffCount(mutagenStacks.buffIndex, 0);
                     }
                 }
-            };
+            }
 
-            On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += (orig, self, buffDef, duration) =>
-            {
-                // When a debuff is added to a body with the Mutagen itembehavior, increase its length
-                if (self.GetComponent<MutagenItemBehavior>() && buffDef.isDebuff && !buffDef.isCooldown)
-                {
-                    duration += self.GetComponent<MutagenItemBehavior>().buffAddTime;
-                }
-
-                // When a buff is added to a body with the Mutagen item, increase its length
-                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0 && !buffDef.isDebuff && !buffDef.isCooldown)
-                {
-                    duration += self.inventory.GetItemCount(itemDef) * ElderMutagen_AddDuration;
-                }
-
-                // Reduce cooldown time for item holders
-                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0 && buffDef.isCooldown)
-                {
-                    duration -= ElderMutagen_CooldownReduction;
-                }
-
-                orig(self, buffDef, duration);
-            };
-
-            // If the attacker has a Mutagen, increase DOT length
-            On.RoR2.DotController.AddDot += (orig, self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex) =>
-            {
-                if (attackerObject.GetComponent<CharacterBody>())
-                {
-                    CharacterBody attacker = attackerObject.GetComponent<CharacterBody>();
-                    if (attacker.inventory && attacker.inventory.GetItemCount(itemDef) > 0)
-                    {
-                        duration += attacker.inventory.GetItemCount(itemDef) * ElderMutagen_AddDuration;
-                    }
-                }
-                orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
-            };
+            On.RoR2.DeathRewards.OnKilledServer += DeathRewards_OnKilledServer;
+            RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        // Upon hitting an enemy, give them an itembehavior that tracks how much longer debuffs should last on them
-        public class MutagenItemBehavior : CharacterBody.ItemBehavior
+        public class MutagenBehavior : MonoBehaviour
         {
-            public float buffAddTime = 0;
+            public Dictionary<string, int> speciesDict = new Dictionary<string, int>();
+
+            public int GetSpeciesKilledNumber()
+            {
+                int killsResult = 0;
+                foreach (int kills in speciesDict.Values)
+                {
+                    killsResult += kills;
+                }
+                return killsResult;
+            }
         }
 
-        public static void Initiate(float ElderMutagen_AddDuration, float ElderMutagen_CooldownReduction)
+        public static BuffDef mutagenStacks { get; private set; }
+        public static void AddBuffs() // Visual indicator of Apathy stacks
+        {
+            mutagenStacks = ScriptableObject.CreateInstance<BuffDef>();
+            mutagenStacks.buffColor = new Color(1f, 1f, 1f);
+            mutagenStacks.canStack = true;
+            mutagenStacks.isDebuff = false;
+            mutagenStacks.name = "Elder Mutagen Stacks";
+            mutagenStacks.isHidden = false;
+            mutagenStacks.isCooldown = false;
+            mutagenStacks.iconSprite = LoadBuffSprite();
+            ContentAddition.AddBuffDef(mutagenStacks);
+        }
+
+        public static void Initiate(float ElderMutagen_MaxHealthAdd, float ElderMutagen_RegenAdd)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(ElderMutagen_AddDuration, ElderMutagen_CooldownReduction);
-            AddHooks(itemDefinition, ElderMutagen_AddDuration, ElderMutagen_CooldownReduction);
+            AddBuffs();
+            AddTokens(ElderMutagen_MaxHealthAdd, ElderMutagen_RegenAdd);
+            AddHooks(itemDefinition, ElderMutagen_MaxHealthAdd, ElderMutagen_RegenAdd);
         }
     }
 }

@@ -240,6 +240,10 @@ namespace Hex3Mod.Items
                     if (attackerInventory.GetItemCount(itemDef) > 0 && victim)
                     {
                         attackerBody.AddBuff(atgCounter);
+                        if (attackerBody.GetBuffCount(atgCounter) == hitRequirement)
+                        {
+                            Util.PlaySound("Play_bandit2_m1_reload_bullet", damageInfo.attacker);
+                        }
                         if (attackerBody.GetBuffCount(atgCounter) >= (hitRequirement + 1))
                         {
                             float damageCoefficient = atgDamageStack * (float)attackerInventory.GetItemCount(itemDef);

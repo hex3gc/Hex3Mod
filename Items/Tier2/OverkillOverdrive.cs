@@ -13,6 +13,7 @@ using MonoMod.Cil;
 using System;
 using System.Linq;
 using HG;
+using System.Security.Cryptography;
 
 namespace Hex3Mod.Items
 {
@@ -26,15 +27,14 @@ namespace Hex3Mod.Items
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheUnforgivablePrefab.prefab");
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OverkillOverdrivePrefab.prefab");
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/TheUnforgivable.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OverkillOverdrive.png");
             return pickupIconSprite;
         }
-        static GameObject focusCrystalPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion();
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -228,7 +228,7 @@ namespace Hex3Mod.Items
         public static void AddTokens(float OverkillOverdrive_ZoneIncrease, bool OverkillOverdrive_AltMode)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Overkill Overdrive");
-            LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I want everyone to hear it, even if it doesn't sound good.\"\n\n- Written on a sticky note, attached to the back of the amp.");
+            LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I want everyone to hear it, even if it doesn't sound good.\"\n\n- Written on a sticky note, attached to the package the item arrived in.");
             if (OverkillOverdrive_AltMode)
             {
                 LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Amplify the range of area buffs.");
@@ -263,6 +263,18 @@ namespace Hex3Mod.Items
                 if (!OverkillOverdrive_AltMode)
                 {
                     self.baseRadius += self.baseRadius * FindTotalMultiplier();
+                }
+            }
+            void Inventory_GiveItem_ItemIndex_int(On.RoR2.Inventory.orig_GiveItem_ItemIndex_int orig, Inventory self, ItemIndex itemIndex, int count)
+            {
+                orig(self, itemIndex, count);
+                if (itemIndex == itemDef.itemIndex)
+                {
+                    foreach (HoldoutZoneController holdoutZone in GameObject.FindObjectsOfType<HoldoutZoneController>())
+                    {
+                        holdoutZone.baseRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease / 100f) * count;
+                        holdoutZone.currentRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease / 100f) * count;
+                    }
                 }
             }
 
@@ -335,13 +347,14 @@ namespace Hex3Mod.Items
 
             // Captain Beacons?
 
-            // Find an efficient way to add Sharp Anchor?
+            // There is no efficient way to add Sharp Anchor >;(
 
             On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable;
             On.RoR2.ShrineHealingBehavior.SetWardEnabled += ShrineHealingBehavior_SetWardEnabled;
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             On.RoR2.BuffWard.Start += BuffWard_Start;
             On.RoR2.DeskPlantController.Awake += DeskPlantController_Awake;
+            On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int;
         }
 
         public static void Initiate(float OverkillOverdrive_ZoneIncrease, bool OverkillOverdrive_AltMode)

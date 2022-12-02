@@ -30,7 +30,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ScavengersPack.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ScavengersPack.png");
             return pickupIconSprite;
         }
         public static ItemDef CreateItem()
@@ -371,7 +371,7 @@ namespace Hex3Mod.Items
                     }
                     else
                     {
-                        master1.GetBody().RemoveBuff(scavengerUses.buffIndex);
+                        master1.GetBody().SetBuffCount(scavengerUses.buffIndex, 0);
                     }
                 }
             }

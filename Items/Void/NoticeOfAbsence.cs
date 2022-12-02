@@ -9,8 +9,8 @@ using VoidItemAPI;
 namespace Hex3Mod.Items
 {
     /*
-    If the Corrupting Parasite exists, your items may all be turned into void items by the time you get enough movement to counteract this.
-    The Notice Of Absence should provide a way to gain movement speed with a fully void build, with the downside of being quite bad without void items.
+    Notice Of Absence now has an opposite use to the Bucket List: A unique boost that only happens during boss fights.
+    The effect should occur every time a boss spawns or a teleporter event begins, so it could be quite potent with enough stacks
     */
     public class NoticeOfAbsence
     {
@@ -37,7 +37,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility };
+            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
@@ -218,47 +218,51 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float NoticeOfAbsence_SpeedBuff)
+        public static void AddTokens(float NoticeOfAbsence_InvisibilityBuff, float NoticeOfAbsence_InvisibilityBuffStack)
         {
-            float NoticeOfAbsence_SpeedBuffReadable = NoticeOfAbsence_SpeedBuff * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Notice Of Absence");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Move faster the more void items you have. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "For each <style=cIsVoid>void item</style> in your inventory, move <style=cIsUtility>" + NoticeOfAbsence_SpeedBuffReadable + "%</style> faster per stack. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Become temporarily invisible when boss fights begin. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Become invisible for {0} seconds</style> <style=cStack>(+{1} per stack)</style> whenever a boss spawns or a teleporter event begins. <style=cIsVoid>Corrupts all Bucket Lists.</style>", NoticeOfAbsence_InvisibilityBuff, NoticeOfAbsence_InvisibilityBuffStack));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "I'm leaving tomorrow\n\nYou wouldn't understand why\n\n- Alex");
         }
 
-        private static void AddHooks(ItemDef itemDef, float NoticeOfAbsence_SpeedBuff, float NoticeOfAbsence_MaxSpeedBuff)
+        private static void AddHooks(ItemDef itemDef, float NoticeOfAbsence_InvisibilityBuff, float NoticeOfAbsence_InvisibilityBuffStack)
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "BucketList");
 
-            void NoticeOfAbsenceRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
+            void cloakAllItemOwners()
             {
-                if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
+                foreach (TeamComponent ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                 {
-                    float voidItemCount = 0f;
-                    voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier1);
-                    voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier2);
-                    voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier3);
-                    voidItemCount += body.inventory.GetTotalItemCountOfTier(ItemTier.VoidBoss);
-                    float finalSpeedBuff = NoticeOfAbsence_SpeedBuff * (voidItemCount * body.inventory.GetItemCount(itemDef));
-                    if (finalSpeedBuff > NoticeOfAbsence_MaxSpeedBuff)
+                    if (ally.body && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0)
                     {
-                        finalSpeedBuff = NoticeOfAbsence_MaxSpeedBuff;
+                        ally.body.AddTimedBuff(RoR2Content.Buffs.Cloak, NoticeOfAbsence_InvisibilityBuff + ((ally.body.inventory.GetItemCount(itemDef) - 1) * NoticeOfAbsence_InvisibilityBuffStack));
                     }
-                    args.moveSpeedMultAdd += finalSpeedBuff;
                 }
             }
-            RecalculateStatsAPI.GetStatCoefficients += NoticeOfAbsenceRecalculateStats;
+
+            void BossGroup_OnEnable(On.RoR2.BossGroup.orig_OnEnable orig, BossGroup self)
+            {
+                orig(self);
+                cloakAllItemOwners();
+            }
+            void HoldoutZoneController_OnEnable(On.RoR2.HoldoutZoneController.orig_OnEnable orig, HoldoutZoneController self)
+            {
+                orig(self);
+                cloakAllItemOwners();
+            }
+
+            On.RoR2.BossGroup.OnEnable += BossGroup_OnEnable;
+            On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable;
         }
 
-        public static void Initiate(float NoticeOfAbsence_SpeedBuff, float NoticeOfAbsence_MaxSpeedBuff)
+        public static void Initiate(float NoticeOfAbsence_InvisibilityBuff, float NoticeOfAbsence_InvisibilityBuffStack)
         {
             CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(NoticeOfAbsence_SpeedBuff);
-            AddHooks(itemDefinition, NoticeOfAbsence_SpeedBuff, NoticeOfAbsence_MaxSpeedBuff);
+            AddTokens(NoticeOfAbsence_InvisibilityBuff, NoticeOfAbsence_InvisibilityBuffStack);
+            AddHooks(itemDefinition, NoticeOfAbsence_InvisibilityBuff, NoticeOfAbsence_InvisibilityBuffStack);
         }
     }
 }

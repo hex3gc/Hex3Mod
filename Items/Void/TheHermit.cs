@@ -2,6 +2,7 @@
 using RoR2;
 using RoR2.ExpansionManagement;
 using System.Linq;
+using System;
 using UnityEngine;
 using VoidItemAPI;
 using Hex3Mod.HelperClasses;
@@ -43,7 +44,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility };
+            item.tags = new ItemTag[]{ ItemTag.Healing };
             item.deprecatedTier = ItemTier.VoidTier3;
             item.canRemove = true;
             item.hidden = false;
@@ -226,11 +227,9 @@ namespace Hex3Mod.Items
 
         public static void AddTokens(float TheHermit_BuffDuration, float TheHermit_DamageReduction)
         {
-            float TheHermit_DamageReductionReadable = TheHermit_DamageReduction * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "The Hermit");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Hitting an enemy grants them a curse, reducing the damage they deal. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "On hit, grant your enemy a <style=cDeath>stacking debuff</style> that <style=cDeath>reduces</style> their damage by <style=cDeath>" + TheHermit_DamageReductionReadable + "%</style> up to 75% for <style=cDeath>" + TheHermit_BuffDuration + "</style> <style=cStack>(+" + TheHermit_BuffDuration + " per stack)</style> seconds. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Getting hit builds up damage resistance. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Taking damage grants a <style=cIsHealing>stacking damage resistance</style> of <style=cIsHealing>{1}%</style> that lasts for <style=cIsHealing>{0}</style> seconds <style=cStack>(+{0} per stack)</style>. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>", TheHermit_BuffDuration, TheHermit_DamageReduction));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"When do you think we'll get outta here?\"" +
         "\n\n\"I don't think we will.\"" +
         "\n\n\"Really? With this again?\"" +
@@ -262,40 +261,23 @@ namespace Hex3Mod.Items
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "PermanentDebuffOnHit");
 
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
+            void HealthComponent_TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
             {
-                // Apply the Hermit's Curse debuff to enemies
-                if (self.gameObject.GetComponent<CharacterBody>() != null && !self.gameObject.GetComponent<CharacterBody>().name.StartsWith("ShopkeeperBody") && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() && damageInfo.attacker.GetComponent<CharacterBody>().inventory)
-                {
-                    Inventory attackerInventory = damageInfo.attacker.GetComponent<CharacterBody>().inventory;
-                    CharacterBody victimBody = self.gameObject.GetComponent<CharacterBody>();
-                    int itemCount = attackerInventory.GetItemCount(itemDef);
-
-                    if (itemCount > 0 && damageInfo.procCoefficient > 0f && !damageInfo.rejected)
-                    {
-                        victimBody.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * itemCount);
-                    }
-                }
-
-                // Reduce damage inflicted by characters with this debuff
-                if (damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.damage > 0f)
-                {
-                    CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-                    float finalDamageReduction = 0f;
-
-                    if (damageInfo.attacker.GetComponent<CharacterBody>().GetBuffCount(hermitBuff) > 0)
-                    {
-                        finalDamageReduction += TheHermit_DamageReduction * attackerBody.GetBuffCount(hermitBuff);
-                        if (finalDamageReduction > 0.75f)
-                        {
-                            finalDamageReduction = 0.75f;
-                        }
-                        damageInfo.damage = damageInfo.damage * (1f - finalDamageReduction);
-                    }
-                }
-
                 orig(self, damageInfo);
-            };
+                if (self.body && self.body.inventory && damageInfo.damage > 0f && !damageInfo.rejected)
+                {
+                    if (self.body.inventory.GetItemCount(itemDef) > 0)
+                    {
+                        self.body.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * self.body.inventory.GetItemCount(itemDef));
+                    }
+                    if (self.body.GetBuffCount(hermitBuff) > 0)
+                    {
+                        damageInfo.damage *= Math.Abs(Util.ConvertAmplificationPercentageIntoReductionPercentage(TheHermit_DamageReduction * self.body.GetBuffCount(hermitBuff)) / 100f);
+                    }
+                }
+            }
+
+            On.RoR2.HealthComponent.TakeDamage += HealthComponent_TakeDamage;
         }
 
         public static BuffDef hermitBuff { get; private set; }

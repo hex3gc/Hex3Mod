@@ -1,11 +1,13 @@
 ﻿using R2API;
 using RoR2;
+using RoR2.Achievements;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Diagnostics;
 using System.ComponentModel;
+using EntityStates.AffixVoid;
 
 namespace Hex3Mod.Items
 {
@@ -32,12 +34,22 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_OneTicket.png");
             return pickupIconSprite;
+        }
+        public static Sprite LoadAchievementSprite()
+        {
+            Sprite achievementIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicketAchievement.png");
+            return achievementIconSprite;
         }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+            UnlockableDef oneTicketUnlock = ScriptableObject.CreateInstance<UnlockableDef>();
+
+            oneTicketUnlock.cachedName = "OneTicketUnlock";
+            oneTicketUnlock.nameToken = upperName + "_UNLOCK_NAME";
+            oneTicketUnlock.achievementIcon = LoadAchievementSprite();
 
             item.name = itemName;
             item.nameToken = "H3_" + upperName + "_NAME";
@@ -53,6 +65,8 @@ namespace Hex3Mod.Items
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
 
+            ContentAddition.AddUnlockableDef(oneTicketUnlock);
+            item.unlockableDef = oneTicketUnlock;
             return item;
         }
         public static ItemDef CreateConsumedItem()
@@ -279,6 +293,10 @@ namespace Hex3Mod.Items
             "\n\n\"Get your hands off!\"" +
             "\n\n\"Mother<style=cStack>[REDACTED]</style>er!\"" +
             "\n\nThe remaining contents of the log are deemed too graphic to show to the Board. Both employees were found dead days later, with the 'ticket' in question missing. So, now that we have a lead: How shall we proceed with the reclamation?");
+
+            LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_NAME", "It's A Feature");
+            LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Use 400 Tickets to duplicate the contents of a Scavenger's bag.");
+            LanguageAPI.Add(upperName + "_UNLOCK_NAME", "It's A Feature");
         }
 
         private static void AddHooks(ItemDef itemDef, ItemDef consumedItemDef, ItemDef hiddenItemDef)
@@ -315,8 +333,9 @@ namespace Hex3Mod.Items
                 int ticketsInExistence = Util.GetItemCountGlobal(itemDef.itemIndex, true);
                 if (ticketsInExistence > 0 && body.inventory && body.teamComponent && (body.teamComponent.teamIndex == TeamIndex.Monster | body.teamComponent.teamIndex == TeamIndex.Lunar | body.teamComponent.teamIndex == TeamIndex.Void))
                 {
-                    args.damageMultAdd += 2f + (2f * (ticketsInExistence - 1));
-                    args.healthMultAdd += 4f + (4f * (ticketsInExistence - 1));
+                    body.isElite = true;
+                    args.damageMultAdd += 1f + (1f * (ticketsInExistence - 1));
+                    args.healthMultAdd += 2f + (2f * (ticketsInExistence - 1));
                 }
             }
 
@@ -332,7 +351,7 @@ namespace Hex3Mod.Items
                     }
                     else
                     {
-                        Chat.AddMessage("<style=cIsUtility>You are rewarded for risks taken.</style>");
+                        Chat.AddMessage("<style=cIsUtility>You are rewarded for the risks you've taken.</style>");
 
                         Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.stageRng.nextUlong);
                         List<PickupIndex> listOfLegendaries = new List<PickupIndex>();
@@ -363,7 +382,8 @@ namespace Hex3Mod.Items
                         inventory.RemoveItem(hiddenItemDef, inventory.GetItemCount(hiddenItemDef));
                         CharacterMasterNotificationQueue.SendTransformNotification(body.master, itemDef.itemIndex, consumedItemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
                         PurchaseInteraction.CreateItemTakenOrb(body.corePosition, self.gameObject, itemDef.itemIndex);
-                        body.RemoveBuff(ticketStacks.buffIndex);
+                        inventory.GiveItem(consumedItemDef);
+                        body.SetBuffCount(ticketStacks.buffIndex, 0);
                     }
                 }
                 else
@@ -401,6 +421,31 @@ namespace Hex3Mod.Items
             ticketStacks.isCooldown = false;
             ticketStacks.iconSprite = LoadBuffSprite();
             ContentAddition.AddBuffDef(ticketStacks);
+        }
+
+        [RegisterAchievement("OneTicket", "OneTicketUnlock", null, typeof(OneTicketAchievement))]
+        public class OneTicketAchievement : BaseAchievement
+        {
+            public override void OnInstall()
+            {
+                base.OnInstall();
+                On.RoR2.ChestBehavior.ItemDrop += ChestBehavior_ItemDrop;
+            }
+
+            public override void OnUninstall()
+            {
+                On.RoR2.ChestBehavior.ItemDrop -= ChestBehavior_ItemDrop;
+                base.OnUninstall();
+            }
+
+            private void ChestBehavior_ItemDrop(On.RoR2.ChestBehavior.orig_ItemDrop orig, ChestBehavior self)
+            {
+                if (localUser != null && self.dropCount > 1 && self.name.Contains("Scav"))
+                {
+                    Grant();
+                }
+                orig(self);
+            }
         }
 
         public static void Initiate()

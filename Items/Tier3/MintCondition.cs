@@ -257,7 +257,7 @@ namespace Hex3Mod.Items
                     int itemCount = body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
-                        args.baseMoveSpeedAdd += MintCondition_MoveSpeed + (MintCondition_MoveSpeedStack * (itemCount - 1));
+                        args.moveSpeedMultAdd += (MintCondition_MoveSpeed + (MintCondition_MoveSpeedStack * (itemCount - 1)));
                     }
                 }
             }

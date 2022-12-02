@@ -2,6 +2,7 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using EntityStates.AffixVoid;
 
 namespace Hex3Mod.Items
 {
@@ -257,42 +258,75 @@ namespace Hex3Mod.Items
 
         private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef)
         {
-            // Store the chest and the character to ensure that the right chest and the right player are getting affected
-            GameObject purchasedObject = new GameObject();
-            CharacterBody interactorBody = new CharacterBody();
-
-            On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, interactor) =>
+            // Install item behavior to ticket holders
+            void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
-                orig(self, interactor);
-                if (interactor.GetComponent<CharacterBody>() && interactor.GetComponent<CharacterBody>().inventory && interactor.GetComponent<CharacterBody>().inventory.GetItemCount(itemDef) > 0)
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0 && !self.GetComponent<TicketsBehavior>())
                 {
-                    if (self.isShrine != true)
-                    {
-                        purchasedObject = self.gameObject;
-                        interactorBody = interactor.GetComponent<CharacterBody>();
-                    }
+                    self.AddItemBehavior<TicketsBehavior>(1);
                 }
-            };
+            }
 
-            On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
+            // Purchases mark the chest as ticketed
+            void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
             {
-                if (self.gameObject == purchasedObject && interactorBody.inventory && interactorBody.inventory.GetItemCount(itemDef) > 0)
+                orig(self, activator);
+                if (activator.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0 && !self.isShrine && body.GetComponent<TicketsBehavior>())
                 {
-                    if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
+                    body.GetComponent<TicketsBehavior>().interaction = self;
+                }
+            }
+
+            // If a chest is the same as an interactor's ticketed chest, drop more items
+            void ChestBehavior_ItemDrop(On.RoR2.ChestBehavior.orig_ItemDrop orig, ChestBehavior self)
+            {
+                if (self.gameObject.GetComponent<PurchaseInteraction>())
+                {
+                    foreach (TicketsBehavior behavior in Object.FindObjectsOfType<TicketsBehavior>())
                     {
-                        self.dropUpVelocityStrength = 10f;
-                        self.dropForwardVelocityStrength = 20f;
+                        if (behavior.interaction && behavior.interaction == self.gameObject.GetComponent<PurchaseInteraction>())
+                        {
+                            if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
+                            {
+                                self.dropUpVelocityStrength = 7f;
+                                self.dropForwardVelocityStrength = 15f;
+                            }
+                            self.dropCount += 1;
+                            behavior.item = itemDef;
+                            behavior.consumedItem = consumeditemDef;
+                            behavior.interaction = null;
+                            behavior.ExchangeTickets();
+                        }
                     }
-                    self.dropCount += 1;
-                    interactorBody.inventory.RemoveItem(itemDef);
-                    interactorBody.inventory.GiveItem(consumeditemDef);
-                    CharacterMasterNotificationQueue.SendTransformNotification(interactorBody.master, itemDef.itemIndex, consumeditemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
-                    Util.PlaySound(RouletteChestController.Opening.soundEntryEvent, self.gameObject);
-                    purchasedObject = null;
-                    interactorBody = null;
                 }
                 orig(self);
-            };
+            }
+
+            On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
+            On.RoR2.ChestBehavior.ItemDrop += ChestBehavior_ItemDrop;
+        }
+
+        public class TicketsBehavior : CharacterBody.ItemBehavior
+        {
+            public PurchaseInteraction interaction;
+            public ItemDef item;
+            public ItemDef consumedItem;
+
+            public void ExchangeTickets()
+            {
+                if (body.inventory && body.master)
+                {
+                    body.inventory.RemoveItem(item);
+                    body.inventory.GiveItem(consumedItem);
+                    CharacterMasterNotificationQueue.SendTransformNotification(body.master, item.itemIndex, consumedItem.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                    Util.PlaySound(RouletteChestController.Opening.soundEntryEvent, body.gameObject);
+                    if (body.inventory.GetItemCount(item) <= 0)
+                    {
+                        Destroy(this);
+                    }
+                }
+            }
         }
 
         public static void Initiate()

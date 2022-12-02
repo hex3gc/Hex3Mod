@@ -3,19 +3,21 @@ using RoR2;
 using System;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using static Hex3Mod.Items.Empathy;
+using UnityEngine.AddressableAssets;
+using static RoR2.NetworkSession;
+using HG;
 
 namespace Hex3Mod.Items
 {
     /*
-    Apathy was a weird item, and its mechanics were shaky. Thematically, I think it works better as a "send in your allies to do the work" item,
-    synergizing with Empathy with an incentive to keep buying those drones that die all the time. Let me know how it feels to play with this one.
+    Final (I hope) version of Apathy. Now synergizes with close-range options and on-kill boosters like The Unforgivable
     */
     public class Apathy
     {
         static string itemName = "Apathy";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
-        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
@@ -31,6 +33,13 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadBuffSprite2()
+        {
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ApathyStacks.png");
+            return pickupIconSprite;
+        }
+        static GameObject FocusCrystalPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion();
+        static Material ApathyMaterial = Addressables.LoadAssetAsync<Material>("RoR2/Base/ArmorReductionOnHit/matPulverizedOverlay.mat").WaitForCompletion();
 
         public static ItemDef CreateItem()
         {
@@ -49,26 +58,6 @@ namespace Hex3Mod.Items
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
-
-            return item;
-        }
-        public static ItemDef CreateHiddenItem() // Keeps track of Apathy stacks
-        {
-            ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
-
-            item.name = "ApathyHidden";
-            item.nameToken = "H3_" + upperName + "_NAME";
-            item.pickupToken = "H3_" + upperName + "_PICKUP";
-            item.descriptionToken = "H3_" + upperName + "_DESC";
-            item.loreToken = "H3_" + upperName + "_LORE";
-
-            item.tags = new ItemTag[] { ItemTag.CannotCopy, ItemTag.CannotSteal, ItemTag.CannotDuplicate };
-            item.deprecatedTier = ItemTier.NoTier;
-            item.canRemove = false;
-            item.hidden = true;
-
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Apathy.png");
 
             return item;
         }
@@ -242,17 +231,11 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        // Hidden items should not display at all
-        public static ItemDisplayRuleDict CreateHiddenDisplayRules()
-        {
-            return new ItemDisplayRuleDict();
-        }
-
-        public static void AddTokens(float Apathy_HealthIncrease, float Apathy_DamageIncrease)
+        public static void AddTokens(float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Apathy");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Gain a permanent max health and damage buff when an ally is killed, as well as full barrier.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an ally is killed, gain full <style=cIsHealing>barrier</style> and receive a permanent <style=cIsHealing>{0}%</style> <style=cStack>(+{0}% per stack)</style> <style=cIsHealing>max health</style> increase and a <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style> <style=cIsDamage>damage buff</style>.", Apathy_HealthIncrease * 100f, Apathy_DamageIncrease * 100f));
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Power up after witnessing enough violence.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an enemy dies within <style=cDeath>{0}m</style> of you, gain a stack of <style=cDeath>Apathy</style>. After reaching <style=cIsDamage>{5}</style> stacks, <style=cDeath>enter a frenzy</style> which grants you <style=cIsDamage>+{1}% movement speed, +{2}% attack speed and {3} hp/s of regeneration for {4} seconds</style> <style=cStack>(+{4}s per stack)</style>", Apathy_Radius, Apathy_MoveSpeedAdd * 100f, Apathy_AttackSpeedAdd * 100f, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills));
             LanguageAPI.Add("H3_" + upperName + "_LORE",
                 "\"I can't [REDACTED] believe I'm doing this...\"" +
                 "\n\n\"We'll share the network. We have to.\"" +
@@ -277,76 +260,187 @@ namespace Hex3Mod.Items
                 );
         }
 
-        private static void AddHooks(ItemDef itemDef, ItemDef hiddenItemDef, float Apathy_HealthIncrease, float Apathy_DamageIncrease)
+        private static void AddHooks(ItemDef itemDef, float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills)
         {
-            // Apply stat changes
-            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
+            // Add/remove radius indicator on inventory change
+            void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
-                if (body.inventory && body.healthComponent && body.inventory.GetItemCount(hiddenItemDef) > 0)
+                orig(self);
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                 {
-                    int hiddenItemCount = body.inventory.GetItemCount(hiddenItemDef);
-                    if (body.inventory.GetItemCount(itemDef) > 0)
+                    if (!self.GetComponent<ApathyBehavior>())
                     {
-                        args.damageMultAdd += Apathy_DamageIncrease * hiddenItemCount; // Apply buffs and update buff count
-                        args.healthMultAdd += Apathy_HealthIncrease * hiddenItemCount;
-                        body.SetBuffCount(apathyStacks.buffIndex, hiddenItemCount);
+                        self.AddItemBehavior<ApathyBehavior>(1);
                     }
-                    else
+                    int numberOfOverdrives = 0;
+                    if (ItemCatalog.FindItemIndex("OverkillOverdrive") != ItemIndex.None)
                     {
-                        body.inventory.RemoveItem(hiddenItemDef, 9999); // If the player doesn't have Apathy, remove all stacks of the hidden item
-                        body.SetBuffCount(apathyStacks.buffIndex, 0);
+                        numberOfOverdrives = self.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
+                    }
+
+                    // Overdrive radius increase set to 0.2, find a way to match with config
+                    ApathyBehavior behavior = self.GetComponent<ApathyBehavior>();
+                    behavior.radius = Apathy_Radius + (Apathy_Radius * (0.2f * numberOfOverdrives));
+                    behavior.sizeAddMultiplier = 0.2f * numberOfOverdrives;
+                    behavior.focusCrystalSizeDivisor = Apathy_Radius / 13f;
+                    behavior.enable = true;
+                }
+                if (self.inventory && self.inventory.GetItemCount(itemDef) <= 0 && self.GetComponent<ApathyBehavior>())
+                {
+                    UnityEngine.Object.Destroy(self.GetComponent<ApathyBehavior>());
+                    self.RemoveBuff(apathyStacks);
+                }
+            }
+
+            void GlobalEventManager_OnCharacterDeath(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport damageReport)
+            {
+                orig(self, damageReport);
+                foreach (ApathyBehavior apathyOwner in GameObject.FindObjectsOfType<ApathyBehavior>())
+                {
+                    int numberOfOverdrives = 0;
+                    Vector3 deathDistanceVector = Vector3.zero;
+                    deathDistanceVector = apathyOwner.body.corePosition - damageReport.damageInfo.position;
+
+                    if (ItemCatalog.FindItemIndex("OverkillOverdrive") != ItemIndex.None)
+                    {
+                        numberOfOverdrives = apathyOwner.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
+                    }
+                    // Overdrive radius increase set to 0.2, find a way to match with config
+                    if (deathDistanceVector.sqrMagnitude <= (float)Math.Pow(Apathy_Radius + (Apathy_Radius * (0.2 * numberOfOverdrives)), 2) && apathyOwner.body.GetBuffCount(apathyBuff) <= 0)
+                    {
+                        apathyOwner.body.AddBuff(apathyStacks);
+                        if (apathyOwner.body.GetBuffCount(apathyStacks) >= Apathy_RequiredKills)
+                        {
+                            Util.PlaySound(EntityStates.ImpBossMonster.GroundPound.initialAttackSoundString, apathyOwner.body.gameObject);
+                            apathyOwner.body.AddTimedBuff(apathyBuff, Apathy_Duration + (Apathy_Duration * (apathyOwner.body.inventory.GetItemCount(itemDef) - 1)));
+                            apathyOwner.body.SetBuffCount(apathyStacks.buffIndex, 0);
+                            apathyOwner.currentBuffDuration = Apathy_Duration + (Apathy_Duration * (apathyOwner.body.inventory.GetItemCount(itemDef) - 1));
+                            apathyOwner.body.RecalculateStats();
+                        }
                     }
                 }
             }
 
-            // Give temporary barrier and hidden item on ally death
-            // AI blacklisted for performance's sake
-            On.RoR2.GlobalEventManager.OnCharacterDeath += (orig, self, damageReport) =>
+            void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
-                if (damageReport.attacker && damageReport.victim && damageReport.victim.body && damageReport.victim.body.teamComponent && damageReport.victim.body.teamComponent.teamIndex == TeamIndex.Player)
+                if (body.GetBuffCount(apathyBuff) > 0)
                 {
-                    foreach (var ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
-                    {
-                        if (ally.body && ally.body.healthComponent && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0)
-                        {
-                            ally.body.healthComponent.AddBarrier(ally.body.healthComponent.fullBarrier);
-                            ally.body.inventory.GiveItem(hiddenItemDef);
-                            Util.PlaySound(EntityStates.ImpBossMonster.GroundPound.initialAttackSoundString, ally.gameObject);
-                            EffectData effectData = new EffectData
-                            {
-                                origin = ally.body.corePosition
-                            };
-                            EffectManager.SpawnEffect(EntityStates.VoidMegaCrab.BackWeapon.FireVoidMissiles.muzzleEffectPrefab, effectData, false);
-                        }
-                    }
+                    args.moveSpeedMultAdd += Apathy_MoveSpeedAdd;
+                    args.attackSpeedMultAdd += Apathy_MoveSpeedAdd;
+                    args.baseRegenAdd += Apathy_RegenAdd;
                 }
-                orig(self, damageReport);
-            };
+            }
 
+            On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
+            On.RoR2.GlobalEventManager.OnCharacterDeath += GlobalEventManager_OnCharacterDeath;
             RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
+        public class ApathyBehavior : CharacterBody.ItemBehavior
+        {
+            public float radius = 0f;
+            public float sizeAddMultiplier;
+            public float focusCrystalSizeDivisor;
+            public float apathyEffectTimer = 0.8f;
+            public float currentBuffDuration = 0f;
+            public bool enable = false;
+            public bool setupDone = false;
+            public bool firstBeatFlag = false;
+            public bool hasOverlay = false;
+            Vector3 defaultScale = new Vector3(0f, 0f, 0f);
+            GameObject radiusIndicator;
+            GameObject apathyEffect;
+            void FixedUpdate()
+            {
+                if (enable)
+                {
+                    if (!setupDone)
+                    {
+                        radiusIndicator = PrefabAPI.InstantiateClone(FocusCrystalPrefab, "ApathyRange");
+                        apathyEffect = PrefabAPI.InstantiateClone(HealthComponent.AssetReferences.permanentDebuffEffectPrefab, "ApathyPulse");
+                        apathyEffect.transform.localScale *= 0.1f;
+                        radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(base.gameObject, null);
+                        radiusIndicator.transform.localScale = defaultScale;
+                        defaultScale.x = focusCrystalSizeDivisor;
+                        defaultScale.y = focusCrystalSizeDivisor;
+                        defaultScale.z = focusCrystalSizeDivisor;
+                        setupDone = true;
+                    }
+                    else
+                    {
+                        radiusIndicator.transform.localScale = defaultScale + (defaultScale * sizeAddMultiplier);
+                        if (body.HasBuff(apathyBuff))
+                        {
+                            if (hasOverlay == false)
+                            {
+                                TemporaryOverlay temporaryOverlay = body.gameObject.AddComponent<TemporaryOverlay>();
+                                temporaryOverlay.duration = currentBuffDuration;
+                                temporaryOverlay.animateShaderAlpha = true;
+                                temporaryOverlay.alphaCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
+                                temporaryOverlay.destroyComponentOnEnd = true;
+                                temporaryOverlay.originalMaterial = ApathyMaterial;
+                                temporaryOverlay.AddToCharacerModel(body.gameObject.GetComponent<ModelLocator>().modelTransform.GetComponentInParent<CharacterModel>());
+                                hasOverlay = true;
+                            }
+                            apathyEffectTimer += Time.fixedDeltaTime;
+                            if (apathyEffectTimer >= 0.8f && !firstBeatFlag)
+                            {
+                                EffectManager.SimpleImpactEffect(apathyEffect, body.corePosition, body.corePosition, true);
+                                firstBeatFlag = true;
+                            }
+                            if (apathyEffectTimer >= 1f)
+                            {
+                                EffectManager.SimpleImpactEffect(apathyEffect, body.corePosition, body.corePosition, true);
+                                apathyEffectTimer = 0f;
+                                firstBeatFlag = false;
+                            }
+                        }
+                        else
+                        {
+                            apathyEffectTimer = 0.8f;
+                            hasOverlay = false;
+                        }
+                    }
+                }
+            }
+
+            private void OnDestroy()
+            {
+                UnityEngine.Object.Destroy(radiusIndicator);
+            }
+        }
+
         public static BuffDef apathyStacks { get; private set; }
-        public static void AddBuffs() // Visual indicator of Apathy stacks
+        public static BuffDef apathyBuff { get; private set; }
+        public static void AddBuffs()
         {
             apathyStacks = ScriptableObject.CreateInstance<BuffDef>();
             apathyStacks.buffColor = new Color(1f, 1f, 1f);
             apathyStacks.canStack = true;
             apathyStacks.isDebuff = false;
-            apathyStacks.name = "Apathy Stacks";
+            apathyStacks.name = "Apathy";
             apathyStacks.isHidden = false;
             apathyStacks.isCooldown = false;
-            apathyStacks.iconSprite = LoadBuffSprite();
+            apathyStacks.iconSprite = LoadBuffSprite2();
             ContentAddition.AddBuffDef(apathyStacks);
+
+            apathyBuff = ScriptableObject.CreateInstance<BuffDef>();
+            apathyBuff.buffColor = new Color(1f, 1f, 1f);
+            apathyBuff.canStack = true;
+            apathyBuff.isDebuff = false;
+            apathyBuff.name = "Apathy Buff";
+            apathyBuff.isHidden = false;
+            apathyBuff.isCooldown = false;
+            apathyBuff.iconSprite = LoadBuffSprite();
+            ContentAddition.AddBuffDef(apathyBuff);
         }
 
-        public static void Initiate(float Apathy_HealthIncrease, float Apathy_DamageIncrease)
+        public static void Initiate(float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
-            AddTokens(Apathy_HealthIncrease, Apathy_DamageIncrease);
+            AddTokens(Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills);
             AddBuffs();
-            AddHooks(itemDefinition, hiddenItemDefinition, Apathy_HealthIncrease, Apathy_DamageIncrease);
+            AddHooks(itemDefinition, Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills);
         }
     }
 }

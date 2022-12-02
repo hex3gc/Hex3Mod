@@ -1,9 +1,10 @@
 ﻿using R2API;
 using RoR2;
 using UnityEngine;
+using System;
 using Hex3Mod.HelperClasses;
 using UnityEngine.PlayerLoop;
-using static Hex3Mod.Items.ScavengersPack;
+using UnityEngine.AddressableAssets;
 
 namespace Hex3Mod.Items
 {
@@ -25,6 +26,7 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Empathy.png");
             return pickupIconSprite;
         }
+        static GameObject FocusCrystalPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion();
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -215,39 +217,117 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float Empathy_HealingFactor)
+        public static void AddTokens(float Empathy_HealthPerHit, float Empathy_Radius)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Empathy");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Heal for a fraction of the damage your allies take.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "When an ally takes damage, <style=cIsHealing>heal</style> for <style=cIsHealing>" + Empathy_HealingFactor * 100f + "%</style> <style=cStack>(+" + Empathy_HealingFactor * 100f + "% per stack)</style> of that damage.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Heal when nearby enemies take damage.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("When an enemy takes damage within <style=cIsHealing>{1}m</style> of you, heal for <style=cIsHealing>{0} hp</style> <style=cStack>(+{0} per stack)</style>.", Empathy_HealthPerHit, Empathy_Radius));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cEvent>//--AUTO-TRANSCRIPTION FROM UES [Redacted] --//</style>\n\n\"Oh yeah? How does this one work?\"\n\n\"Nanomachines. In response to physical trauma to the body, they get to work immediately and start patching up the wound. They're so tiny you don't even feel it happening.\"\n\n\"Is that... safe?\"\n\n\"What?\"\n\n\"A bunch of little robots in your bloodstream? There's no way that's never caused a problem.\"\n\n\"Well, maybe twenty years ago. It's 2055, technology has come far.\"\n\n\"Huh.\"\n\n\"...Although,\"\n\n\"See, I'm not putting that in my body.\"\n\n\"No, it's no big deal! But- these bots have been known to 'overcorrect'. They operate on a shared network, meaning that if- you and I, for example- both use the same group, then when -you- get hurt, the bots will think I'm hurt too!\"\n\n\"Meaning?\"\n\n\"It's unpredictable, but fascinating. If you get hurt and my body is healthy, they'll still try to 'fix' me, so they'll begin to look for inefficiencies and redundancies. They'll begin removing unneeded vestiges and replacing them with something useful, and when they're done with that, they'll begin creating something new. It's been known to happen-- they'll grow fresh organs that deal with the function of your heart or your liver but using ten times less energy and ten times less space. They'll begin re-organizing everything in your body, and they'll make your skeleton stronger while they're at it. So, really, they're quite helpful.\"\n\n\"And we only have one of these between us.\"\n\n\"Yes.\"\n\n\"...\"\n\n\"...\"\n\n\"I think I'll do the mission alone.\"");
         }
 
-        private static void AddHooks(ItemDef itemDef, float Empathy_HealingFactor)
+        private static void AddHooks(ItemDef itemDef, float Empathy_HealthPerHit, float Empathy_Radius)
         {
-            // Heal for a fraction of the damage that your allies take
-            On.RoR2.HealthComponent.TakeDamage += (orig, self, damageInfo) =>
+            // Add/remove radius indicator on inventory change
+            void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
+            {
+                orig(self);
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
+                {
+                    if (!self.GetComponent<EmpathyBehavior>())
+                    {
+                        self.AddItemBehavior<EmpathyBehavior>(1);
+                    }
+                    int numberOfOverdrives = 0;
+                    if (ItemCatalog.FindItemIndex("OverkillOverdrive") != ItemIndex.None)
+                    {
+                        numberOfOverdrives = self.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
+                    }
+
+                    // Overdrive radius increase set to 0.2, find a way to match with config
+                    EmpathyBehavior behavior = self.GetComponent<EmpathyBehavior>();
+                    behavior.radius = Empathy_Radius + (Empathy_Radius * (0.2f * numberOfOverdrives));
+                    behavior.sizeAddMultiplier = 0.2f * numberOfOverdrives;
+                    behavior.focusCrystalSizeDivisor = Empathy_Radius / 13f;
+                    behavior.enable = true;
+                }
+                if (self.inventory && self.inventory.GetItemCount(itemDef) < 0 && self.GetComponent<EmpathyBehavior>())
+                {
+                    UnityEngine.Object.Destroy(self.GetComponent<EmpathyBehavior>());
+                }
+            }
+            // Heal if damage occurs close enough
+            void HealthComponent_TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
             {
                 orig(self, damageInfo);
-                if (!damageInfo.rejected && damageInfo.damage > 0 && self.body && self.body.teamComponent && self.body.teamComponent.teamIndex == TeamIndex.Player)
+                if (self.body && self.body.teamComponent && self.body.teamComponent.teamIndex != TeamIndex.Player && self.body.teamComponent.teamIndex != TeamIndex.None)
                 {
-                    foreach (var ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
+                    foreach (TeamComponent ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                     {
-                        if (ally.body && ally.body.healthComponent && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0)
+                        Vector3 enemyDistanceVector = Vector3.zero;
+                        if (ally.body && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0 && ally.body.healthComponent)
                         {
-                            float stackHealFactor = (Empathy_HealingFactor) * (ally.body.inventory.GetItemCount(itemDef) - 1);
-                            ally.body.healthComponent.Heal(damageInfo.damage * (Empathy_HealingFactor + stackHealFactor), new ProcChainMask());
+                            int numberOfOverdrives = 0;
+                            enemyDistanceVector = ally.body.corePosition - damageInfo.position;
+
+                            if (ItemCatalog.FindItemIndex("OverkillOverdrive") != ItemIndex.None)
+                            {
+                                numberOfOverdrives = ally.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
+                            }
+                            // Overdrive radius increase set to 0.2, find a way to match with config
+                            if (enemyDistanceVector.sqrMagnitude <= (float)Math.Pow(Empathy_Radius + (Empathy_Radius * (0.2 * numberOfOverdrives)), 2))
+                            {
+                                ally.body.healthComponent.Heal(2f, new ProcChainMask());
+                            }
                         }
                     }
                 }
-            };
+            }
+
+            On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
+            On.RoR2.HealthComponent.TakeDamage += HealthComponent_TakeDamage;
         }
 
-        public static void Initiate(float Empathy_HealingFactor)
+        public class EmpathyBehavior : CharacterBody.ItemBehavior
+        {
+            public float radius = 0f;
+            public float sizeAddMultiplier;
+            public float focusCrystalSizeDivisor;
+            public bool enable = false;
+            public bool setupDone = false;
+            Vector3 defaultScale = new Vector3(0f, 0f, 0f);
+            GameObject radiusIndicator;
+            void FixedUpdate() // Screw the color, it works
+            {
+                if (enable)
+                {
+                    if (!setupDone)
+                    {
+                        radiusIndicator = PrefabAPI.InstantiateClone(FocusCrystalPrefab, "EmpathyRange");
+                        radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(base.gameObject, null);
+                        radiusIndicator.transform.localScale = defaultScale;
+                        defaultScale.x = focusCrystalSizeDivisor;
+                        defaultScale.y = focusCrystalSizeDivisor;
+                        defaultScale.z = focusCrystalSizeDivisor;
+                        setupDone = true;
+                    }
+                    else
+                    {
+                        radiusIndicator.transform.localScale = defaultScale + (defaultScale * sizeAddMultiplier);
+                    }
+                }
+            }
+
+            private void OnDestroy()
+            {
+                UnityEngine.Object.Destroy(radiusIndicator);
+            }
+        }
+
+        public static void Initiate(float Empathy_HealthPerHit, float Empathy_Radius)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(Empathy_HealingFactor);
-            AddHooks(itemDefinition, Empathy_HealingFactor);
+            AddTokens(Empathy_HealthPerHit, Empathy_Radius);
+            AddHooks(itemDefinition, Empathy_HealthPerHit, Empathy_Radius);
         }
     }
 }
