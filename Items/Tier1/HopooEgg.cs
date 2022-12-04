@@ -231,7 +231,7 @@ namespace Hex3Mod.Items
             {
                 if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    args.jumpPowerMultAdd += HopooEgg_JumpModifier;
+                    args.jumpPowerMultAdd += HopooEgg_JumpModifier * body.inventory.GetItemCount(itemDef);
                 }
             }
 

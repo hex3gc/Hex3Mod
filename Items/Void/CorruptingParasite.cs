@@ -1,5 +1,6 @@
 ﻿using R2API;
 using RoR2;
+using RoR2.Achievements;
 using RoR2.ExpansionManagement;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,19 @@ namespace Hex3Mod.Items
             Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/CorruptingParasite.png");
             return pickupIconSprite;
         }
+        public static Sprite LoadAchievementSprite()
+        {
+            Sprite achievementIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/corruptingParasiteAchievement.png");
+            return achievementIconSprite;
+        }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+            UnlockableDef corruptingParasiteUnlock = ScriptableObject.CreateInstance<UnlockableDef>();
+
+            corruptingParasiteUnlock.cachedName = "CorruptingParasiteUnlock";
+            corruptingParasiteUnlock.nameToken = upperName + "_UNLOCK_NAME";
+            corruptingParasiteUnlock.achievementIcon = LoadAchievementSprite();
 
             item.name = itemName;
             item.nameToken = "H3_" + upperName + "_NAME";
@@ -46,6 +57,8 @@ namespace Hex3Mod.Items
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
 
+            ContentAddition.AddUnlockableDef(corruptingParasiteUnlock);
+            item.unlockableDef = corruptingParasiteUnlock;
             return item;
         }
 
@@ -239,6 +252,10 @@ namespace Hex3Mod.Items
             "\nShipping Address: Earth, Unspecified address" +
             "\n\nBugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs?" +
             "\n\nBugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs? Bugs?");
+
+            LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_NAME", "From The Depths");
+            LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Enter the Deep Void Portal.");
+            LanguageAPI.Add(upperName + "_UNLOCK_NAME", "From The Depths");
         }
 
         private static void AddHooks(ItemDef itemDef, bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
@@ -280,9 +297,33 @@ namespace Hex3Mod.Items
             };
         }
 
+        [RegisterAchievement("CorruptingParasite", "CorruptingParasiteUnlock", null, typeof(CorruptingParasiteAchievement))]
+        public class CorruptingParasiteAchievement : BaseAchievement
+        {
+            public override void OnInstall()
+            {
+                base.OnInstall();
+                On.RoR2.CharacterMaster.OnServerStageBegin += CharacterMaster_OnServerStageBegin;
+            }
+
+            public override void OnUninstall()
+            {
+                On.RoR2.CharacterMaster.OnServerStageBegin -= CharacterMaster_OnServerStageBegin;
+                base.OnUninstall();
+            }
+
+            private void CharacterMaster_OnServerStageBegin(On.RoR2.CharacterMaster.orig_OnServerStageBegin orig, CharacterMaster self, Stage stage)
+            {
+                orig(self, stage);
+                if (localUser != null && stage.sceneDef.baseSceneName == "voidraid")
+                {
+                    Grant();
+                }
+            }
+        }
+
         public static void Initiate(bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
         {
-            CreateItem();
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(CorruptingParasite_CorruptBossItems, CorruptingParasite_ItemsPerStage);
             AddHooks(itemDefinition, CorruptingParasite_CorruptBossItems, CorruptingParasite_ItemsPerStage);

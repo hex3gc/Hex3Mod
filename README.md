@@ -1,6 +1,6 @@
-# Hex3Mod
+# Hex3Mod 2.0
 
-Adds 1 artifact and 26 new items to the game:
+Adds 1 artifact and 25 new items to the game:
 * 7 Common
 * 5 Uncommon
 * 4 Legendary
@@ -33,14 +33,14 @@ Adds 1 artifact and 26 new items to the game:
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>At the start of each stage, **1 random item will be corrupted into its void equivalent** <sup>(+1 per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987939840060/NoticeOfAbsence.png?raw=true" width=128> | **Notice Of Absence**<br>**Become invisible for 10 seconds** <sup>(+5 per stack)</sup> whenever a boss spawns or a teleporter event begins. **Corrupts all Bucket Lists.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890485198848/DropOfNecrosis.png?raw=true" width=128> | **Drop Of Necrosis**<br>Your attacks have a **5%** <sup>(+5% per stack)</sup> chance to inflict **Blight**, which deals **5%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Captain's Favor**<br>Stages contain **10%** <sup>(+10% per stack)</sup> more interactables. **Corrupts all 400 Tickets.** |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1048610656749899796/CaptainsFavor.png?raw=true" width=128> | **Captain's Favor**<br>Stages contain **8%** <sup>(+8% per stack)</sup> more interactables. **Corrupts all 400 Tickets.** |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **3** points per stack of **regenerating shield** to every player who has this item. Caps at **300 shield** per stack. **Corrupts all Infusions.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986677354506/SpatteredCollection.png?raw=true" width=128> | **Spattered Collection**<br>Your attacks have a **10%** chance to inflict **Blight**, which now **reduces enemies' armor by 2** <sup>(+2 per stack)</sup> for each stack. **Corrupts all Scattered Reflections.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>Taking damage grants a **stacking damage resistance of 5%** that lasts for **10 seconds** <sup>(+5 per stack)</sup>. **Corrupts all Symbiotic Scorpions.**|
 | | <p align="center">**LUNAR**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555784782528542/OneTicket.png?raw=true" width=128> | **One Ticket**<br>This ticket grants **legendary items** when deposited into a **cleansing pool**: One <sup>(+1 per stack)</sup> for each stage cleared while holding it. **ALL enemies spawn as Perfected Elites while it is in your inventory, and each stack makes them stronger.** | <details><summary>Unlock</summary>Use 400 Tickets to duplicate the contents of a Scavenger's bag.</details> |
 | | <p align="center">**LUNAR EQUIPMENT**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Blood Of The Lamb**<br>Purge **6** of your items for a random **boss item.** Any item except **Lunar**, **Tierless**, or **Boss** items may be purged. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1048610593445265438/BloodOfTheLamb.png?raw=true" width=128> | **Blood Of The Lamb**<br>Purge **6** of your items for a random **boss item.** Any item except **Lunar**, **Tierless**, or **Boss** items may be purged. |
 | | <p align="center">**ARTIFACTS**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891345047562/ArtifactOfCorruption_On.png?raw=true" width=128> | **Artifact Of Bugs**<br>Gives you one **Corrupting Parasite** each stage. |
 
@@ -52,8 +52,8 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
-### 2.0.0 - VERSION 2.0! RESET YOUR CONFIGS!
-7 brand-new items, 7 reworks to existing items, 2 achievements, and a lot of tweaks and bugfixes:
+### 2.0.0 - Version 2.0, and lots of big changes! Delete/reset your configs!
+7 brand-new items, 7 reworks to existing items, 3 achievements, and a lot of tweaks and bugfixes:
 * **Added item "Balance" (Common)**
 * **Added item "Miner's Helmet" (Common)**
 * **Added item "The Unforgiven" (Uncommon)**
@@ -62,6 +62,7 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * **Added item "One Ticket" (Lunar)**
 * **Added item "Blood Of The Lamb" (Lunar Equipment)**
 * **Added achievement "We're Rich!":** Unlocks Miner's Helmet
+* **Added achievement "From The Depths":** Unlocks Corrupting Parasite
 * **Added achievement "It's A Feature":** Unlocks One Ticket
 * **Empathy rework:** Heal for a small amount whenever a nearby enemy is hit.
 * **Apathy rework:** Power up after seeing enough violence.
@@ -71,7 +72,7 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * **Spattered Collection rework:** Your attacks may inflict a potent Blight which melts through enemies' armor.
 * **The Hermit rework:** Getting hit grants stacking damage resistance.
 * ATG Prototype now plays a subtle audio cue on the penultimate hit
-* Hopoo Egg now scales fall damage reduction along with jump power.
+* Hopoo Egg fall damage reduction now scales proportionately to jump height.
 * 400 Tickets no longer appears in printers.
 * 400 Tickets now tracks per-player, preventing unintended behavior.
 * Scattered Reflection's damage reflection bonus per Shard Of Glass now stacks.

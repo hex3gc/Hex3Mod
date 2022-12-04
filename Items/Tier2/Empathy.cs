@@ -259,7 +259,7 @@ namespace Hex3Mod.Items
             void HealthComponent_TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
             {
                 orig(self, damageInfo);
-                if (self.body && self.body.teamComponent && self.body.teamComponent.teamIndex != TeamIndex.Player && self.body.teamComponent.teamIndex != TeamIndex.None)
+                if (self.body && self.body.teamComponent && self.body.teamComponent.teamIndex != TeamIndex.Player && self.body.teamComponent.teamIndex != TeamIndex.None && damageInfo.damage > 0f && damageInfo.procCoefficient > 0f)
                 {
                     foreach (TeamComponent ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                     {
@@ -276,7 +276,7 @@ namespace Hex3Mod.Items
                             // Overdrive radius increase set to 0.2, find a way to match with config
                             if (enemyDistanceVector.sqrMagnitude <= (float)Math.Pow(Empathy_Radius + (Empathy_Radius * (0.2 * numberOfOverdrives)), 2))
                             {
-                                ally.body.healthComponent.Heal(2f, new ProcChainMask());
+                                ally.body.healthComponent.Heal(2f * damageInfo.procCoefficient, new ProcChainMask());
                             }
                         }
                     }

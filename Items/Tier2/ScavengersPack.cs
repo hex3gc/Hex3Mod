@@ -337,17 +337,17 @@ namespace Hex3Mod.Items
                 if (self.GetItemCount(itemDef) > 0 && itemPairs.ContainsKey(ItemCatalog.GetItemDef(itemIndex).name)) // Should not call on itself, as it never adds consumed items
                 {
                     itemPairs.TryGetValue(ItemCatalog.GetItemDef(itemIndex).name, out string value);
-                    if (ItemCatalog.FindItemIndex(value) != ItemIndex.None && self.gameObject.TryGetComponent(out CharacterMaster master))
+                    if (ItemCatalog.FindItemIndex(value) != ItemIndex.None && self.gameObject.TryGetComponent(out CharacterMaster master) && master.GetBody())
                     {
                         self.RemoveItem(itemIndex); // Restore 1 broken item
                         self.GiveItemString(value);
 
-                        Util.PlaySound(EntityStates.ScavMonster.FindItem.sound, self.gameObject); // Play effects
+                        Util.PlaySound(EntityStates.ScavMonster.FindItem.sound, master.GetBody().gameObject); // Play effects
                         EffectData effectData = new EffectData
                         {
-                            origin = self.transform.position
+                            origin = master.GetBody().transform.position
                         };
-                        effectData.SetNetworkedObjectReference(self.gameObject);
+                        effectData.SetNetworkedObjectReference(master.GetBody().gameObject);
                         EffectManager.SpawnEffect(HealthComponent.AssetReferences.crowbarImpactEffectPrefab, effectData, true);
                         notificationsToClear++;
 

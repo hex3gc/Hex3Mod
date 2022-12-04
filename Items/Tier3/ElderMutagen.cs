@@ -276,6 +276,7 @@ namespace Hex3Mod.Items
                     if (!speciesDict.ContainsKey(speciesName))
                     {
                         speciesDict.Add(speciesName, 1);
+                        EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.permanentDebuffEffectPrefab, damageReport.attackerBody.corePosition, damageReport.attackerBody.corePosition, true);
                         damageReport.attackerBody.RecalculateStats();
                     }
                     else
@@ -283,6 +284,7 @@ namespace Hex3Mod.Items
                         if (speciesDict[speciesName] < inventory.GetItemCount(itemDef))
                         {
                             speciesDict[speciesName]++;
+                            EffectManager.SimpleImpactEffect(HealthComponent.AssetReferences.permanentDebuffEffectPrefab, damageReport.attackerBody.corePosition, damageReport.attackerBody.corePosition, true);
                             damageReport.attackerBody.RecalculateStats();
                         }
                     }

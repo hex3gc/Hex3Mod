@@ -261,18 +261,23 @@ namespace Hex3Mod.Items
             // Install item behavior to ticket holders
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
+                orig(self);
                 if (self.inventory && self.inventory.GetItemCount(itemDef) > 0 && !self.GetComponent<TicketsBehavior>())
                 {
                     self.AddItemBehavior<TicketsBehavior>(1);
                 }
             }
 
-            // Purchases mark the chest as ticketed
+            // Purchases mark the chest as ticketed, and also makes sure the purchaser has an itembehavior
             void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
             {
                 orig(self, activator);
-                if (activator.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0 && !self.isShrine && body.GetComponent<TicketsBehavior>())
+                if (activator.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0 && !self.isShrine)
                 {
+                    if (!body.GetComponent<TicketsBehavior>())
+                    {
+                        body.AddItemBehavior<TicketsBehavior>(1);
+                    }
                     body.GetComponent<TicketsBehavior>().interaction = self;
                 }
             }

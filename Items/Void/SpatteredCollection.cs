@@ -236,7 +236,7 @@ namespace Hex3Mod.Items
 
             void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args) // Reduce armor based on Blight stacks
             {
-                if (body.teamComponent && body.teamComponent.teamIndex == (TeamIndex.Monster | TeamIndex.Lunar | TeamIndex.Void) && Util.GetItemCountForTeam(TeamIndex.Player, itemDef.itemIndex, true) > 0)
+                if (body.teamComponent && (body.teamComponent.teamIndex == TeamIndex.Monster || body.teamComponent.teamIndex == TeamIndex.Lunar || body.teamComponent.teamIndex == TeamIndex.Void) && Util.GetItemCountForTeam(TeamIndex.Player, itemDef.itemIndex, true) > 0)
                 {
                     if (body.GetBuffCount(RoR2Content.Buffs.Blight) > 0)
                     {

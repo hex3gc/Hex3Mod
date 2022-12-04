@@ -357,7 +357,7 @@ namespace Hex3Mod.Items
                     if (!setupDone)
                     {
                         radiusIndicator = PrefabAPI.InstantiateClone(FocusCrystalPrefab, "ApathyRange");
-                        apathyEffect = PrefabAPI.InstantiateClone(HealthComponent.AssetReferences.permanentDebuffEffectPrefab, "ApathyPulse");
+                        apathyEffect = PrefabAPI.InstantiateClone(HealthComponent.AssetReferences.diamondDamageBonusImpactEffectPrefab, "ApathyPulse");
                         apathyEffect.transform.localScale *= 0.1f;
                         radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(base.gameObject, null);
                         radiusIndicator.transform.localScale = defaultScale;

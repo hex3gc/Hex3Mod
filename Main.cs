@@ -110,8 +110,8 @@ namespace Hex3Mod
         public ConfigEntry<int> MintCondition_AddJumpsStack() { return Config.Bind<int>(new ConfigDefinition("Legendary - Mint Condition", "Additional jumps per stack"), 2, new ConfigDescription("Jump count increase per additional stack", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> ElderMutagen_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Elder Mutagen", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ElderMutagen_MaxHealthAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Max health per species"), 0.02f, new ConfigDescription("What fraction of max health should be added for each killed species", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ElderMutagen_RegenAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Regen per species"), 0.5f, new ConfigDescription("How much hp per second regen should be added for each killed species", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ElderMutagen_MaxHealthAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Max health per species"), 0.04f, new ConfigDescription("What fraction of max health should be added for each killed species", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ElderMutagen_RegenAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Regen per species"), 1f, new ConfigDescription("How much hp per second regen should be added for each killed species", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> DoNotEat_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Do Not Eat", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> DoNotEat_PearlChancePerStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Pearl Chance"), 8f, new ConfigDescription("Percent chance that a Pearl or Irradiant Pearl will drop from a chest.", null, Array.Empty<object>())); }
@@ -221,16 +221,6 @@ namespace Hex3Mod
             // Lunar Equipment
             Log.LogInfo("Lunar Equipment");
             if (BloodOfTheLamb_Enable().Value == true) { BloodOfTheLamb.Initiate(BloodOfTheLamb_ItemsTaken().Value); }
-
-            /*
-            
-            TODO
-
-            Models
-            Item Displays
-            Unlocks
-
-            */
 
             Log.LogInfo("Done!");
         }
