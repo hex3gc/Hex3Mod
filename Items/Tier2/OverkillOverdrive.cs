@@ -225,29 +225,29 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float OverkillOverdrive_ZoneIncrease, bool OverkillOverdrive_AltMode)
+        public static void AddTokens(float OverkillOverdrive_ZoneIncrease)
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Overkill Overdrive");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I want everyone to hear it, even if it doesn't sound good.\"\n\n- Written on a sticky note, attached to the package the item arrived in.");
-            if (OverkillOverdrive_AltMode)
-            {
-                LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Amplify the range of area buffs.");
-                LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Amplify the radius of <style=cIsUtility>area buffs</style> by <style=cWorldEvent>{0}%</style> <style=cStack>(+{0}% per stack)</style>", OverkillOverdrive_ZoneIncrease * 1.5));
-            }
-            else
-            {
-                LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Amplify the range of area buffs and holdout zones.");
-                LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Amplify the radius of <style=cIsUtility>area buffs</style> and <style=cWorldEvent>holdout zones</style> by <style=cWorldEvent>{0}%</style> <style=cStack>(+{0}% per stack)</style>", OverkillOverdrive_ZoneIncrease));
-            }
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Amplify the range of area buffs and holdout zones.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Amplify the radius of <style=cIsUtility>area buffs</style> and <style=cWorldEvent>holdout zones</style> by <style=cWorldEvent>{0}%</style> <style=cStack>(+{0}% per stack)</style>", OverkillOverdrive_ZoneIncrease));
         }
 
-        private static void AddHooks(ItemDef itemDef, float OverkillOverdrive_ZoneIncrease, bool OverkillOverdrive_AltMode)
+        private static void AddHooks(ItemDef itemDef, bool OverkillOverdrive_TurretBlacklist, float OverkillOverdrive_ZoneIncrease, bool Overkilloverdrive_EnableHoldouts, bool Overkilloverdrive_EnableShrineWoods, bool Overkilloverdrive_EnableFocusCrystal, bool Overkilloverdrive_EnableBuffWards, bool Overkilloverdrive_EnableDeskPlant, bool Overkilloverdrive_EnableBungus)
         {
             float FindTotalMultiplier() // Gets the appropriate radius multiplier based on all player inventories
             {
                 int totalItemAmount = 0;
                 foreach (TeamComponent ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                 {
+                    if (ally.body && OverkillOverdrive_TurretBlacklist == true)
+                    {
+                        string trimmedName = ally.body.name.Replace("(Clone)", "").Trim();
+                        if (trimmedName == "EngiTurretBody" || trimmedName == "EngiWalkerTurretBody")
+                        {
+                            continue;
+                        }
+                    }
                     if (ally.body && ally.body.inventory)
                     {
                         totalItemAmount += ally.body.inventory.GetItemCount(itemDef);
@@ -260,10 +260,7 @@ namespace Hex3Mod.Items
             void HoldoutZoneController_OnEnable(On.RoR2.HoldoutZoneController.orig_OnEnable orig, HoldoutZoneController self)
             {
                 orig(self);
-                if (!OverkillOverdrive_AltMode)
-                {
-                    self.baseRadius += self.baseRadius * FindTotalMultiplier();
-                }
+                self.baseRadius += self.baseRadius * FindTotalMultiplier();
             }
             void Inventory_GiveItem_ItemIndex_int(On.RoR2.Inventory.orig_GiveItem_ItemIndex_int orig, Inventory self, ItemIndex itemIndex, int count)
             {
@@ -298,19 +295,22 @@ namespace Hex3Mod.Items
                     behavior.nearbyDamageBonusIndicator.transform.localScale = new Vector3(scaledSize, scaledSize, scaledSize);
                 }
             }
-            IL.RoR2.HealthComponent.TakeDamage += (il) =>
+            if (Overkilloverdrive_EnableFocusCrystal)
             {
-                ILCursor ilcursor = new(il);
-                if (ilcursor.TryGotoNext(MoveType.Before,
-                    x => x.MatchLdcR4(169f)))
+                IL.RoR2.HealthComponent.TakeDamage += (il) =>
                 {
-                    ilcursor.Remove();
-                    ilcursor.EmitDelegate<Func<float>>(() =>
+                    ILCursor ilcursor = new(il);
+                    if (ilcursor.TryGotoNext(MoveType.Before,
+                        x => x.MatchLdcR4(169f)))
                     {
-                        return (float)Math.Pow(13f + (13f * FindTotalMultiplier()), 2);
-                    });
-                }
-            };
+                        ilcursor.Remove();
+                        ilcursor.EmitDelegate<Func<float>>(() =>
+                        {
+                            return (float)Math.Pow(13f + (13f * FindTotalMultiplier()), 2);
+                        });
+                    }
+                };
+            }
 
             // Buff Wards
             void BuffWard_Start(On.RoR2.BuffWard.orig_Start orig, BuffWard self)
@@ -320,20 +320,27 @@ namespace Hex3Mod.Items
             }
 
             // Bustling Fungus
-            IL.RoR2.Items.MushroomBodyBehavior.FixedUpdate += (il) =>
+            if (Overkilloverdrive_EnableBungus)
             {
-                ILCursor ilcursor = new(il);
-                if (ilcursor.TryGotoNext(MoveType.After,
-                    x => x.MatchAdd(),
-                    x => x.MatchLdcR4(1.5f)))
+                IL.RoR2.Items.MushroomBodyBehavior.FixedUpdate += (il) =>
                 {
-                    ilcursor.Emit(OpCodes.Add);
-                    ilcursor.EmitDelegate<Func<float>>(() =>
+                    ILCursor ilcursor = new(il);
+                    if (ilcursor.TryGotoNext(MoveType.After,
+                        x => x.MatchLdloc(0),
+                        x => x.MatchConvR4(),
+                        x => x.MatchMul(),
+                        x => x.MatchAdd()))
                     {
-                        return (0.5f + 1.5f + 1.5f) * FindTotalMultiplier();
-                    });
-                }
-            };
+                        ilcursor.Emit(OpCodes.Dup);
+                        ilcursor.EmitDelegate<Func<float>>(() =>
+                        {
+                            return FindTotalMultiplier();
+                        });
+                        ilcursor.Emit(OpCodes.Mul);
+                        ilcursor.Emit(OpCodes.Add);
+                    }
+                };
+            }
 
             // Interstellar Desk Plant
             void DeskPlantController_Awake(On.RoR2.DeskPlantController.orig_Awake orig, DeskPlantController self)
@@ -349,19 +356,18 @@ namespace Hex3Mod.Items
 
             // There is no efficient way to add Sharp Anchor >;(
 
-            On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable;
-            On.RoR2.ShrineHealingBehavior.SetWardEnabled += ShrineHealingBehavior_SetWardEnabled;
-            On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
-            On.RoR2.BuffWard.Start += BuffWard_Start;
-            On.RoR2.DeskPlantController.Awake += DeskPlantController_Awake;
-            On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int;
+            if (Overkilloverdrive_EnableHoldouts){ On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable; On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int; }
+            if (Overkilloverdrive_EnableShrineWoods) { On.RoR2.ShrineHealingBehavior.SetWardEnabled += ShrineHealingBehavior_SetWardEnabled; }
+            if (Overkilloverdrive_EnableFocusCrystal) { On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged; }
+            if (Overkilloverdrive_EnableBuffWards) { On.RoR2.BuffWard.Start += BuffWard_Start; }
+            if (Overkilloverdrive_EnableDeskPlant) { On.RoR2.DeskPlantController.Awake += DeskPlantController_Awake; }
         }
 
-        public static void Initiate(float OverkillOverdrive_ZoneIncrease, bool OverkillOverdrive_AltMode)
+        public static void Initiate(bool OverkillOverdrive_TurretBlacklist, float OverkillOverdrive_ZoneIncrease, bool Overkilloverdrive_EnableHoldouts, bool Overkilloverdrive_EnableShrineWoods, bool Overkilloverdrive_EnableFocusCrystal, bool Overkilloverdrive_EnableBuffWards, bool Overkilloverdrive_EnableDeskPlant, bool Overkilloverdrive_EnableBungus)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(OverkillOverdrive_ZoneIncrease, OverkillOverdrive_AltMode);
-            AddHooks(itemDefinition, OverkillOverdrive_ZoneIncrease, OverkillOverdrive_AltMode);
+            AddTokens(OverkillOverdrive_ZoneIncrease);
+            AddHooks(itemDefinition, OverkillOverdrive_TurretBlacklist, OverkillOverdrive_ZoneIncrease, Overkilloverdrive_EnableHoldouts, Overkilloverdrive_EnableShrineWoods, Overkilloverdrive_EnableFocusCrystal, Overkilloverdrive_EnableBuffWards, Overkilloverdrive_EnableDeskPlant, Overkilloverdrive_EnableBungus);
         }
     }
 }

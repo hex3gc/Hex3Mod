@@ -220,7 +220,7 @@ namespace Hex3Mod.Items
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Balance");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Dodge more attacks the slower you're moving.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Gain a maximum <style=cWorldEvent>{0}% chance to dodge attacks</style> <style=cStack>(+{0}% per stack, hyperbolic)</style> <style=cWorldEvent>the slower you're moving:</style> <style=cIsUtility>Full chance</style> while not moving, <style=cIsUtility>half chance</style> while walking or receiving a speed debuff, and <style=cIsUtility>no chance</style> while freely sprinting.", Balance_MaxDodge));
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Gain a maximum <style=cWorldEvent>{0}% chance to dodge attacks</style> <style=cStack>(+{0}% per stack, hyperbolic)</style> <style=cWorldEvent>the slower you're moving:</style> <style=cIsUtility>Full chance</style> while not moving, <style=cIsUtility>half chance</style> while walking or receiving a speed debuff, and <style=cIsUtility>no chance</style> while freely sprinting. Unaffected by luck.", Balance_MaxDodge));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I think one of them stung me.\"" +
             "\n\n\"The beetles? Really?\"" +
             "\n\n\"What?\"" +

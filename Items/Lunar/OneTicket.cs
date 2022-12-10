@@ -84,7 +84,7 @@ namespace Hex3Mod.Items
             item.hidden = false;
 
             item.pickupModelPrefab = LoadPrefab();
-            item.pickupIconSprite = LoadSprite();
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket_Consumed.png");
 
             return item;
         }
@@ -294,6 +294,10 @@ namespace Hex3Mod.Items
             "\n\n\"Mother<style=cStack>[REDACTED]</style>er!\"" +
             "\n\nThe remaining contents of the log are deemed too graphic to show to the Board. Both employees were found dead days later, with the 'ticket' in question missing. So, now that we have a lead: How shall we proceed with the reclamation?");
 
+            LanguageAPI.Add("H3_" + upperName + "CONSUMED_NAME", "Cleansed Ticket");
+            LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "Cleansed of all value.");
+            LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "Cleansed of all value.");
+
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_NAME", "It's A Feature");
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Use 400 Tickets to duplicate the contents of a Scavenger's bag.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "It's A Feature");
@@ -403,10 +407,21 @@ namespace Hex3Mod.Items
                 orig(self);
             }
 
+            // Prevents Cripple while holding
+            void CharacterBody_OnBuffFirstStackGained(On.RoR2.CharacterBody.orig_OnBuffFirstStackGained orig, CharacterBody self, BuffDef buffDef)
+            {
+                orig(self, buffDef);
+                if (self.inventory && self.inventory.GetItemCount(itemDef) > 0 && buffDef.name == "bdCripple")
+                {
+                    self.RemoveBuff(buffDef);
+                }
+            }
+
             On.RoR2.CharacterMaster.OnServerStageBegin += CharacterMaster_OnServerStageBegin;
             RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
             On.RoR2.CharacterBody.Start += CharacterBody_Start;
+            On.RoR2.CharacterBody.OnBuffFirstStackGained += CharacterBody_OnBuffFirstStackGained;
         }
 
         public static BuffDef ticketStacks { get; private set; }

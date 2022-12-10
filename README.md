@@ -15,12 +15,12 @@ Adds 1 artifact and 25 new items to the game:
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891810619442/BucketList.png?raw=true" width=128> | **Bucket List**<br>Move **20%** faster <sup>(+20% per stack)</sup>. Reduce this bonus by **75%** during boss fights. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890950758420/HopooEgg.png?raw=true" width=128> | **Hopoo Egg**<br>Jump **20%** <sup>(+20% per stack)</sup> higher. **Reduces fall damage**. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Shard Of Glass**<br>Increase your **base damage** by **7%** <sup>(+7% per stack)</sup>. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987243618364/Tickets.png?raw=true" width=128> | **400 Tickets**<br>The next item purchase you make will grant **double the amount of items**. Consumed on use. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044935829660905492/Balance.png?raw=true" width=128> | **Balance**<br>Gain a maximum **20% chance to dodge attacks** (+20% per stack, hyperbolic) **the slower you're moving:** **Full chance** while not moving, **half chance** while walking or receiving a speed debuff, and **no chance** while freely sprinting. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987243618364/Tickets.png?raw=true" width=128> | **400 Tickets**<br>The next chest, lunar pod or void cradle you open will contain **double the amount of items**. Consumed on use. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044935829660905492/Balance.png?raw=true" width=128> | **Balance**<br>Gain a maximum **20% chance to dodge attacks** (+20% per stack, hyperbolic) **the slower you're moving:** **Full chance** while not moving, **half chance** while walking or receiving a speed debuff, and **no chance** while freely sprinting. Unaffected by luck. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044761356659851274/MinersHelmet.png?raw=true" width=128> | **Miner's Helmet**<br>**Every time you earn $25** <sup>(Scaling with time)</sup>, reduce your **skill cooldowns** by **2** seconds <sup>(+2 per stack)</sup>. | <details><summary>Unlock</summary>Carry enough money to buy 3 legendary chests.</details> |
 | | <p align="center">**UNCOMMON**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>**When an enemy takes damage within 20m** of you, heal for **2 hp** <sup>(+2 per stack)</sup>. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Reflect 7% of all received damage** back to your attacker, magnifying it by **70%** <sup>(+70% per stack)</sup>. For every **Shard Of Glass** in your inventory, **reflect 0.7%** <sup>(+0.7% per stack)</sup> **more damage**. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Block and reflect 7% of all received damage** back to your attacker, magnifying it by **700%** <sup>(+70% per stack)</sup>. For every **Shard Of Glass** in your inventory, **reflect 0.7%** <sup>(+0.7% per stack)</sup> **more damage**. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/985265706620829716/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pack**<br>When an item is **consumed or broken**, **replace it** with a brand new one. This may occur up to **3** times before the pack is empty. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555785277452410/TheUnforgivable.png?raw=true" width=128> | **The Unforgivable**<br>Activate your **on-kill effects** at your location **once** <sup>(+1 per stack)</sup> every **8** seconds. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1047947959779725312/OverkillOverdrive.png?raw=true" width=128> | **Overkill Overdrive**<br>Amplify the radius of your **area buffs** and **holdout zones** by **20%** <sup>(+20% per stack)</sup>. |
@@ -51,6 +51,21 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
 
 # Changelog
+
+### 2.0.3
+* <details><summary>Scattered Reflection default reflect damage boost per stack 70% -> 700%</summary>Scattered Reflection can be a potent item when it comes to damage prevention if you get the right build going, but its damage was always very underwhelming for a green item. This 10x increase seems huge but it really just bumps it up to usable levels, considering how low 7% really is.</details>
+* <details><summary>Empathy default healing per hit 2 -> 4</summary>For its limitations, it really should have a bit more healing power than two leeching seeds.</details>
+* <details><summary>Scavenger's Pack default uses 3 -> 2</summary>Scavenger's Pack is hard to balance because some consumable items are incredibly good, while others aren't. Having less uses might make one value their pack more, and consider which consumables they want to pick up.</details>
+* <details><summary>Do Not Eat default pearl chance 8% -> 10%</summary>A little boost for this item, because it kind of needs it.</details>
+* <details><summary>One Ticket now provides immunity to the Cripple debuff while it's being held.</summary>Fighting Perfected Elites is a challenge on its own with their shields and extra stats, but on top of that, the cripple debuff made it way more tedious than challenging. It also gives you a much needed "advantage" if you're forced to keep the item for difficult fights.</details>
+* Overkill Overdrive now has an optional blacklist for Engineer turrets.
+* One Ticket now has a proper consumed version.
+* Fixed a conflict with ArtifactOfPotential and Do Not Eat.
+
+### 2.0.2
+* Overkill Overdrive no longer prevents bustling fungus from stacking. **However, be careful about using mods that change the radius of Bustling Fungus or Focus Crystal, as they'll most likely break this item and cause errors. I may add special support for mods like this in the future.**
+* To compensate, the zones that Overkill Overdrive affects can now be enabled or disabled individually.
+* 400 Tickets description clarified.
 
 ### 2.0.1
 * Readme inconsistencies

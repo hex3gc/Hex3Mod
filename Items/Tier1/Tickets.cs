@@ -244,8 +244,8 @@ namespace Hex3Mod.Items
         public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "400 Tickets");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The next item purchase you make will be doubled.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "The next item purchase you make will grant <style=cIsUtility>double the amount of items</style>. <style=cStack>Consumed on use.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The next chest you open will contain double the items.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "The next chest, lunar pod or void cradle you open will contain <style=cIsUtility>double the amount of items</style>. <style=cStack>Consumed on use.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"Oh yeah, these. They're old tickets from that 'space casino' they tried to open up. While the adults were playing slots or roulette or whatever in the main floor, their kids could go spend their pocket change on the machines downstairs. These are the tickets they'd get as winnings. Could buy- you know- teddy bears and hoverboards and stuff with them.\"" +
             "\n\n\"That's screwed up. Why do you have those?\"" +
             "\n\n\"Well, there's one crucial detail they forgot about before closing up the casino: All the tickets are still valid.\"" +
@@ -289,7 +289,7 @@ namespace Hex3Mod.Items
                 {
                     foreach (TicketsBehavior behavior in Object.FindObjectsOfType<TicketsBehavior>())
                     {
-                        if (behavior.interaction && behavior.interaction == self.gameObject.GetComponent<PurchaseInteraction>())
+                        if (behavior && behavior.interaction && behavior.interaction == self.gameObject.GetComponent<PurchaseInteraction>())
                         {
                             if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
                             {

@@ -234,23 +234,22 @@ namespace Hex3Mod.Items
         {
             On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
             {
-                if (NetworkServer.active)
+                orig(self);
+                if (Util.GetItemCountGlobal(itemDef.itemIndex, true) > 0)
                 {
-                    // Get the total number of items owned by players, and use the highest luck to award a pearl
-                    int totalItems = 0;
+                    int totalItems = Util.GetItemCountGlobal(itemDef.itemIndex, true);
                     float highestLuck = -99;
                     foreach (PlayerCharacterMasterController masterController in PlayerCharacterMasterController.instances)
                     {
                         if (masterController.master && masterController.master.GetBody() && masterController.master.GetBody().inventory)
                         {
-                            totalItems += masterController.master.GetBody().inventory.GetItemCount(itemDef);
                             if (masterController.master.luck >= highestLuck)
                             {
                                 highestLuck = masterController.master.luck;
                             }
                         }
                     }
-                    if (totalItems > 0 && Util.CheckRoll(DoNotEat_PearlChancePerStack * totalItems, highestLuck))
+                    if (Util.CheckRoll(DoNotEat_PearlChancePerStack * totalItems, highestLuck))
                     {
                         float angle = 360f / ((float)self.dropCount);
                         Vector3 vector = Vector3.up * (self.dropUpVelocityStrength / 2) + self.dropTransform.forward * 0f;
@@ -265,8 +264,6 @@ namespace Hex3Mod.Items
                         }
                     }
                 }
-
-                orig(self);
             };
         }
 

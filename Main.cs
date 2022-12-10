@@ -24,7 +24,7 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "2.0.1";
+        public const string ModVer = "2.0.3";
 
         public static AssetBundle MainAssets;
 
@@ -63,14 +63,14 @@ namespace Hex3Mod
         public ConfigEntry<bool> ScatteredReflection_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scattered Reflection", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> ScatteredReflection_DamageReflectPercent() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Scattered Reflection", "Damage reflect value"), 0.07f, new ConfigDescription("The percent of all total received damage to be reflected", null, Array.Empty<object>())); }
         public ConfigEntry<float> ScatteredReflection_DamageReflectShardStack() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Scattered Reflection", "Damage reflect multiplier per shard"), 0.007f, new ConfigDescription("How much of a reflection bonus each Shard Of Glass adds in percentage of total damage (Caps at 90%)", null, Array.Empty<object>())); }
-        public ConfigEntry<float> ScatteredReflection_DamageReflectBonus() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Scattered Reflection", "Reflected damage bonus"), 0.7f, new ConfigDescription("Multiplier of how much bonus damage is added to the reflection", null, Array.Empty<object>())); }
+        public ConfigEntry<float> ScatteredReflection_DamageReflectBonus() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Scattered Reflection", "Reflected damage bonus"), 7f, new ConfigDescription("Multiplier of how much bonus damage is added to the reflection", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> Empathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Empathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Empathy_HealthPerHit() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Health per hit"), 2f, new ConfigDescription("Health points restored when an enemy is hit within radius", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Empathy_HealthPerHit() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Health per hit"), 4f, new ConfigDescription("Health points restored when an enemy is hit within radius", null, Array.Empty<object>())); }
         public ConfigEntry<float> Empathy_Radius() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Zone radius"), 20f, new ConfigDescription("Radius of activation zone in meters", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> ScavengersPack_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pack", "Maximum uses"), 3, new ConfigDescription("Times the Scavenger's Pack can be used before breaking.", null, Array.Empty<object>())); }
+        public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pack", "Maximum uses"), 2, new ConfigDescription("Times the Scavenger's Pack can be used before breaking.", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_RegenScrap() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Regenerating Scrap"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_PowerElixir() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Power Elixir"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
         public ConfigEntry<bool> ScavengersPack_DelicateWatch() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Delicate Watch"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
@@ -92,8 +92,15 @@ namespace Hex3Mod
         public ConfigEntry<float> TheUnforgivable_Interval() { return Config.Bind<float>(new ConfigDefinition("Uncommon - The Unforgivable", "Activation interval"), 8f, new ConfigDescription("Activate your on-kill effects every time this amount of seconds passes", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> OverkillOverdrive_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> OverkillOverdrive_TurretBlacklist() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Turret blacklist"), false, new ConfigDescription("This item has no effect if used by Engineer turrets. Disabled by default", null, Array.Empty<object>())); }
         public ConfigEntry<float> OverkillOverdrive_ZoneIncrease() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Zone size percentage increase"), 20f, new ConfigDescription("How much larger affected zones should be in percentage", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> OverkillOverdrive_AltMode() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Alt mode"), false, new ConfigDescription("Overkill Overdrive no longer affects holdout zones. Instead, it increases area buffs by Percentage Increase * 1.5", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> Overkilloverdrive_EnableHoldouts() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify holdout zones"), true, new ConfigDescription("e.g Teleporter, Pillars", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> Overkilloverdrive_EnableShrineWoods() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify Shrine of the Woods"), true, new ConfigDescription("", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> Overkilloverdrive_EnableFocusCrystal() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify Focus Crystal"), true, new ConfigDescription("", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> Overkilloverdrive_EnableBuffWards() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify buff wards"), true, new ConfigDescription("e.g Warbanner, Spinel Tonic", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> Overkilloverdrive_EnableDeskPlant() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify Interstellar Desk Plant"), true, new ConfigDescription("", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> Overkilloverdrive_EnableBungus() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify Bustling Fungus"), true, new ConfigDescription("", null, Array.Empty<object>())); }
+
         // Legendary
         public ConfigEntry<bool> Apathy_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Apathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> Apathy_Radius() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Radius"), 20f, new ConfigDescription("Radius within which kills contribute to Apathy stacks", null, Array.Empty<object>())); }
@@ -114,7 +121,7 @@ namespace Hex3Mod
         public ConfigEntry<float> ElderMutagen_RegenAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Elder Mutagen", "Regen per species"), 1f, new ConfigDescription("How much hp per second regen should be added for each killed species", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> DoNotEat_Enable() { return Config.Bind<bool>(new ConfigDefinition("Legendary - Do Not Eat", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<float> DoNotEat_PearlChancePerStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Pearl Chance"), 8f, new ConfigDescription("Percent chance that a Pearl or Irradiant Pearl will drop from a chest.", null, Array.Empty<object>())); }
+        public ConfigEntry<float> DoNotEat_PearlChancePerStack() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Pearl Chance"), 10f, new ConfigDescription("Percent chance that a Pearl or Irradiant Pearl will drop from a chest.", null, Array.Empty<object>())); }
         public ConfigEntry<float> DoNotEat_IrradiantChance() { return Config.Bind<float>(new ConfigDefinition("Legendary - Do Not Eat", "Irradiant Pearl Chance"), 20f, new ConfigDescription("Percent chance that an Irradiant Pearl will drop instead of a Pearl.", null, Array.Empty<object>())); }
 
         /*
@@ -198,7 +205,7 @@ namespace Hex3Mod
             if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealthPerHit().Value, Empathy_Radius().Value); }
             if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_PowerElixir().Value, ScavengersPack_DelicateWatch().Value, ScavengersPack_Dios().Value, ScavengersPack_VoidDios().Value, ScavengersPack_RustedKey().Value, ScavengersPack_EncrustedKey().Value, ScavengersPack_FourHundredTickets().Value, ScavengersPack_OneTicket().Value, ScavengersPack_ShopCard().Value, ScavengersPack_CuteBow().Value, ScavengersPack_ClockworkMechanism().Value, ScavengersPack_Vials().Value, ScavengersPack_BrokenChopsticks().Value, ScavengersPack_AbyssalCartridge().Value, ScavengersPack_Singularity().Value); }
             if (TheUnforgivable_Enable().Value == true) { TheUnforgivable.Initiate(TheUnforgivable_Interval().Value); }
-            if (OverkillOverdrive_Enable().Value == true) { OverkillOverdrive.Initiate(OverkillOverdrive_ZoneIncrease().Value, OverkillOverdrive_AltMode().Value); }
+            if (OverkillOverdrive_Enable().Value == true) { OverkillOverdrive.Initiate(OverkillOverdrive_TurretBlacklist().Value, OverkillOverdrive_ZoneIncrease().Value, Overkilloverdrive_EnableHoldouts().Value, Overkilloverdrive_EnableShrineWoods().Value, Overkilloverdrive_EnableFocusCrystal().Value, Overkilloverdrive_EnableBuffWards().Value, Overkilloverdrive_EnableDeskPlant().Value, Overkilloverdrive_EnableBungus().Value); }
             // Legendary
             Log.LogInfo("Legendary");
             if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_Radius().Value, Apathy_MoveSpeedAdd().Value, Apathy_AttackSpeedAdd().Value, Apathy_RegenAdd().Value, Apathy_Duration().Value, Apathy_RequiredKills().Value); }
