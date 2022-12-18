@@ -2,6 +2,7 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using Hex3Mod.Utils;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Networking;
 using UnityEngine.AddressableAssets;
@@ -12,8 +13,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
 using System.Linq;
-using HG;
-using System.Security.Cryptography;
+using EntityStates.Missions.Arena.NullWard;
 
 namespace Hex3Mod.Items
 {
@@ -28,6 +28,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OverkillOverdrivePrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -273,6 +277,11 @@ namespace Hex3Mod.Items
                         holdoutZone.currentRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease / 100f) * count;
                     }
                 }
+
+                // Void fields cells
+                NullWardBaseState.wardRadiusOff = 0.2f + (0.2f * FindTotalMultiplier());
+                NullWardBaseState.wardRadiusOn = 15f + (15f * FindTotalMultiplier());
+                NullWardBaseState.wardWaitingRadius = 5f + (5f * FindTotalMultiplier());
             }
 
             // Shrine of the Forest
@@ -350,13 +359,9 @@ namespace Hex3Mod.Items
                 orig(self);
             }
 
-            // Void Fields Cells?
-
             // Captain Beacons?
 
-            // There is no efficient way to add Sharp Anchor >;(
-
-            if (Overkilloverdrive_EnableHoldouts){ On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable; On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int; }
+            if (Overkilloverdrive_EnableHoldouts) { On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable; On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int; }
             if (Overkilloverdrive_EnableShrineWoods) { On.RoR2.ShrineHealingBehavior.SetWardEnabled += ShrineHealingBehavior_SetWardEnabled; }
             if (Overkilloverdrive_EnableFocusCrystal) { On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged; }
             if (Overkilloverdrive_EnableBuffWards) { On.RoR2.BuffWard.Start += BuffWard_Start; }

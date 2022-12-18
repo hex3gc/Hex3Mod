@@ -5,6 +5,7 @@ using Hex3Mod.HelperClasses;
 using System.Collections.Generic;
 using System.Linq;
 using RoR2;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -21,6 +22,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BloodOfTheLambPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()

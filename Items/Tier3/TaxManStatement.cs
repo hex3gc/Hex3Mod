@@ -2,6 +2,7 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -16,7 +17,11 @@ namespace Hex3Mod.Items
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ShardOfGlassPrefab.prefab");
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()

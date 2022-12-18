@@ -2,6 +2,7 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -17,6 +18,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ATGPrototypePrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -228,41 +233,35 @@ namespace Hex3Mod.Items
         {
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
-                if (damageInfo != null && damageInfo.attacker && damageInfo.attacker.GetComponent<CharacterBody>() != null && damageInfo.attacker.GetComponent<CharacterBody>().inventory != null && damageInfo.procCoefficient > 0f && !damageInfo.procChainMask.HasProc(ProcType.Missile))
+                orig(self, damageInfo, victim);
+                if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody attackerBody) == true && attackerBody.inventory && attackerBody.inventory.GetItemCount(itemDef) > 0 && damageInfo.procCoefficient > 0f && !damageInfo.procChainMask.HasProc(ProcType.Missile) && !damageInfo.rejected && damageInfo.attacker != victim)
                 {
-                    CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-                    Inventory attackerInventory = attackerBody.inventory;
-
                     if (attackerBody.GetBuffCount(atgCounter) == 0)
                     {
                         attackerBody.SetBuffCount(atgCounter.buffIndex, 1);
                     }
-                    if (attackerInventory.GetItemCount(itemDef) > 0 && victim)
+                    attackerBody.AddBuff(atgCounter);
+                    if (attackerBody.GetBuffCount(atgCounter) == hitRequirement)
                     {
-                        attackerBody.AddBuff(atgCounter);
-                        if (attackerBody.GetBuffCount(atgCounter) == hitRequirement)
-                        {
-                            Util.PlaySound("Play_bandit2_m1_reload_bullet", damageInfo.attacker);
-                        }
-                        if (attackerBody.GetBuffCount(atgCounter) >= (hitRequirement + 1))
-                        {
-                            float damageCoefficient = atgDamageStack * (float)attackerInventory.GetItemCount(itemDef);
-                            float missileDamage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);
-                            MissileUtils.FireMissile(
-                                attackerBody.corePosition, 
-                                attackerBody, 
-                                damageInfo.procChainMask, 
-                                victim, 
-                                missileDamage, 
-                                damageInfo.crit, 
-                                GlobalEventManager.CommonAssets.missilePrefab, 
-                                DamageColorIndex.Item, 
-                                true);
-                            attackerBody.SetBuffCount(atgCounter.buffIndex, 1);
-                        }
+                        Util.PlaySound("Play_bandit2_m1_reload_bullet", damageInfo.attacker);
+                    }
+                    if (attackerBody.GetBuffCount(atgCounter) >= (hitRequirement + 1))
+                    {
+                        float damageCoefficient = atgDamageStack * (float)attackerBody.inventory.GetItemCount(itemDef);
+                        float missileDamage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);
+                        MissileUtils.FireMissile(
+                            attackerBody.corePosition,
+                            attackerBody,
+                            damageInfo.procChainMask,
+                            victim,
+                            missileDamage,
+                            damageInfo.crit,
+                            GlobalEventManager.CommonAssets.missilePrefab,
+                            DamageColorIndex.Item,
+                            true);
+                        attackerBody.SetBuffCount(atgCounter.buffIndex, 1);
                     }
                 }
-                orig(self, damageInfo, victim);
             };
         }
 

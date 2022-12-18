@@ -7,6 +7,7 @@ using UnityEngine.PlayerLoop;
 using RoR2.Achievements;
 using UnityEngine.AddressableAssets;
 using RoR2.Items;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -22,6 +23,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MinersHelmetPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()

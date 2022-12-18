@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.Diagnostics;
 using System.ComponentModel;
 using EntityStates.AffixVoid;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -25,6 +26,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OneTicketPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -398,13 +403,13 @@ namespace Hex3Mod.Items
             // Spawn enemies as Perfected elites
             void CharacterBody_Start(On.RoR2.CharacterBody.orig_Start orig, CharacterBody self)
             {
+                orig(self);
                 int ticketsInExistence = Util.GetItemCountGlobal(itemDef.itemIndex, true);
                 if (ticketsInExistence > 0 && self.inventory && self.teamComponent && (self.teamComponent.teamIndex == TeamIndex.Monster || self.teamComponent.teamIndex == TeamIndex.Lunar || self.teamComponent.teamIndex == TeamIndex.Void))
                 {
                     self.inventory.SetEquipmentIndex(RoR2Content.Equipment.AffixLunar.equipmentIndex);
                     self.isElite = true;
                 }
-                orig(self);
             }
 
             // Prevents Cripple while holding

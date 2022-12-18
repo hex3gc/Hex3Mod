@@ -5,6 +5,7 @@ using System;
 using Hex3Mod.HelperClasses;
 using UnityEngine.PlayerLoop;
 using UnityEngine.AddressableAssets;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -19,6 +20,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/EmpathyPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -225,7 +230,7 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cEvent>//--AUTO-TRANSCRIPTION FROM UES [Redacted] --//</style>\n\n\"Oh yeah? How does this one work?\"\n\n\"Nanomachines. In response to physical trauma to the body, they get to work immediately and start patching up the wound. They're so tiny you don't even feel it happening.\"\n\n\"Is that... safe?\"\n\n\"What?\"\n\n\"A bunch of little robots in your bloodstream? There's no way that's never caused a problem.\"\n\n\"Well, maybe twenty years ago. It's 2055, technology has come far.\"\n\n\"Huh.\"\n\n\"...Although,\"\n\n\"See, I'm not putting that in my body.\"\n\n\"No, it's no big deal! But- these bots have been known to 'overcorrect'. They operate on a shared network, meaning that if- you and I, for example- both use the same group, then when -you- get hurt, the bots will think I'm hurt too!\"\n\n\"Meaning?\"\n\n\"It's unpredictable, but fascinating. If you get hurt and my body is healthy, they'll still try to 'fix' me, so they'll begin to look for inefficiencies and redundancies. They'll begin removing unneeded vestiges and replacing them with something useful, and when they're done with that, they'll begin creating something new. It's been known to happen-- they'll grow fresh organs that deal with the function of your heart or your liver but using ten times less energy and ten times less space. They'll begin re-organizing everything in your body, and they'll make your skeleton stronger while they're at it. So, really, they're quite helpful.\"\n\n\"And we only have one of these between us.\"\n\n\"Yes.\"\n\n\"...\"\n\n\"...\"\n\n\"I think I'll do the mission alone.\"");
         }
 
-        private static void AddHooks(ItemDef itemDef, float Empathy_HealthPerHit, float Empathy_Radius)
+        private static void AddHooks(ItemDef itemDef, float Empathy_HealthPerHit, float Empathy_Radius, float OverkillOverdrive_ZoneIncrease)
         {
             // Add/remove radius indicator on inventory change
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
@@ -243,10 +248,9 @@ namespace Hex3Mod.Items
                         numberOfOverdrives = self.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
                     }
 
-                    // Overdrive radius increase set to 0.2, find a way to match with config
                     EmpathyBehavior behavior = self.GetComponent<EmpathyBehavior>();
-                    behavior.radius = Empathy_Radius + (Empathy_Radius * (0.2f * numberOfOverdrives));
-                    behavior.sizeAddMultiplier = 0.2f * numberOfOverdrives;
+                    behavior.radius = Empathy_Radius + (Empathy_Radius * ((OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives));
+                    behavior.sizeAddMultiplier = (OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives;
                     behavior.focusCrystalSizeDivisor = Empathy_Radius / 13f;
                     behavior.enable = true;
                 }
@@ -273,10 +277,9 @@ namespace Hex3Mod.Items
                             {
                                 numberOfOverdrives = ally.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
                             }
-                            // Overdrive radius increase set to 0.2, find a way to match with config
-                            if (enemyDistanceVector.sqrMagnitude <= (float)Math.Pow(Empathy_Radius + (Empathy_Radius * (0.2 * numberOfOverdrives)), 2))
+                            if (enemyDistanceVector.sqrMagnitude <= (float)Math.Pow(Empathy_Radius + (Empathy_Radius * ((OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives)), 2))
                             {
-                                ally.body.healthComponent.Heal(2f * damageInfo.procCoefficient, new ProcChainMask());
+                                ally.body.healthComponent.Heal(Empathy_HealthPerHit * damageInfo.procCoefficient, new ProcChainMask());
                             }
                         }
                     }
@@ -323,11 +326,11 @@ namespace Hex3Mod.Items
             }
         }
 
-        public static void Initiate(float Empathy_HealthPerHit, float Empathy_Radius)
+        public static void Initiate(float Empathy_HealthPerHit, float Empathy_Radius, float OverkillOverdrive_ZoneIncrease)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(Empathy_HealthPerHit, Empathy_Radius);
-            AddHooks(itemDefinition, Empathy_HealthPerHit, Empathy_Radius);
+            AddHooks(itemDefinition, Empathy_HealthPerHit, Empathy_Radius, OverkillOverdrive_ZoneIncrease);
         }
     }
 }

@@ -3,6 +3,7 @@ using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using UnityEngine.AddressableAssets;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -18,6 +19,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BalancePrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -256,6 +261,7 @@ namespace Hex3Mod.Items
                         body.GetBuffCount(BuffCatalog.FindBuffIndex("bdWeak")) +
                         body.GetBuffCount(BuffCatalog.FindBuffIndex("bdSlow30")) +
                         body.GetBuffCount(BuffCatalog.FindBuffIndex("bdClayGoo")) +
+                        body.GetBuffCount(BuffCatalog.FindBuffIndex("bdArmorBoost ")) + // Power mode
                         body.GetBuffCount(BuffCatalog.FindBuffIndex("bdJailerSlow"));
                     int stopDebuffCount = body.GetBuffCount(BuffCatalog.FindBuffIndex("bdEntangle")) +
                         body.GetBuffCount(BuffCatalog.FindBuffIndex("bdLunarSecondaryRoot")) +

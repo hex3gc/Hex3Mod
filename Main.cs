@@ -11,7 +11,6 @@ using Hex3Mod.Items;
 using Hex3Mod.Artifacts;
 using Hex3Mod.Logging;
 using Hex3Mod.HelperClasses;
-using BetterUI;
 
 namespace Hex3Mod
 {
@@ -24,13 +23,18 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "2.0.3";
+        public const string ModVer = "2.0.4";
+
+        public static bool debugMode = false; // DISABLE BEFORE BUILD
 
         public static AssetBundle MainAssets;
 
         public static Dictionary<string, string> ShaderLookup = new Dictionary<string, string>() // Strings of stubbed vs. real shaders
         {
-            {"stubbed hopoo games/deferred/standard", "shaders/deferred/hgstandard"}
+            {"stubbed hopoo games/deferred/standard", "shaders/deferred/hgstandard"},
+            {"stubbed hopoo games/fx/cloud intersection remap", "shaders/fx/hgintersectioncloudremap"},
+            {"stubbed hopoo games/fx/cloud remap", "shaders/fx/hgcloudremap"},
+            {"stubbed hopoo games/fx/opaque cloud remap", "shaders/fx/hgopaquecloudremap"}
         };
 
         public static ManualLogSource logger;
@@ -106,7 +110,7 @@ namespace Hex3Mod
         public ConfigEntry<float> Apathy_Radius() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Radius"), 20f, new ConfigDescription("Radius within which kills contribute to Apathy stacks", null, Array.Empty<object>())); }
         public ConfigEntry<float> Apathy_MoveSpeedAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Buff move speed multiplier"), 1f, new ConfigDescription("Move speed multiplier added while buffed", null, Array.Empty<object>())); }
         public ConfigEntry<float> Apathy_AttackSpeedAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Buff attack speed multiplier"), 1f, new ConfigDescription("Attack speed multiplier added while buffed", null, Array.Empty<object>())); }
-        public ConfigEntry<float> Apathy_RegenAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Buff regen added"), 15f, new ConfigDescription("Regen hp/second added while buffed", null, Array.Empty<object>())); }
+        public ConfigEntry<float> Apathy_RegenAdd() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Buff regen added"), 20f, new ConfigDescription("Regen hp/second added while buffed", null, Array.Empty<object>())); }
         public ConfigEntry<float> Apathy_Duration() { return Config.Bind<float>(new ConfigDefinition("Legendary - Apathy", "Buff duration"), 5f, new ConfigDescription("Duration of buff", null, Array.Empty<object>())); }
         public ConfigEntry<int> Apathy_RequiredKills() { return Config.Bind<int>(new ConfigDefinition("Legendary - Apathy", "Kills required for buff"), 15, new ConfigDescription("Required stacks of Apathy to trigger buff", null, Array.Empty<object>())); }
 
@@ -202,13 +206,13 @@ namespace Hex3Mod
             // Uncommon
             Log.LogInfo("Uncommon");
             if (ScatteredReflection_Enable().Value == true){ ScatteredReflection.Initiate(ScatteredReflection_DamageReflectPercent().Value, ScatteredReflection_DamageReflectShardStack().Value, ScatteredReflection_DamageReflectBonus().Value); }
-            if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealthPerHit().Value, Empathy_Radius().Value); }
+            if (Empathy_Enable().Value == true){ Empathy.Initiate(Empathy_HealthPerHit().Value, Empathy_Radius().Value, OverkillOverdrive_ZoneIncrease().Value); }
             if (ScavengersPack_Enable().Value == true) { ScavengersPack.Initiate(ScavengersPack_Uses().Value, ScavengersPack_PowerElixir().Value, ScavengersPack_DelicateWatch().Value, ScavengersPack_Dios().Value, ScavengersPack_VoidDios().Value, ScavengersPack_RustedKey().Value, ScavengersPack_EncrustedKey().Value, ScavengersPack_FourHundredTickets().Value, ScavengersPack_OneTicket().Value, ScavengersPack_ShopCard().Value, ScavengersPack_CuteBow().Value, ScavengersPack_ClockworkMechanism().Value, ScavengersPack_Vials().Value, ScavengersPack_BrokenChopsticks().Value, ScavengersPack_AbyssalCartridge().Value, ScavengersPack_Singularity().Value); }
             if (TheUnforgivable_Enable().Value == true) { TheUnforgivable.Initiate(TheUnforgivable_Interval().Value); }
             if (OverkillOverdrive_Enable().Value == true) { OverkillOverdrive.Initiate(OverkillOverdrive_TurretBlacklist().Value, OverkillOverdrive_ZoneIncrease().Value, Overkilloverdrive_EnableHoldouts().Value, Overkilloverdrive_EnableShrineWoods().Value, Overkilloverdrive_EnableFocusCrystal().Value, Overkilloverdrive_EnableBuffWards().Value, Overkilloverdrive_EnableDeskPlant().Value, Overkilloverdrive_EnableBungus().Value); }
             // Legendary
             Log.LogInfo("Legendary");
-            if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_Radius().Value, Apathy_MoveSpeedAdd().Value, Apathy_AttackSpeedAdd().Value, Apathy_RegenAdd().Value, Apathy_Duration().Value, Apathy_RequiredKills().Value); }
+            if (Apathy_Enable().Value == true){ Apathy.Initiate(Apathy_Radius().Value, Apathy_MoveSpeedAdd().Value, Apathy_AttackSpeedAdd().Value, Apathy_RegenAdd().Value, Apathy_Duration().Value, Apathy_RequiredKills().Value, OverkillOverdrive_ZoneIncrease().Value); }
             if (MintCondition_Enable().Value == true){ MintCondition.Initiate(MintCondition_MoveSpeed().Value, MintCondition_MoveSpeedStack().Value, MintCondition_AddJumps().Value, MintCondition_AddJumpsStack().Value); }
             if (ElderMutagen_Enable().Value == true){ ElderMutagen.Initiate(ElderMutagen_MaxHealthAdd().Value, ElderMutagen_RegenAdd().Value); }
             if (DoNotEat_Enable().Value == true) { DoNotEat.Initiate(DoNotEat_PearlChancePerStack().Value, DoNotEat_IrradiantChance().Value); }

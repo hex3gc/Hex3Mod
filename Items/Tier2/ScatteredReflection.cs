@@ -3,6 +3,7 @@ using RoR2;
 using RoR2.Orbs;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -18,6 +19,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -232,8 +237,8 @@ namespace Hex3Mod.Items
             float ScatteredReflection_DamageReflectBonus_Readable = ScatteredReflection_DamageReflectBonus * 100f;
 
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Scattered Reflection");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Reflect some of the damage you take back to attackers. Reflect more with each <style=cWorldEvent>Shard Of Glass</style> you own.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Reflect {0}% of all received damage</style> back to your attacker, magnifying it by <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style>. For every <style=cIsUtility>Shard Of Glass</style> in your inventory, <style=cIsUtility>reflect {2}%</style> <style=cStack>(+{2}% per stack)</style> <style=cIsUtility>more damage</style>.", ScatteredReflection_DamageReflectPercent_Readable, ScatteredReflection_DamageReflectBonus_Readable, ScatteredReflection_DamageReflectShardStack_Readable));
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Block and reflect some of the damage you take back to attackers. Reflect more with each <style=cWorldEvent>Shard Of Glass</style> you own.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Block and reflect {0}% of all received damage</style> back to your attacker, magnifying it by <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style>. For every <style=cIsUtility>Shard Of Glass</style> in your inventory, <style=cIsUtility>reflect {2}%</style> <style=cStack>(+{2}% per stack)</style> <style=cIsUtility>more damage</style>.", ScatteredReflection_DamageReflectPercent_Readable, ScatteredReflection_DamageReflectBonus_Readable, ScatteredReflection_DamageReflectShardStack_Readable));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "An aggregate of shattered souls\n\nLost to the wind and to time\n\nThey form a ward to protect you\n\nThe only one they can follow home");
         }
 

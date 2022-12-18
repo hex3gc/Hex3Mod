@@ -7,6 +7,7 @@ using static Hex3Mod.Items.Empathy;
 using UnityEngine.AddressableAssets;
 using static RoR2.NetworkSession;
 using HG;
+using Hex3Mod.Utils;
 
 namespace Hex3Mod.Items
 {
@@ -21,6 +22,10 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
+            if (Main.debugMode == true)
+            {
+                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+            }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
@@ -260,7 +265,7 @@ namespace Hex3Mod.Items
                 );
         }
 
-        private static void AddHooks(ItemDef itemDef, float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills)
+        private static void AddHooks(ItemDef itemDef, float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills, float OverkillOverdrive_ZoneIncrease)
         {
             // Add/remove radius indicator on inventory change
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
@@ -278,10 +283,9 @@ namespace Hex3Mod.Items
                         numberOfOverdrives = self.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
                     }
 
-                    // Overdrive radius increase set to 0.2, find a way to match with config
                     ApathyBehavior behavior = self.GetComponent<ApathyBehavior>();
-                    behavior.radius = Apathy_Radius + (Apathy_Radius * (0.2f * numberOfOverdrives));
-                    behavior.sizeAddMultiplier = 0.2f * numberOfOverdrives;
+                    behavior.radius = Apathy_Radius + (Apathy_Radius * ((OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives));
+                    behavior.sizeAddMultiplier = (OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives;
                     behavior.focusCrystalSizeDivisor = Apathy_Radius / 13f;
                     behavior.enable = true;
                 }
@@ -305,8 +309,7 @@ namespace Hex3Mod.Items
                     {
                         numberOfOverdrives = apathyOwner.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
                     }
-                    // Overdrive radius increase set to 0.2, find a way to match with config
-                    if (deathDistanceVector.sqrMagnitude <= (float)Math.Pow(Apathy_Radius + (Apathy_Radius * (0.2 * numberOfOverdrives)), 2) && apathyOwner.body.GetBuffCount(apathyBuff) <= 0)
+                    if (deathDistanceVector.sqrMagnitude <= (float)Math.Pow(Apathy_Radius + (Apathy_Radius * ((OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives)), 2) && apathyOwner.body.GetBuffCount(apathyBuff) <= 0)
                     {
                         apathyOwner.body.AddBuff(apathyStacks);
                         if (apathyOwner.body.GetBuffCount(apathyStacks) >= Apathy_RequiredKills)
@@ -435,12 +438,12 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(apathyBuff);
         }
 
-        public static void Initiate(float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills)
+        public static void Initiate(float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills, float OverkillOverdrive_ZoneIncrease)
         {
             ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
             AddTokens(Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills);
             AddBuffs();
-            AddHooks(itemDefinition, Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills);
+            AddHooks(itemDefinition, Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills, OverkillOverdrive_ZoneIncrease);
         }
     }
 }
