@@ -19,21 +19,24 @@ namespace Hex3Mod.Items
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ElderMutagenPrefab.prefab");
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ElderMutagen.prefab");
             if (Main.debugMode == true)
             {
-                pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+                foreach (Renderer renderer in pickupModelPrefab.GetComponentsInChildren<Renderer>())
+                {
+                    renderer.gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
+                }
             }
             return pickupModelPrefab;
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ElderMutagen.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ElderMutagen.png");
             return pickupIconSprite;
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ElderMutagen.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_Mutagen.png");
             return pickupIconSprite;
         }
         public static ItemDef CreateItem()
@@ -336,7 +339,7 @@ namespace Hex3Mod.Items
         public static void AddBuffs() // Visual indicator of Apathy stacks
         {
             mutagenStacks = ScriptableObject.CreateInstance<BuffDef>();
-            mutagenStacks.buffColor = new Color(1f, 1f, 1f);
+            mutagenStacks.buffColor = new Color(0.796f, 0.192f, 0.086f);
             mutagenStacks.canStack = true;
             mutagenStacks.isDebuff = false;
             mutagenStacks.name = "Elder Mutagen Stacks";

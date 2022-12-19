@@ -329,14 +329,10 @@ namespace Hex3Mod.Items
                     {
                         body.SetBuffCount(ticketStacks.buffIndex, body.inventory.GetItemCount(hiddenItemDef));
                     }
-                    else
-                    {
-                        body.RemoveBuff(ticketStacks.buffIndex);
-                    }
                 }
-                else
+                if (body.inventory && body.inventory.GetItemCount(itemDef) <= 0 && body.GetBuffCount(ticketStacks.buffIndex) > 0)
                 {
-                    body.RemoveBuff(ticketStacks.buffIndex);
+                    body.SetBuffCount(ticketStacks.buffIndex, 0);
                 }
 
                 int ticketsInExistence = Util.GetItemCountGlobal(itemDef.itemIndex, true);

@@ -19,15 +19,15 @@ Adds 1 artifact and 25 new items to the game:
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044935829660905492/Balance.png?raw=true" width=128> | **Balance**<br>Gain a maximum **20% chance to dodge attacks** (+20% per stack, hyperbolic) **the slower you're moving:** **Full chance** while not moving, **half chance** while walking or receiving a speed debuff, and **no chance** while freely sprinting. Unaffected by luck. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044761356659851274/MinersHelmet.png?raw=true" width=128> | **Miner's Helmet**<br>**Every time you earn $25** <sup>(Scaling with time)</sup>, reduce your **skill cooldowns** by **2** seconds <sup>(+2 per stack)</sup>. | <details><summary>Unlock</summary>Carry enough money to buy 3 legendary chests.</details> |
 | | <p align="center">**UNCOMMON**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890711711774/Empathy.png?raw=true" width=128> | **Empathy**<br>**When an enemy takes damage within 20m** of you, heal for **4 hp** <sup>(+4 per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1053878386017185842/Empathy.png?raw=true" width=128> | **Empathy**<br>**When an enemy takes damage within 20m** of you, heal for **4 hp** <sup>(+4 per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Block and reflect 7% of all received damage** back to your attacker, magnifying it by **700%** <sup>(+700% per stack)</sup>. For every **Shard Of Glass** in your inventory, **reflect 0.7%** <sup>(+0.7% per stack)</sup> **more damage**. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/985265706620829716/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pack**<br>When an item is **consumed or broken**, **replace it** with a brand new one. This may occur up to **2** times before the pack is empty. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188497302454312/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pouch**<br>When an item is **consumed or broken**, **replace it** with a brand new one. This may occur up to **2** times before the pouch is empty. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555785277452410/TheUnforgivable.png?raw=true" width=128> | **The Unforgivable**<br>Activate your **on-kill effects** at your location **once** <sup>(+1 per stack)</sup> every **8** seconds. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1047947959779725312/OverkillOverdrive.png?raw=true" width=128> | **Overkill Overdrive**<br>Amplify the radius of your **area buffs** and **holdout zones** by **20%** <sup>(+20% per stack)</sup>. |
 | | <p align="center">**LEGENDARY**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>**When an enemy dies within 20m** of you, gain a stack of **Apathy**. After reaching **15** stacks, **enter a frenzy** which grants you **+100% movement speed**, **attack speed** and **20 hp/s of regeneration** for **5 seconds** <sup>(+5s per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>**Provides immunity to movement restricting status effects**. Gain **20%** movement speed <sup>(+40% per stack)</sup> and **1** <sup>(+2 per stack)</sup> extra jumps. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987696594974/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **4% max health** and **1 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188496866254868/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **4% max health** and **1 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **10%** <sup>(+10% per stack)</sup> chance to also contain a **Pearl** or an **Irradiant Pearl**. |
 | | <p align="center">**VOID**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>At the start of each stage, **1 random item will be corrupted into its void equivalent** <sup>(+1 per stack)</sup>. | <details><summary>Unlock</summary>Enter the Deep Void.</details> |
@@ -51,6 +51,15 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 * Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
 
 # Changelog
+
+### 2.0.5
+I am currently in the process of re-modelling each of this mod's items, because some of them were rushed and I'd like for the mod to have a more complete visual style. These changes will come out gradually along with some fixes once I have time to investigate the more annoying bugs.
+* **Revamped VFX** for Empathy
+* **Revamped VFX** for Scavenger's Pack: Now named Scavenger's Pouch
+* **Revamped VFX** for Elder Mutagen
+* Updated to latest R2API version, but item displays won't work for a bit.
+* Overkill Overdrive's Bustling Fungus and Focus Crystal buffs are now automatically disabled while UltimateCustomRun or VanillaRebalance are present, to avoid conflicts.
+* Fixed One Ticket spamming the logs (I think)
 
 ### 2.0.4
 * <details><summary>Apathy default regen boost 15 hp/s -> 20 hp/s</summary>Apathy's regen only occurs for 5 seconds at a time, so its effects shouldn't feel underwhelming. Might change more if necessary.</details>

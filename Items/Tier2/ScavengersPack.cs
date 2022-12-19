@@ -10,18 +10,18 @@ using Hex3Mod.Utils;
 namespace Hex3Mod.Items
 {
     /*
-    Rewrite of Scavenger's Pack that tightens its functionality. It was seriously bloated...
+    It's a pouch now!
     */
     public class ScavengersPack
     {
-        static string itemName = "ScavengersPack";
+        static string itemName = "ScavengersPouch";
         static string upperName = itemName.ToUpper();
         static ItemDef itemDefinition = CreateItem();
         public static ItemDef consumedItemDefinition = CreateConsumedItem();
         public static ItemDef hiddenItemDefinition = CreateHiddenItem();
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScavengersPackPrefab.prefab");
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
             if (Main.debugMode == true)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
@@ -30,12 +30,12 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ScavengersPack.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ScavengersPack.png");
             return pickupIconSprite;
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ScavengersPack.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_ScavengersPack.png");
             return pickupIconSprite;
         }
         public static ItemDef CreateItem()
@@ -72,8 +72,8 @@ namespace Hex3Mod.Items
             item.canRemove = false;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScavengersPackPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ScavengersPackConsumed.png");
+            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
+            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ScavengersPackConsumed.png");
 
             return item;
         }
@@ -271,25 +271,31 @@ namespace Hex3Mod.Items
 
         public static void AddTokens(int ScavengersPack_Uses)
         {
-            LanguageAPI.Add("H3_" + upperName + "_NAME", "Scavenger's Pack");
+            LanguageAPI.Add("H3_" + upperName + "_NAME", "Scavenger's Pouch");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "When an item is consumed, replace it with a brand new one. Occurs up to " + ScavengersPack_Uses + " times.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed or broken</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pack is empty.", ScavengersPack_Uses));
-            LanguageAPI.Add("H3_" + upperName + "_LORE", "\"What are these?\"" +
-            "\n\n\"I think they're... Eclipse sneakers?\"" +
-            "\n\nAlex and Jolene had just cleaned up following their daily slaughter of local wildlife. The more keen-eyed of the two had discovered something lying on the ground beside one of the bodies, and insisted that Jolene (the stronger of the two) take it back to their ship. What she had found turned out to be a small pouch full of knick-knacks and artifacts, all with seemingly no purpose." +
-            "\n\n\"Maybe he was a collector. Those things go for thousands, you know?\"" +
-            "\n\n\"But there's also a teddy bear in here... and-\" Alex slid her railgun aside, allowing more space on the table to pour out the satchel's contents. \"A bag of mushrooms, couple of drumsticks, a credit card, some feathers-\"" +
-            "\n\nAlex felt a foreign poking at her arm, and she nearly jumped out of her seat. Jolene chuckled and revealed the device. \"Lookit these, little grabby arms!\"" +
-            "\n\n\"I'd prefer you keep those in the bag. Also, don't drink this, please.\" She pointed at a flask full of strange, dark liquid. Jolene was taken aback." +
-            "\n\n\"You really think I'd drink that?\"" +
-            "\n\n\"Yes.\"" +
-            "\n\n\"I mean... what does it smell like?\"" +
-            "\n\nAlex continued her search until she was interrupted by an unusual feeling. Something at the very back of the bag was beckoning her-- beckoning her inside. First, she inserted an arm, and then the other. As if possessed, she crept over the table, her head now entering the mouth of the bag which had so kindly invited her." +
-            "\n\nJolene grimaced at the tonic's strong taste, but soon noticed that something else was off. Namely that her friend had vanished." +
-            "\n\n\"Alex?\""
+            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed or broken</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pouch is empty.", ScavengersPack_Uses));
+            LanguageAPI.Add("H3_" + upperName + "_LORE", "========================================\n" +
+            "====   MyBabel Machine Translator   ====\n" +
+            "====     [Version 12.45.1.010 ]   ======\n" +
+            "========================================\n" +
+            "Training… <100000000 cycles>\n" +
+            "Training… <100000000 cycles>\n" +
+            "Training... <100000000 cycles>\n" +
+            "Training... <102515 cycles>\n" +
+            "Complete!\n" +
+            "Display result? Y/N\n" +
+            "Y\n" +
+            "========================================\n\n" +
+            "I love my stuff.\n\n" +
+            "I don't have many friends. Other Scavengers think I'm too small and that I don't have enough things. Can't they see that it's not about how many things you have, but how valuable they are?\n\n" +
+            "I only have three things. I guess I'm a little picky.\n\n" +
+            "One of them is a cool blob I found. It makes me feel strong even when times are looking tough.\n\n" +
+            "One of them is a yellow box with wires sticking out. I can plug it into things and watch them get ten times more powerful.\n\n" +
+            "The last is a helmet with a light on it. I don't know why, but it makes me feel rich even though I don't have much.\n\n" +
+            "I bet those other Scavengers couldn't find anything half as good as my stuff!"
             );
 
-            LanguageAPI.Add("H3_" + upperName + "CONSUMED_NAME", "Empty Pack");
+            LanguageAPI.Add("H3_" + upperName + "CONSUMED_NAME", "Empty Pouch");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "No longer useful.");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer useful.");
         }
@@ -400,10 +406,10 @@ namespace Hex3Mod.Items
         public static void AddBuffs() // Shows how many uses are left in a pack
         {
             scavengerUses = ScriptableObject.CreateInstance<BuffDef>();
-            scavengerUses.buffColor = new Color(1f, 1f, 1f);
+            scavengerUses.buffColor = new Color(0.855f, 0.761f, 0.529f);
             scavengerUses.canStack = true;
             scavengerUses.isDebuff = false;
-            scavengerUses.name = "Scavenger's Pack Uses Left";
+            scavengerUses.name = "Scavenger's Pouch Uses Left";
             scavengerUses.isHidden = false;
             scavengerUses.isCooldown = false;
             scavengerUses.iconSprite = LoadBuffSprite();

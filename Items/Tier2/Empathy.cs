@@ -19,7 +19,7 @@ namespace Hex3Mod.Items
         static ItemDef itemDefinition = CreateItem();
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/EmpathyPrefab.prefab");
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/EmpathyPrefab.prefab");
             if (Main.debugMode == true)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
@@ -28,7 +28,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Empathy.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Empathy.png");
             return pickupIconSprite;
         }
         static GameObject FocusCrystalPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion();

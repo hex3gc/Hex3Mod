@@ -15,15 +15,21 @@ using Hex3Mod.HelperClasses;
 namespace Hex3Mod
 {
     [BepInPlugin(ModGuid, ModName, ModVer)]
-    [BepInDependency(R2API.R2API.PluginGUID, R2API.R2API.PluginVersion)]
+    [BepInDependency("com.bepis.r2api", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.bepis.r2api.content_management", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.bepis.r2api.items", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.bepis.r2api.language", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.bepis.r2api.prefab", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("com.bepis.r2api.recalculatestats", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("Hayaku.VanillaRebalance", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("HIFU.UltimateCustomRun", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(VoidItemAPI.VoidItemAPI.MODGUID)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
-    [R2APISubmoduleDependency(nameof(ItemAPI), nameof(LanguageAPI), nameof(RecalculateStatsAPI), nameof(PrefabAPI))]
     public class Main : BaseUnityPlugin
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "2.0.4";
+        public const string ModVer = "2.0.5";
 
         public static bool debugMode = false; // DISABLE BEFORE BUILD
 
@@ -73,24 +79,24 @@ namespace Hex3Mod
         public ConfigEntry<float> Empathy_HealthPerHit() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Health per hit"), 4f, new ConfigDescription("Health points restored when an enemy is hit within radius", null, Array.Empty<object>())); }
         public ConfigEntry<float> Empathy_Radius() { return Config.Bind<float>(new ConfigDefinition("Uncommon - Empathy", "Zone radius"), 20f, new ConfigDescription("Radius of activation zone in meters", null, Array.Empty<object>())); }
 
-        public ConfigEntry<bool> ScavengersPack_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
-        public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pack", "Maximum uses"), 2, new ConfigDescription("Times the Scavenger's Pack can be used before breaking.", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_RegenScrap() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Regenerating Scrap"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_PowerElixir() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Power Elixir"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_DelicateWatch() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Delicate Watch"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_Dios() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Dios Best Friend"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_VoidDios() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLA: Pluripotent Larva"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_RustedKey() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "WOLFO QOL: Rusted Key"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_EncrustedKey() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "WOLFO QOL: Encrusted Key"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_FourHundredTickets() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "HEX3MOD: 400 Tickets"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_OneTicket() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "HEX3MOD: One Ticket"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_ShopCard() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "MYSTICS ITEMS: Platinum Card"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_CuteBow() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "MYSTICS ITEMS: Cutesy Bow"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_ClockworkMechanism() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLAVOID: Clockwork Mechanism"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_Vials() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "VANILLAVOID: Enhancement Vials"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_BrokenChopsticks() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "HOLYCRAPFORKISBACK: Sharp Chopsticks"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_AbyssalCartridge() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "SPIKESTRIP: Abyssal Cartridge"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
-        public ConfigEntry<bool> ScavengersPack_Singularity() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pack", "SPIKESTRIP: Singularity"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
+        public ConfigEntry<int> ScavengersPack_Uses() { return Config.Bind<int>(new ConfigDefinition("Uncommon - Scavengers Pouch", "Maximum uses"), 2, new ConfigDescription("Times the Scavenger's Pouch can be used before being emptied.", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_RegenScrap() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Regenerating Scrap"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_PowerElixir() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Power Elixir"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_DelicateWatch() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Delicate Watch"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_Dios() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Dios Best Friend"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_VoidDios() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Pluripotent Larva"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_RustedKey() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "WOLFO QOL: Rusted Key"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_EncrustedKey() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "WOLFO QOL: Encrusted Key"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_FourHundredTickets() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "HEX3MOD: 400 Tickets"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_OneTicket() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "HEX3MOD: One Ticket"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_ShopCard() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "MYSTICS ITEMS: Platinum Card"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_CuteBow() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "MYSTICS ITEMS: Cutesy Bow"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_ClockworkMechanism() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLAVOID: Clockwork Mechanism"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_Vials() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLAVOID: Enhancement Vials"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_BrokenChopsticks() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "HOLYCRAPFORKISBACK: Sharp Chopsticks"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_AbyssalCartridge() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "SPIKESTRIP: Abyssal Cartridge"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
+        public ConfigEntry<bool> ScavengersPack_Singularity() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - Scavengers Pouch", "SPIKESTRIP: Singularity"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>())); }
 
         public ConfigEntry<bool> TheUnforgivable_Enable() { return Config.Bind<bool>(new ConfigDefinition("Uncommon - The Unforgivable", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs.", null, Array.Empty<object>())); }
         public ConfigEntry<float> TheUnforgivable_Interval() { return Config.Bind<float>(new ConfigDefinition("Uncommon - The Unforgivable", "Activation interval"), 8f, new ConfigDescription("Activate your on-kill effects every time this amount of seconds passes", null, Array.Empty<object>())); }
@@ -192,6 +198,11 @@ namespace Hex3Mod
                     material.shader = replacementShader;
                 }
             }
+
+            if (UltimateCustomRunCompatibility.enabled == true) { Log.LogInfo("Detected Ultimate Custom Run soft dependency"); }
+            else { Log.LogInfo("Did not detect Ultimate Custom Run soft dependency"); }
+            if (VanillaRebalanceCompatibility.enabled == true) { Log.LogInfo("Detected VanillaRebalance soft dependency"); }
+            else { Log.LogInfo("Did not detect VanillaRebalance soft dependency"); }
 
             Log.LogInfo("Initializing items...");
             // Common

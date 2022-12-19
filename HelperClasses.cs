@@ -35,4 +35,34 @@ namespace Hex3Mod.HelperClasses
         }
 
     }
+    public static class UltimateCustomRunCompatibility
+    {
+        private static bool? _enabled;
+        public static bool enabled
+        {
+            get
+            {
+                if (_enabled == null)
+                {
+                    _enabled = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("HIFU.UltimateCustomRun");
+                }
+                return (bool)_enabled;
+            }
+        }
+    }
+    public static class VanillaRebalanceCompatibility
+    {
+        private static bool? _enabled;
+        public static bool enabled
+        {
+            get
+            {
+                if (_enabled == null)
+                {
+                    _enabled = BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("Hayaku.VanillaRebalance");
+                }
+                return (bool)_enabled;
+            }
+        }
+    }
 }

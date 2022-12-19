@@ -298,7 +298,7 @@ namespace Hex3Mod.Items
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
                 orig(self);
-                if (self.TryGetComponent(out NearbyDamageBonusBodyBehavior behavior) == true && behavior.isActiveAndEnabled)
+                if (self.TryGetComponent(out NearbyDamageBonusBodyBehavior behavior) == true && behavior.isActiveAndEnabled && !UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
                 {
                     float scaledSize = 1 + (1 * FindTotalMultiplier());
                     behavior.nearbyDamageBonusIndicator.transform.localScale = new Vector3(scaledSize, scaledSize, scaledSize);
@@ -306,19 +306,22 @@ namespace Hex3Mod.Items
             }
             if (Overkilloverdrive_EnableFocusCrystal)
             {
-                IL.RoR2.HealthComponent.TakeDamage += (il) =>
+                if (!UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
                 {
-                    ILCursor ilcursor = new(il);
-                    if (ilcursor.TryGotoNext(MoveType.Before,
-                        x => x.MatchLdcR4(169f)))
+                    IL.RoR2.HealthComponent.TakeDamage += (il) =>
                     {
-                        ilcursor.Remove();
-                        ilcursor.EmitDelegate<Func<float>>(() =>
+                        ILCursor ilcursor = new(il);
+                        if (ilcursor.TryGotoNext(MoveType.Before,
+                            x => x.MatchLdcR4(169f)))
                         {
-                            return (float)Math.Pow(13f + (13f * FindTotalMultiplier()), 2);
-                        });
-                    }
-                };
+                            ilcursor.Remove();
+                            ilcursor.EmitDelegate<Func<float>>(() =>
+                            {
+                                return (float)Math.Pow(13f + (13f * FindTotalMultiplier()), 2);
+                            });
+                        }
+                    };
+                }
             }
 
             // Buff Wards
@@ -331,24 +334,27 @@ namespace Hex3Mod.Items
             // Bustling Fungus
             if (Overkilloverdrive_EnableBungus)
             {
-                IL.RoR2.Items.MushroomBodyBehavior.FixedUpdate += (il) =>
+                if (!UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
                 {
-                    ILCursor ilcursor = new(il);
-                    if (ilcursor.TryGotoNext(MoveType.After,
-                        x => x.MatchLdloc(0),
-                        x => x.MatchConvR4(),
-                        x => x.MatchMul(),
-                        x => x.MatchAdd()))
+                    IL.RoR2.Items.MushroomBodyBehavior.FixedUpdate += (il) =>
                     {
-                        ilcursor.Emit(OpCodes.Dup);
-                        ilcursor.EmitDelegate<Func<float>>(() =>
+                        ILCursor ilcursor = new(il);
+                        if (ilcursor.TryGotoNext(MoveType.After,
+                            x => x.MatchLdloc(0),
+                            x => x.MatchConvR4(),
+                            x => x.MatchMul(),
+                            x => x.MatchAdd()))
                         {
-                            return FindTotalMultiplier();
-                        });
-                        ilcursor.Emit(OpCodes.Mul);
-                        ilcursor.Emit(OpCodes.Add);
-                    }
-                };
+                            ilcursor.Emit(OpCodes.Dup);
+                            ilcursor.EmitDelegate<Func<float>>(() =>
+                            {
+                                return FindTotalMultiplier();
+                            });
+                            ilcursor.Emit(OpCodes.Mul);
+                            ilcursor.Emit(OpCodes.Add);
+                        }
+                    };
+                }
             }
 
             // Interstellar Desk Plant
