@@ -17,7 +17,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "Empathy";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/EmpathyPrefab.prefab");
@@ -230,15 +230,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Heal when nearby enemies take damage.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cEvent>//--AUTO-TRANSCRIPTION FROM UES [Redacted] --//</style>\n\n\"Oh yeah? How does this one work?\"\n\n\"Nanomachines. In response to physical trauma to the body, they get to work immediately and start patching up the wound. They're so tiny you don't even feel it happening.\"\n\n\"Is that... safe?\"\n\n\"What?\"\n\n\"A bunch of little robots in your bloodstream? There's no way that's never caused a problem.\"\n\n\"Well, maybe twenty years ago. It's 2055, technology has come far.\"\n\n\"Huh.\"\n\n\"...Although,\"\n\n\"See, I'm not putting that in my body.\"\n\n\"No, it's no big deal! But- these bots have been known to 'overcorrect'. They operate on a shared network, meaning that if- you and I, for example- both use the same group, then when -you- get hurt, the bots will think I'm hurt too!\"\n\n\"Meaning?\"\n\n\"It's unpredictable, but fascinating. If you get hurt and my body is healthy, they'll still try to 'fix' me, so they'll begin to look for inefficiencies and redundancies. They'll begin removing unneeded vestiges and replacing them with something useful, and when they're done with that, they'll begin creating something new. It's been known to happen-- they'll grow fresh organs that deal with the function of your heart or your liver but using ten times less energy and ten times less space. They'll begin re-organizing everything in your body, and they'll make your skeleton stronger while they're at it. So, really, they're quite helpful.\"\n\n\"And we only have one of these between us.\"\n\n\"Yes.\"\n\n\"...\"\n\n\"...\"\n\n\"I think I'll do the mission alone.\"");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!Empathy_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Empathy" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Empathy");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("When an enemy takes damage within <style=cIsHealing>{1}m</style> of you, heal for <style=cIsHealing>{0} hp</style> <style=cStack>(+{0} per stack)</style>.", Empathy_HealthPerHit.Value, Empathy_Radius.Value));
         }
@@ -344,7 +346,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

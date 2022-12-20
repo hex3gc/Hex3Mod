@@ -18,7 +18,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "CaptainsFavor";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CaptainsFavorPrefab.prefab");
@@ -230,15 +230,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Future stages will contain more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Don't spend it all in one place...\n\nOr, better yet, don't spend it all. That's MY card!");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!CaptainsFavor_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Captain's Favor" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Captain's Favor");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Stages contain <style=cShrine>{0}%</style> <style=cStack>(+{0}% per stack)</style> more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>", CaptainsFavor_InteractableIncrease.Value));
         }
@@ -273,7 +275,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

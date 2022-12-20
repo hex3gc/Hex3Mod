@@ -15,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "BucketList";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BucketListPrefab.prefab");
@@ -227,15 +227,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Move faster before teleporter events and boss fights.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "- go to Saturn and see the night lights\n\n- visit grandma\n\n- see Bovine Joni in concert\n\n- try Mercurian Salts (get Jaden to make sure im ok after)\n\n- pet a gip");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!BucketList_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Bucket List" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Bucket List");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Move <style=cIsUtility>" + BucketList_FullBuff.Value * 100f + "%</style> faster <style=cStack>(+" + BucketList_FullBuff.Value * 100f + "% per stack)</style>. Reduce this bonus by <style=cDeath>" + BucketList_BuffReduce.Value * 100f + "%</style> during boss fights.");
         }
@@ -279,7 +281,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

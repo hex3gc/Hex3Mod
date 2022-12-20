@@ -15,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "MintCondition";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MintConditionPrefab.prefab");
@@ -239,15 +239,17 @@ namespace Hex3Mod.Items
                 "\n\nEdit by Customer 240****** (03/02/2056)" +
                 "\n\"Lost in transit\" are you joking??? you STILL HAVE the money it has not been refunded. I will sue your [REDACTED] [REDACTED] to mars and back if you keep turning down my calls, believe it you [REDACTED]. You don't know what kind of [REDACTED] youve gotten yourselves into now");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!MintCondition_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Mint Condition" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Mint Condition");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "<style=cIsUtility>Provides immunity to all movement restricting status effects</style>. Gain <style=cIsUtility>" + MintCondition_MoveSpeed.Value * 100f + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack.Value * 100f + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps.Value + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack.Value + " per stack)</style> extra jumps.");
         }
@@ -333,7 +335,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

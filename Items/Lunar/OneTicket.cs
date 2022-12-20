@@ -21,7 +21,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "OneTicket";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static ItemDef consumedItemDef;
         public static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
@@ -309,15 +309,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Use 400 Tickets to duplicate the contents of a Scavenger's bag.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "It's A Feature");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!OneTicket_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "One Ticket" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "One Ticket");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
         }
 
@@ -486,7 +488,7 @@ namespace Hex3Mod.Items
             ItemAPI.Add(new CustomItem(consumedItemDef, CreateHiddenDisplayRules()));
             ItemAPI.Add(new CustomItem(hiddenItemDef, CreateHiddenDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddBuffs();
             AddHooks();
         }

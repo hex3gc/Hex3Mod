@@ -234,15 +234,17 @@ namespace Hex3Mod.Items
             "\n\n\"My collection. It's wonderful, isn't it? I want you to see it. Please, come see my collection... Bubbling, stinging poisons, corrosive to the touch... If you listen closely it's bubbling, here...\"" +
             "\n\n<style=cStack>(Bubbling sounds, mixed with heavy breathing. The audio recording ends shortly after.)</style>");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!SpatteredCollection_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Spattered Collection" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Spattered Collection");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Your attacks have a <style=cIsDamage>{1}%</style> chance to inflict <style=cIsDamage>Blight</style>, which now <style=cIsDamage>reduces enemies' armor by {0}</style> <style=cStack>(+2 per stack)</style> for each stack. <style=cIsVoid>Corrupts all Scattered Reflections.</style>", SpatteredCollection_ArmorReduction.Value, SpatteredCollection_DotChance.Value));
         }
@@ -304,7 +306,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

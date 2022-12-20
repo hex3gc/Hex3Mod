@@ -26,7 +26,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "OverkillOverdrive";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OverkillOverdrivePrefab.prefab");
@@ -238,15 +238,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I want everyone to hear it, even if it doesn't sound good.\"\n\n- Written on a sticky note, attached to the package the item arrived in.");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Amplify the range of area buffs and holdout zones.");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!OverkillOverdrive_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Overkill Overdrive" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Overkill Overdrive");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Amplify the radius of <style=cIsUtility>area buffs</style> and <style=cWorldEvent>holdout zones</style> by <style=cWorldEvent>{0}%</style> <style=cStack>(+{0}% per stack)</style>", OverkillOverdrive_ZoneIncrease.Value));
         }
@@ -401,7 +403,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

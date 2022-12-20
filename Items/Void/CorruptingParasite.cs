@@ -253,15 +253,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Enter the Deep Void Portal.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "From The Depths");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!CorruptingParasite_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Corrupting Parasite" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Corrupting Parasite");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", string.Format("Corrupts {0} of your items into their <style=cIsVoid>void equivalents</style> each stage.", CorruptingParasite_ItemsPerStage.Value));
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("At the start of a stage, <style=cIsVoid>{0} random item(s) will be corrupted into their void equivalent</style> <style=cStack>(+{0} per stack)</style>.", CorruptingParasite_ItemsPerStage.Value));
@@ -336,7 +338,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

@@ -18,7 +18,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ElderMutagen";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ElderMutagen.prefab");
@@ -256,15 +256,17 @@ namespace Hex3Mod.Items
             "\n> Somethings wrong" +
             "\n> Timestamping for break");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!ElderMutagen_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Elder Mutagen" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Elder Mutagen");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Killing a new monster species grants a permanent <style=cIsHealing>{0} max health</style> and <style=cIsHealing>{1} hp/s regeneration bonus</style>. Each stack allows you to gain this bonus <style=cIsHealing>1</style> more time from all species.", ElderMutagen_MaxHealthFlatAdd.Value, ElderMutagen_RegenAdd.Value));
         }
@@ -368,7 +370,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddBuffs();
             AddHooks();
         }

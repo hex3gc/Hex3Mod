@@ -21,7 +21,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "TheUnforgivable";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheUnforgivablePrefab.prefab");
@@ -242,15 +242,17 @@ namespace Hex3Mod.Items
             "\n\nI found her shoe beside the bed." +
             "\n\nWhat the hell did you do...?");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!TheUnforgivable_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Unforgivable" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Unforgivable");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Activate your <style=cIsDamage>on-kill effects</style> at your location <style=cIsDamage>once</style> <style=cStack>(+1 per stack)</style> every <style=cIsDamage>{0}</style> seconds.", TheUnforgivable_Interval.Value));
         }
@@ -290,7 +292,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
 

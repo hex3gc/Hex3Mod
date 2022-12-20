@@ -230,15 +230,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Become temporarily invisible when boss fights begin. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "I'm leaving tomorrow\n\nYou wouldn't understand why\n\n- Alex");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!NoticeOfAbsence_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Notice Of Absence" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Notice Of Absence");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Become invisible for {0} seconds</style> <style=cStack>(+{1} per stack)</style> whenever a boss spawns or a teleporter event begins. <style=cIsVoid>Corrupts all Bucket Lists.</style>", NoticeOfAbsence_InvisibilityBuff.Value, NoticeOfAbsence_InvisibilityBuffStack.Value));
         }
@@ -279,7 +281,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

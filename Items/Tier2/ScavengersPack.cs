@@ -17,7 +17,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ScavengersPouch";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         static ItemDef consumedItemDef;
         static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
@@ -299,15 +299,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "No longer useful.");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer useful.");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!ScavengersPack_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Scavenger's Pouch" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Scavenger's Pouch");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", "When an item is consumed, replace it with a brand new one. Occurs up to " + ScavengersPack_Uses.Value + " times.");
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed or broken</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pouch is empty.", ScavengersPack_Uses.Value));
@@ -459,7 +461,7 @@ namespace Hex3Mod.Items
             ItemAPI.Add(new CustomItem(hiddenItemDef, CreateHiddenDisplayRules()));
             AddBuffs();
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

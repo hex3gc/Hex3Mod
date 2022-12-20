@@ -259,15 +259,17 @@ namespace Hex3Mod.Items
         "\n\nAlex felt a push at her back, and she fell on solid ground. The purple hue on everything had vanished, and so had the rumbling. She looked back towards Lance, and behind him, the jaws of a giant claw ready to consume him." +
         "\n\nHe had found a way out, but it was too late to take it.");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!TheHermit_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Hermit" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Hermit");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Taking damage grants a <style=cIsHealing>stacking damage resistance</style> of <style=cIsHealing>{1}%</style> that lasts for <style=cIsHealing>{0}</style> seconds <style=cStack>(+{0} per stack)</style>. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>", TheHermit_BuffDuration.Value, TheHermit_DamageReduction.Value));
         }
@@ -315,7 +317,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddBuffs();
             AddHooks();
         }

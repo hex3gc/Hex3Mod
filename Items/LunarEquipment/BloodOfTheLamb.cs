@@ -242,15 +242,17 @@ namespace Hex3Mod.Items
             "\n\n<style=cIsUtility>000000</style>" +
             "\n\n<style=cIsUtility>ORIGIN</style>");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!BloodOfTheLamb_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Blood Of The Lamb" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableEquipment.Contains(equipmentDef.equipmentIndex)) { run.availableEquipment.Remove(equipmentDef.equipmentIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Blood Of The Lamb");
+                if (run && !run.availableEquipment.Contains(equipmentDef.equipmentIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableEquipment.Add(equipmentDef.equipmentIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", "<style=cDeath>Purge " + BloodOfTheLamb_ItemsTaken.Value + " of your items</style> for a <style=cShrine>random boss item.</style>");
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "<style=cDeath>Purge " + BloodOfTheLamb_ItemsTaken.Value + " of your items</style> for a <style=cShrine>random boss item.</style> Any item except <style=cIsUtility>Lunar</style>, <style=cStack>Tierless</style>, or <style=cShrine>Boss</style> items may be purged.");
@@ -329,7 +331,7 @@ namespace Hex3Mod.Items
             equipmentDef = CreateEquip();
             ItemAPI.Add(new CustomEquipment(equipmentDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

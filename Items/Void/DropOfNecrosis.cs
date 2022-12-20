@@ -237,15 +237,17 @@ namespace Hex3Mod.Items
             "\n\n\"Ahhh... yes, that's... mmm, my poisons. You will not find my poisons... my collection-- it's mine, mine forever. You wouldn't appreciate them.\"" +
             "\n\n<style=cStack>(Audio recording ends abruptly.)</style>");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!DropOfNecrosis_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Drop Of Necrosis" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Drop Of Necrosis");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Your attacks have a " + DropOfNecrosis_DotChance.Value + "% <style=cStack>(+" + DropOfNecrosis_DotChance.Value + "% per stack)</style> chance to inflict <style=cIsDamage>Blight</style>, which deals <style=cIsDamage>" + (DropOfNecrosis_Damage.Value * 100f) + "%</style> more damage for each additional stack of this item. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
         }
@@ -296,7 +298,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

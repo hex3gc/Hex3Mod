@@ -15,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "AtgPrototype";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ATGPrototypePrefab.prefab");
@@ -226,15 +226,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_NAME", "AtG Prototype");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: AtG Missile Launcher Prototype\nTracking Number: 11******\nEstimated Delivery: 08/15/2056\nShipping Method: Priority\nShipping Address: Cargo Bay 1-A, Terminal 2-A, UES Port\nShipping Details:\n\nThe AtG Missile Launcher MK1 is a staple for our military operations, but like many wrist rockets and shoulder-mounted launchers, it suffers a safety issue with its targeting scheme. As the missiles are heat-seeking, it can often be thrown off by variance in local temperatures, which is a common issue at our deployment locations. This also renders the missiles ineffective against targets who can manipulate cold and ice, which was admittedly unprecedented.\n\nAdditionally, while the ATG has safeguards against seeking its holder, these fall apart when the launcher sustains heavy damage or even a temporary power outage. This has resulted in a number of unfortunate accidents. We'll need to have a look at the AtG's predecessor models, because clearly something was [REDACTED] up along the way.");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!AtgPrototype_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "AtG Prototype" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "AtG Prototype");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", "Every " + AtgPrototype_HitRequirement.Value + " hits, fire a missile.");
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "After inflicting <style=cIsUtility>" + AtgPrototype_HitRequirement.Value + "</style> hits, fire a missile that deals <style=cIsDamage>" + AtgPrototype_Damage.Value * 100f + "%</style> <style=cStack>(+" + AtgPrototype_Damage.Value * 100f + "% per stack)</style> TOTAL damage.");
@@ -295,7 +297,7 @@ namespace Hex3Mod.Items
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddBuffs();
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

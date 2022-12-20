@@ -16,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "Balance";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BalancePrefab.prefab");
@@ -243,15 +243,17 @@ namespace Hex3Mod.Items
             "\n\nFor a moment, she felt close to drifting off, as her thoughts finally wandered away from the threat of danger. That was until a hand wrapped around the entrance of the cave. Like a skeleton covered in flesh, wrapped with pulsating muscle and vein, and adorned with crimson-spattered spikes." +
             "\n\n\"Captain-\"");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!Balance_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Balance" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Balance");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Gain a maximum <style=cWorldEvent>{0}% chance to dodge attacks</style> <style=cStack>(+{0}% per stack, hyperbolic)</style> <style=cWorldEvent>the slower you're moving:</style> <style=cIsUtility>Full chance</style> while not moving, <style=cIsUtility>half chance</style> while walking or receiving a speed debuff, and <style=cIsUtility>no chance</style> while freely sprinting. Unaffected by luck.", Balance_MaxDodge.Value));
         }
@@ -329,7 +331,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

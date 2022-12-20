@@ -16,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ShardOfGlass";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ShardOfGlassPrefab.prefab");
@@ -228,15 +228,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Increase your damage.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "The essence of a broken body\n\nYou collect the pieces carefully\n\nAn air of arrogance surrounds these shards\n\nYou feel like you can take on the world and never break beneath it");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!ShardOfGlass_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Shard Of Glass" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Shard Of Glass");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Increase your <style=cIsDamage>base damage</style> by <style=cIsDamage>" + ShardOfGlass_DamageIncrease.Value * 100f + "%</style> <style=cStack>(+" + ShardOfGlass_DamageIncrease.Value * 100f + "% per stack)</style>.");
         }
@@ -259,7 +261,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

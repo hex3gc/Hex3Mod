@@ -271,15 +271,17 @@ namespace Hex3Mod.Items
             "\n\nMy spyglass and toolkit are gone. I left them beside me before sleeping, woke up and they were missing. I'm so bored... but I'm so anxious. I'll try the portal again. Maybe something will change. Why am I still sweating?" +
             "\n\n<style=cStack>I'm so cold...</style>");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!Discovery_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Discovery" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Discovery");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd.Value + "</style> points per stack of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " shield</style> <style=cStack>(+" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
         }
@@ -398,8 +400,9 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             hiddenItemDef = CreateHiddenItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            ItemAPI.Add(new CustomItem(hiddenItemDef, CreateHiddenDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddBuffs();
             AddHooks();
         }

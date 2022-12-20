@@ -17,7 +17,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "FourHundredTickets";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         static ItemDef consumedItemDef;
         public static GameObject LoadPrefab()
         {
@@ -263,15 +263,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "No longer valid.");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer valid.");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!Tickets_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "400 Tickets" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "400 Tickets");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
         }
 
@@ -360,6 +362,7 @@ namespace Hex3Mod.Items
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             ItemAPI.Add(new CustomItem(consumedItemDef, CreateHiddenDisplayRules()));
             AddTokens();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }

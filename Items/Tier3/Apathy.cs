@@ -16,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "Apathy";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
@@ -262,15 +262,17 @@ namespace Hex3Mod.Items
                 "\n\nThe Titan had never felt fear before."
                 );
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
             if (!Apathy_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Apathy" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Apathy");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", String.Format("When an enemy dies within <style=cDeath>{0}m</style> of you, gain a stack of <style=cDeath>Apathy</style>. After reaching <style=cIsDamage>{5}</style> stacks, <style=cDeath>enter a frenzy</style> which grants you <style=cIsDamage>+{1}% movement speed, +{2}% attack speed and {3} hp/s of regeneration for {4} seconds</style> <style=cStack>(+{4}s per stack)</style>", Apathy_Radius.Value, Apathy_MoveSpeedAdd.Value * 100f, Apathy_AttackSpeedAdd.Value * 100f, Apathy_RegenAdd.Value, Apathy_Duration.Value, Apathy_RequiredKills.Value));
         }
@@ -453,7 +455,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddBuffs();
             AddHooks();
         }

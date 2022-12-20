@@ -20,7 +20,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "MinersHelmet";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDef;
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MinersHelmetPrefab.prefab");
@@ -256,15 +256,17 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Carry enough gold to buy three legendary chests.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "We're Rich!");
         }
-        public static void UpdateItemStatus()
+        public static void UpdateItemStatus(Run run)
         {
-            if (!AtgPrototype_Enable.Value)
+            if (!MinersHelmet_Enable.Value)
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Miner's Helmet" + " <style=cDeath>[DISABLED]</style>");
+                if (run && run.availableItems.Contains(itemDef.itemIndex)) { run.availableItems.Remove(itemDef.itemIndex); }
             }
             else
             {
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Miner's Helmet");
+                if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
             LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("<style=cShrine>Every time you earn ${1}</style> <style=cStack>(Scaling with time)</style>, reduce your <style=cIsUtility>skill cooldowns</style> by <style=cIsUtility>{0}</style> seconds <style=cStack>(+{0} per stack)</style>.", MinersHelmet_CooldownReduction.Value, MinersHelmet_GoldPerProc.Value));
         }
@@ -373,7 +375,7 @@ namespace Hex3Mod.Items
             itemDef = CreateItem();
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
-            UpdateItemStatus();
+            UpdateItemStatus(null);
             AddHooks();
         }
     }
