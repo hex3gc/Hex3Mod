@@ -3,6 +3,7 @@ using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -14,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "AtgPrototype";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ATGPrototypePrefab.prefab");
@@ -43,6 +44,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -219,17 +221,26 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float atgDamageStack, int hitRequirement)
+        public static void AddTokens()
         {
-            float atgDamageStack_Readable = atgDamageStack * 100;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "AtG Prototype");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Every ten hits, fire a missile.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "After inflicting <style=cIsUtility>" + hitRequirement + "</style> hits, fire a missile that deals <style=cIsDamage>" + atgDamageStack_Readable + "%</style> <style=cStack>(+" + atgDamageStack_Readable + "% per stack)</style> TOTAL damage.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: AtG Missile Launcher Prototype\nTracking Number: 11******\nEstimated Delivery: 08/15/2056\nShipping Method: Priority\nShipping Address: Cargo Bay 1-A, Terminal 2-A, UES Port\nShipping Details:\n\nThe AtG Missile Launcher MK1 is a staple for our military operations, but like many wrist rockets and shoulder-mounted launchers, it suffers a safety issue with its targeting scheme. As the missiles are heat-seeking, it can often be thrown off by variance in local temperatures, which is a common issue at our deployment locations. This also renders the missiles ineffective against targets who can manipulate cold and ice, which was admittedly unprecedented.\n\nAdditionally, while the ATG has safeguards against seeking its holder, these fall apart when the launcher sustains heavy damage or even a temporary power outage. This has resulted in a number of unfortunate accidents. We'll need to have a look at the AtG's predecessor models, because clearly something was [REDACTED] up along the way.");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!AtgPrototype_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "AtG Prototype" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "AtG Prototype");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", "Every " + AtgPrototype_HitRequirement.Value + " hits, fire a missile.");
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "After inflicting <style=cIsUtility>" + AtgPrototype_HitRequirement.Value + "</style> hits, fire a missile that deals <style=cIsDamage>" + AtgPrototype_Damage.Value * 100f + "%</style> <style=cStack>(+" + AtgPrototype_Damage.Value * 100f + "% per stack)</style> TOTAL damage.");
+        }
 
-        private static void AddHooks(ItemDef itemDef, float atgDamageStack, int hitRequirement)
+        private static void AddHooks()
         {
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
@@ -241,13 +252,13 @@ namespace Hex3Mod.Items
                         attackerBody.SetBuffCount(atgCounter.buffIndex, 1);
                     }
                     attackerBody.AddBuff(atgCounter);
-                    if (attackerBody.GetBuffCount(atgCounter) == hitRequirement)
+                    if (attackerBody.GetBuffCount(atgCounter) == AtgPrototype_HitRequirement.Value)
                     {
                         Util.PlaySound("Play_bandit2_m1_reload_bullet", damageInfo.attacker);
                     }
-                    if (attackerBody.GetBuffCount(atgCounter) >= (hitRequirement + 1))
+                    if (attackerBody.GetBuffCount(atgCounter) >= (AtgPrototype_HitRequirement.Value + 1))
                     {
-                        float damageCoefficient = atgDamageStack * (float)attackerBody.inventory.GetItemCount(itemDef);
+                        float damageCoefficient = AtgPrototype_Damage.Value * (float)attackerBody.inventory.GetItemCount(itemDef);
                         float missileDamage = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);
                         MissileUtils.FireMissile(
                             attackerBody.corePosition,
@@ -278,12 +289,14 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(atgCounter);
         }
 
-        public static void Initiate(float atgDamageStack, int hitRequirement)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddBuffs();
-            AddTokens(atgDamageStack, hitRequirement);
-            AddHooks(itemDefinition, atgDamageStack, hitRequirement);
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

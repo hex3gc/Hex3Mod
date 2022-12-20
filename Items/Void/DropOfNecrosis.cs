@@ -6,6 +6,8 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -16,7 +18,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "DropOfNecrosis";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DropOfNecrosisPrefab.prefab");
@@ -45,7 +47,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
-            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -222,11 +224,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Drop Of Necrosis");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your attacks have a chance to inflict <style=cIsDamage>Blight</style> with slightly increased damage. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Your attacks have a " + DropOfNecrosis_DotChance + "% <style=cStack>(+" + DropOfNecrosis_DotChance + "% per stack)</style> chance to inflict <style=cIsDamage>Blight</style>, which deals <style=cIsDamage>" + (DropOfNecrosis_Damage * 100f) + "%</style> more damage for each additional stack of this item. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I think I was... exploring? I... my spyglass is...\"" +
             "\n\n<style=cStack>(Silence for 30 seconds)</style>" +
             "\n\n\"Right, it's gone. All that's left is... hm.\"" +
@@ -236,8 +237,20 @@ namespace Hex3Mod.Items
             "\n\n\"Ahhh... yes, that's... mmm, my poisons. You will not find my poisons... my collection-- it's mine, mine forever. You wouldn't appreciate them.\"" +
             "\n\n<style=cStack>(Audio recording ends abruptly.)</style>");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!DropOfNecrosis_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Drop Of Necrosis" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Drop Of Necrosis");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Your attacks have a " + DropOfNecrosis_DotChance.Value + "% <style=cStack>(+" + DropOfNecrosis_DotChance.Value + "% per stack)</style> chance to inflict <style=cIsDamage>Blight</style>, which deals <style=cIsDamage>" + (DropOfNecrosis_Damage.Value * 100f) + "%</style> more damage for each additional stack of this item. <style=cIsVoid>Corrupts all Shards of Glass.</style>");
+        }
 
-        private static void AddHooks(ItemDef itemDef, float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance) // Insert hooks here
+        private static void AddHooks() // Insert hooks here
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "ShardOfGlass");
@@ -246,7 +259,7 @@ namespace Hex3Mod.Items
             {
                 if (dotIndex == DotController.DotIndex.Blight && attackerObject && attackerObject.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    damageMultiplier += DropOfNecrosis_Damage * body.inventory.GetItemCount(itemDef);
+                    damageMultiplier += DropOfNecrosis_Damage.Value * body.inventory.GetItemCount(itemDef);
                 }
                 orig(self, attackerObject, duration, dotIndex, damageMultiplier, maxStacksFromAttacker, totalDamage, preUpgradeDotIndex);
             };
@@ -259,7 +272,7 @@ namespace Hex3Mod.Items
                     {
                         if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage && damageInfo.damage > 0f)
                         {
-                            if (Util.CheckRoll((DropOfNecrosis_DotChance * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck) == true)
+                            if (Util.CheckRoll((DropOfNecrosis_DotChance.Value * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck) == true)
                             {
                                 InflictDotInfo inflictDotInfo = new InflictDotInfo
                                 {
@@ -278,12 +291,13 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float DropOfNecrosis_Damage, float DropOfNecrosis_DotChance)
+        public static void Initiate()
         {
-            CreateItem();
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(DropOfNecrosis_Damage, DropOfNecrosis_DotChance);
-            AddHooks(itemDefinition, DropOfNecrosis_Damage, DropOfNecrosis_DotChance);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

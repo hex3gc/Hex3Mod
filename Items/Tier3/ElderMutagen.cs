@@ -5,6 +5,8 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using System.Linq;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -16,7 +18,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ElderMutagen";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ElderMutagen.prefab");
@@ -53,6 +55,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -229,11 +232,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float ElderMutagen_MaxHealthAdd, float ElderMutagen_RegenAdd)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Elder Mutagen");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Gain permanent max health and regen for each unique monster species killed.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Killing a new monster species grants a permanent <style=cIsHealing>{0}% max health</style> and <style=cIsHealing>{1} hp/s regeneration bonus</style>. Each stack allows you to gain this bonus <style=cIsHealing>1</style> more time from all species.", ElderMutagen_MaxHealthAdd * 100f, ElderMutagen_RegenAdd));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "<style=cMono>Lab Dissection Analysis File</style> " +
             "\n\nSubject: Strange Blob" +
             "\nTechnician: Alex [REDACTED]" +
@@ -254,8 +256,20 @@ namespace Hex3Mod.Items
             "\n> Somethings wrong" +
             "\n> Timestamping for break");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!ElderMutagen_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Elder Mutagen" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Elder Mutagen");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Killing a new monster species grants a permanent <style=cIsHealing>{0} max health</style> and <style=cIsHealing>{1} hp/s regeneration bonus</style>. Each stack allows you to gain this bonus <style=cIsHealing>1</style> more time from all species.", ElderMutagen_MaxHealthFlatAdd.Value, ElderMutagen_RegenAdd.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float ElderMutagen_MaxHealthAdd, float ElderMutagen_RegenAdd)
+        private static void AddHooks()
         {
             // On kill, add the victim's name to the dictionary
             void DeathRewards_OnKilledServer(On.RoR2.DeathRewards.orig_OnKilledServer orig, DeathRewards self, DamageReport damageReport)
@@ -305,8 +319,8 @@ namespace Hex3Mod.Items
                 {
                     if (body.master.playerCharacterMasterController.gameObject.TryGetComponent(out MutagenBehavior mutagenBehavior))
                     {
-                        args.baseRegenAdd += ElderMutagen_RegenAdd * mutagenBehavior.GetSpeciesKilledNumber();
-                        args.healthMultAdd += ElderMutagen_MaxHealthAdd * mutagenBehavior.GetSpeciesKilledNumber();
+                        args.baseRegenAdd += ElderMutagen_RegenAdd.Value * mutagenBehavior.GetSpeciesKilledNumber();
+                        args.baseHealthAdd += (float)ElderMutagen_MaxHealthFlatAdd.Value * mutagenBehavior.GetSpeciesKilledNumber();
                         body.SetBuffCount(mutagenStacks.buffIndex, mutagenBehavior.GetSpeciesKilledNumber());
                     }
                     else
@@ -349,12 +363,14 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(mutagenStacks);
         }
 
-        public static void Initiate(float ElderMutagen_MaxHealthAdd, float ElderMutagen_RegenAdd)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
             AddBuffs();
-            AddTokens(ElderMutagen_MaxHealthAdd, ElderMutagen_RegenAdd);
-            AddHooks(itemDefinition, ElderMutagen_MaxHealthAdd, ElderMutagen_RegenAdd);
+            AddHooks();
         }
     }
 }

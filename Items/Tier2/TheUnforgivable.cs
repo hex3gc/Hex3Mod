@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using RoR2.Projectile;
 using System;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -20,7 +21,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "TheUnforgivable";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheUnforgivablePrefab.prefab");
@@ -51,6 +52,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -227,11 +229,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float TheUnforgivable_Interval)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "The Unforgivable");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Periodically activate on-kill effects at your location.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Activate your <style=cIsDamage>on-kill effects</style> at your location <style=cIsDamage>once</style> <style=cStack>(+1 per stack)</style> every <style=cIsDamage>{0}</style> seconds.", TheUnforgivable_Interval));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "I left her for twenty minutes." +
             "\n\nShe couldn't have gone anywhere in twenty minutes. She can barely even walk yet." +
             "\n\nYou know something." +
@@ -241,8 +242,20 @@ namespace Hex3Mod.Items
             "\n\nI found her shoe beside the bed." +
             "\n\nWhat the hell did you do...?");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!TheUnforgivable_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Unforgivable" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Unforgivable");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Activate your <style=cIsDamage>on-kill effects</style> at your location <style=cIsDamage>once</style> <style=cStack>(+1 per stack)</style> every <style=cIsDamage>{0}</style> seconds.", TheUnforgivable_Interval.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float TheUnforgivable_Interval)
+        private static void AddHooks()
         {
             void AddRemoveBehavior(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
@@ -252,7 +265,7 @@ namespace Hex3Mod.Items
                     if (self.TryGetComponent(out UnforgivableBehavior behavior) == false)
                     {
                         self.AddItemBehavior<UnforgivableBehavior>(self.inventory.GetItemCount(itemDef));
-                        self.GetComponent<UnforgivableBehavior>().killInterval = TheUnforgivable_Interval;
+                        self.GetComponent<UnforgivableBehavior>().killInterval = TheUnforgivable_Interval.Value;
                     }
                     else
                     {
@@ -272,11 +285,13 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterBody.OnInventoryChanged += AddRemoveBehavior;
         }
 
-        public static void Initiate(float TheUnforgivable_Interval)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(TheUnforgivable_Interval);
-            AddHooks(itemDefinition, TheUnforgivable_Interval);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
 
         private class UnforgivableBehavior : CharacterBody.ItemBehavior

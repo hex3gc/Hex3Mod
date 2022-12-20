@@ -6,6 +6,8 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -17,8 +19,8 @@ namespace Hex3Mod.Items
     {
         static string itemName = "Discovery";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
-        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
+        public static ItemDef itemDef;
+        public static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
@@ -52,7 +54,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier2;
             item.canRemove = true;
             item.hidden = false;
-            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -255,12 +257,10 @@ namespace Hex3Mod.Items
             return new ItemDisplayRuleDict();
         }
 
-        public static void AddTokens(float Discovery_ShieldAdd, int Discovery_MaxStacks)
+        public static void AddTokens()
         {
-            float finalNumber = Discovery_ShieldAdd * Discovery_MaxStacks;
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Discovery");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Using a world interactable grants <style=cIsHealing>regenerating shield</style> to all holders of this item. <style=cIsVoid>Corrupts all Infusions.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd + "</style> points per stack of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + finalNumber + " shield</style> <style=cStack>(+" + finalNumber + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "EXPLORER'S LOG" +
             "\n// 'Author' information lost, attempting to fix..." +
             "\n// 'Date' information lost, attempting to fix..." +
@@ -271,8 +271,20 @@ namespace Hex3Mod.Items
             "\n\nMy spyglass and toolkit are gone. I left them beside me before sleeping, woke up and they were missing. I'm so bored... but I'm so anxious. I'll try the portal again. Maybe something will change. Why am I still sweating?" +
             "\n\n<style=cStack>I'm so cold...</style>");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!Discovery_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Discovery" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Discovery");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd.Value + "</style> points per stack of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " shield</style> <style=cStack>(+" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
+        }
 
-        private static void AddHooks(ItemDef itemDef, ItemDef hiddenitemDef, float Discovery_ShieldAdd, int Discovery_MaxStacks) // Insert hooks here
+        private static void AddHooks() // Insert hooks here
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "Infusion");
@@ -290,14 +302,14 @@ namespace Hex3Mod.Items
 
                         foreach (var member in bodyTeamMembers)
                         {
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenitemDef) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef)))
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenItemDef) < (Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef)))
                             {
-                                member.body.inventory.GiveItem(hiddenitemDef, member.body.inventory.GetItemCount(itemDef));
-                                if (member.body.inventory.GetItemCount(hiddenitemDef) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef))
+                                member.body.inventory.GiveItem(hiddenItemDef, member.body.inventory.GetItemCount(itemDef));
+                                if (member.body.inventory.GetItemCount(hiddenItemDef) > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef))
                                 {
-                                    for (int i = member.body.inventory.GetItemCount(hiddenitemDef); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef); i--)
+                                    for (int i = member.body.inventory.GetItemCount(hiddenItemDef); i > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef); i--)
                                     {
-                                        member.body.inventory.RemoveItem(hiddenitemDef);
+                                        member.body.inventory.RemoveItem(hiddenItemDef);
                                     }
                                 }
                                 Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
@@ -309,7 +321,7 @@ namespace Hex3Mod.Items
                             }
                             if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) < 1)
                             {
-                                member.body.inventory.ResetItem(hiddenitemDef);
+                                member.body.inventory.ResetItem(hiddenItemDef);
                             }
                         }
                     }
@@ -317,7 +329,6 @@ namespace Hex3Mod.Items
             }
             void DiscoveryBarrelInteract(Interactor interactor)
             {
-
                 if (interactor.gameObject.GetComponent<CharacterBody>())
                 {
                     CharacterBody body = interactor.gameObject.GetComponent<CharacterBody>();
@@ -325,14 +336,14 @@ namespace Hex3Mod.Items
 
                     foreach (var member in bodyTeamMembers)
                     {
-                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenitemDef) < (Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef)))
+                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenItemDef) < (Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef)))
                         {
-                            member.body.inventory.GiveItem(hiddenitemDef, member.body.inventory.GetItemCount(itemDef));
-                            if (member.body.inventory.GetItemCount(hiddenitemDef) > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef))
+                            member.body.inventory.GiveItem(hiddenItemDef, member.body.inventory.GetItemCount(itemDef));
+                            if (member.body.inventory.GetItemCount(hiddenItemDef) > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef))
                             {
-                                for (int i = member.body.inventory.GetItemCount(hiddenitemDef); i > Discovery_MaxStacks * member.body.inventory.GetItemCount(itemDef); i--)
+                                for (int i = member.body.inventory.GetItemCount(hiddenItemDef); i > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef); i--)
                                 {
-                                    member.body.inventory.RemoveItem(hiddenitemDef);
+                                    member.body.inventory.RemoveItem(hiddenItemDef);
                                 }
                             }
                             Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
@@ -350,8 +361,8 @@ namespace Hex3Mod.Items
             {
                 if (body && body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    args.baseShieldAdd += Discovery_ShieldAdd * body.inventory.GetItemCount(hiddenitemDef);
-                    body.SetBuffCount(discoveryBuff.buffIndex, body.inventory.GetItemCount(hiddenitemDef));
+                    args.baseShieldAdd += Discovery_ShieldAdd.Value * body.inventory.GetItemCount(hiddenItemDef);
+                    body.SetBuffCount(discoveryBuff.buffIndex, body.inventory.GetItemCount(hiddenItemDef));
                 }
             }
 
@@ -382,15 +393,15 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(discoveryBuff);
         }
 
-        public static void Initiate(float Discovery_ShieldAdd, int Discovery_MaxStacks)
+        public static void Initiate()
         {
-            CreateItem();
-            CreateHiddenItem();
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
-            AddTokens(Discovery_ShieldAdd, Discovery_MaxStacks);
+            itemDef = CreateItem();
+            hiddenItemDef = CreateHiddenItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
             AddBuffs();
-            AddHooks(itemDefinition, hiddenItemDefinition, Discovery_ShieldAdd, Discovery_MaxStacks);
+            AddHooks();
         }
     }
 }

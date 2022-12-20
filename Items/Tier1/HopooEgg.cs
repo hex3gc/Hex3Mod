@@ -2,8 +2,8 @@
 using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
-using On.EntityStates;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -15,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "HopooEgg";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/HopooEggPrefab.prefab");
@@ -44,6 +44,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -220,34 +221,45 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float HopooEgg_JumpModifier)
+        public static void AddTokens()
         {
-            float HopooEgg_JumpModifier_Readable = HopooEgg_JumpModifier * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Hopoo Egg");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Jump higher and take less fall damage.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Jump <style=cIsUtility>" + HopooEgg_JumpModifier_Readable + "%</style> higher <style=cStack>(+" + HopooEgg_JumpModifier_Readable + "% per stack)</style>. <style=cIsUtility>Take reduced fall damage.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"...The hopoo's chicks are independent, being the only Europan nesting birds that hunt for themselves from birth. One is able to leave its nest as a newborn thanks to the low gravity environment, and it is born nimble enough to navigate down any rough terrain that lies between it and its food. This creates a unique problem for many newborn hopoos, however, as they often find themselves unable to go back up. The hopoo, out of reach of its nest, usually becomes nomadic and lives on its lonesome, having forgotten about its home by the time it has grown into an adult. This is where they get their common nickname, the 'hobo bird'.\"\n\n- Europan Wildlife Guide");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!HopooEgg_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Hopoo Egg" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Hopoo Egg");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Jump <style=cIsUtility>" + HopooEgg_JumpModifier.Value * 100f + "%</style> higher <style=cStack>(+" + HopooEgg_JumpModifier.Value * 100f + "% per stack)</style>. <style=cIsUtility>Take reduced fall damage.</style>");
+        }
 
-        private static void AddHooks(ItemDef itemDef, float HopooEgg_JumpModifier)
+        private static void AddHooks()
         {
             void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
                 if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    args.jumpPowerMultAdd += HopooEgg_JumpModifier * body.inventory.GetItemCount(itemDef);
+                    args.jumpPowerMultAdd += HopooEgg_JumpModifier.Value * body.inventory.GetItemCount(itemDef);
                 }
             }
 
             RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        public static void Initiate(float HopooEgg_JumpModifier)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(HopooEgg_JumpModifier);
-            AddHooks(itemDefinition, HopooEgg_JumpModifier);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

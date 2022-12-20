@@ -4,6 +4,7 @@ using RoR2.Orbs;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -15,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ScatteredReflection";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
@@ -44,6 +45,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -230,19 +232,26 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus)
+        public static void AddTokens()
         {
-            float ScatteredReflection_DamageReflectPercent_Readable = ScatteredReflection_DamageReflectPercent * 100f;
-            float ScatteredReflection_DamageReflectShardStack_Readable = ScatteredReflection_DamageReflectShardStack * 100f;
-            float ScatteredReflection_DamageReflectBonus_Readable = ScatteredReflection_DamageReflectBonus * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Scattered Reflection");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Block and reflect some of the damage you take back to attackers. Reflect more with each <style=cWorldEvent>Shard Of Glass</style> you own.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Block and reflect {0}% of all received damage</style> back to your attacker, magnifying it by <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style>. For every <style=cIsUtility>Shard Of Glass</style> in your inventory, <style=cIsUtility>reflect {2}%</style> <style=cStack>(+{2}% per stack)</style> <style=cIsUtility>more damage</style>.", ScatteredReflection_DamageReflectPercent_Readable, ScatteredReflection_DamageReflectBonus_Readable, ScatteredReflection_DamageReflectShardStack_Readable));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "An aggregate of shattered souls\n\nLost to the wind and to time\n\nThey form a ward to protect you\n\nThe only one they can follow home");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!ScatteredReflection_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Scattered Reflection" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Scattered Reflection");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Block and reflect {0}% of all received damage</style> back to your attacker, magnifying it by <style=cIsDamage>{1}%</style> <style=cStack>(+{1}% per stack)</style>. For every <style=cIsUtility>Shard Of Glass</style> in your inventory, <style=cIsUtility>reflect {2}%</style> <style=cStack>(+{2}% per stack)</style> <style=cIsUtility>more damage</style>.", ScatteredReflection_DamageReflectPercent.Value * 100f, ScatteredReflection_DamageReflectBonus.Value * 100f, ScatteredReflection_DamageReflectShardStack.Value * 100f));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus) // Insert hooks here
+        private static void AddHooks()
         {
             void TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
             {
@@ -261,7 +270,7 @@ namespace Hex3Mod.Items
                     if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody enemyBody) && enemyBody.teamComponent && body != enemyBody && body.teamComponent.teamIndex != enemyBody.teamComponent.teamIndex && damageInfo.damage > 0.1f)
                     {
                         shardCount *= inventory.GetItemCount(itemDef); // Stacks of Scattered Reflection now strengthen the synergy
-                        float totalReflectPercent = ScatteredReflection_DamageReflectPercent + (shardCount * ScatteredReflection_DamageReflectShardStack);
+                        float totalReflectPercent = ScatteredReflection_DamageReflectPercent.Value + (shardCount * ScatteredReflection_DamageReflectShardStack.Value);
                         if (totalReflectPercent > 0.9f)
                         { 
                             totalReflectPercent = 0.9f; // Prevent damage capped at 90%
@@ -275,7 +284,7 @@ namespace Hex3Mod.Items
                         lightningOrb.bouncesRemaining = 0;
                         lightningOrb.damageCoefficientPerBounce = 1f;
                         lightningOrb.damageColorIndex = DamageColorIndex.Item;
-                        lightningOrb.damageValue = damageReflected + ((damageReflected * ScatteredReflection_DamageReflectBonus) * itemCount);
+                        lightningOrb.damageValue = damageReflected + ((damageReflected * ScatteredReflection_DamageReflectBonus.Value) * itemCount);
                         lightningOrb.damageType = DamageType.Generic;
                         lightningOrb.isCrit = false;
                         lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
@@ -294,11 +303,13 @@ namespace Hex3Mod.Items
             On.RoR2.HealthComponent.TakeDamage += TakeDamage;
         }
 
-        public static void Initiate(float ScatteredReflection_DamageReflectPercent, float ScatteredReflection_DamageReflectShardStack, float ScatteredReflection_DamageReflectBonus)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(ScatteredReflection_DamageReflectPercent, ScatteredReflection_DamageReflectShardStack, ScatteredReflection_DamageReflectBonus);
-            AddHooks(itemDefinition, ScatteredReflection_DamageReflectPercent, ScatteredReflection_DamageReflectShardStack, ScatteredReflection_DamageReflectBonus);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

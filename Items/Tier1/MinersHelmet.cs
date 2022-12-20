@@ -8,6 +8,7 @@ using RoR2.Achievements;
 using UnityEngine.AddressableAssets;
 using RoR2.Items;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -19,7 +20,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "MinersHelmet";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MinersHelmetPrefab.prefab");
@@ -59,6 +60,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -237,11 +239,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float MinersHelmet_CooldownReduction, int MinersHelmet_GoldPerProc)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Miner's Helmet");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Earning enough money reduces your skill cooldowns.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cShrine>Every time you earn ${1}</style> <style=cStack>(Scaling with time)</style>, reduce your <style=cIsUtility>skill cooldowns</style> by <style=cIsUtility>{0}</style> seconds <style=cStack>(+{0} per stack)</style>.", MinersHelmet_CooldownReduction, MinersHelmet_GoldPerProc));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: Mining Equipment" +
             "\nTracking Number: 90***********" +
             "\nEstimated Delivery: 7/10/2056" +
@@ -255,8 +256,20 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Carry enough gold to buy three legendary chests.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "We're Rich!");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!AtgPrototype_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Miner's Helmet" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Miner's Helmet");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("<style=cShrine>Every time you earn ${1}</style> <style=cStack>(Scaling with time)</style>, reduce your <style=cIsUtility>skill cooldowns</style> by <style=cIsUtility>{0}</style> seconds <style=cStack>(+{0} per stack)</style>.", MinersHelmet_CooldownReduction.Value, MinersHelmet_GoldPerProc.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float MinersHelmet_CooldownReduction, int MinersHelmet_GoldPerProc)
+        private static void AddHooks()
         {
             miningFX.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             void OnGoldCollected (On.RoR2.Stats.StatManager.orig_OnGoldCollected orig, CharacterMaster master, ulong amount)
@@ -270,8 +283,8 @@ namespace Hex3Mod.Items
                         if (body.GetComponent<MinersHelmetBehavior>() == null)
                         {
                             body.AddItemBehavior<MinersHelmetBehavior>(1);
-                            body.GetComponent<MinersHelmetBehavior>().MinersHelmet_CooldownReduction = MinersHelmet_CooldownReduction;
-                            body.GetComponent<MinersHelmetBehavior>().MinersHelmet_GoldPerProc = MinersHelmet_GoldPerProc;
+                            body.GetComponent<MinersHelmetBehavior>().MinersHelmet_CooldownReduction = MinersHelmet_CooldownReduction.Value;
+                            body.GetComponent<MinersHelmetBehavior>().MinersHelmet_GoldPerProc = MinersHelmet_GoldPerProc.Value;
                         }
                         MinersHelmetBehavior behavior = body.GetComponent<MinersHelmetBehavior>();
                         behavior.stack = body.inventory.GetItemCount(itemDef);
@@ -355,11 +368,13 @@ namespace Hex3Mod.Items
             }
         }
 
-        public static void Initiate(float MinersHelmet_CooldownReduction, int MinersHelmet_GoldPerProc)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(MinersHelmet_CooldownReduction, MinersHelmet_GoldPerProc);
-            AddHooks(itemDefinition, MinersHelmet_CooldownReduction, MinersHelmet_GoldPerProc);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

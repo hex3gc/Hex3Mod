@@ -27,13 +27,13 @@ Adds 1 artifact and 25 new items to the game:
 | | <p align="center">**LEGENDARY**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>**When an enemy dies within 20m** of you, gain a stack of **Apathy**. After reaching **15** stacks, **enter a frenzy** which grants you **+100% movement speed**, **attack speed** and **20 hp/s of regeneration** for **5 seconds** <sup>(+5s per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>**Provides immunity to movement restricting status effects**. Gain **20%** movement speed <sup>(+40% per stack)</sup> and **1** <sup>(+2 per stack)</sup> extra jumps. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188496866254868/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **4% max health** and **1 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188496866254868/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **15 max health** and **1 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **10%** <sup>(+10% per stack)</sup> chance to also contain a **Pearl** or an **Irradiant Pearl**. |
 | | <p align="center">**VOID**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>At the start of each stage, **1 random item will be corrupted into its void equivalent** <sup>(+1 per stack)</sup>. | <details><summary>Unlock</summary>Enter the Deep Void.</details> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987939840060/NoticeOfAbsence.png?raw=true" width=128> | **Notice Of Absence**<br>**Become invisible for 10 seconds** <sup>(+5 per stack)</sup> whenever a boss spawns or a teleporter event begins. **Corrupts all Bucket Lists.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890485198848/DropOfNecrosis.png?raw=true" width=128> | **Drop Of Necrosis**<br>Your attacks have a **5%** <sup>(+5% per stack)</sup> chance to inflict **Blight**, which deals **5%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1048610656749899796/CaptainsFavor.png?raw=true" width=128> | **Captain's Favor**<br>Stages contain **10%** <sup>(+10% per stack)</sup> more interactables. **Corrupts all 400 Tickets.** |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1048610656749899796/CaptainsFavor.png?raw=true" width=128> | **Captain's Favor**<br>Stages contain **8%** <sup>(+10% per stack)</sup> more interactables. **Corrupts all 400 Tickets.** |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **3** points per stack of **regenerating shield** to every player who has this item. Caps at **300 shield** per stack. **Corrupts all Infusions.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986677354506/SpatteredCollection.png?raw=true" width=128> | **Spattered Collection**<br>Your attacks have a **10%** chance to inflict **Blight**, which now **reduces enemies' armor by 2** <sup>(+2 per stack)</sup> for each stack. **Corrupts all Scattered Reflections.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>Taking damage grants a **stacking damage resistance of 5%** that lasts for **10 seconds** <sup>(+5 per stack)</sup>. **Corrupts all Symbiotic Scorpions.**|
@@ -52,12 +52,22 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+### 2.0.6 - For best results, delete your config file before startup.
+**Risk Of Options integration!** All configurable settings can now be changed in real time through the Mod Settings menu. Visual changes to stats will update between stages.
+* Added a toggleable expansion to the lobby menu.
+* <details><summary>Elder Mutagen max health boost per species 4% Max HP -> 15 Max HP</summary>Elder Mutagen's max health stacking was a little too potent for one legendary item, considering how many species can be killed in one run. The flat HP boost should still net you 300 max HP for killing 20 unique species, which is a decent number.</details>
+* <details><summary>Mint Condition default move speed per additional stack 40% -> 60%</summary>The stacking should be more powerful for this item since above 1 stack it doesn't give any new effects, just mobility.</details>
+* <details><summary>Captain's Favor default interactable increase 10% -> 7.5%</summary>This item's increase in interactables boosts the most powerful thing in the game: Items. A nerf is necessary to make this an actual tradeoff with tickets.</details>
+* Scavenger's Pack's synergy with Regenerating Scrap can now be disabled properly
+* Mint Condition should remove debuffs more reliably
+* Fixed the dependencies
+
 ### 2.0.5
 I am currently in the process of re-modelling each of this mod's items, because some of them were rushed and I'd like for the mod to have a more complete visual style. These changes will come out gradually along with some fixes once I have time to investigate the more annoying bugs.
 * **Revamped VFX** for Empathy
 * **Revamped VFX** for Scavenger's Pack: Now named Scavenger's Pouch
 * **Revamped VFX** for Elder Mutagen
-* Updated to latest R2API version, but item displays won't work for a bit.
+* Updated to latest R2API version.
 * Overkill Overdrive's Bustling Fungus and Focus Crystal buffs are now automatically disabled while UltimateCustomRun or VanillaRebalance are present, to avoid conflicts.
 * Fixed One Ticket spamming the logs (I think)
 
@@ -88,7 +98,7 @@ I am currently in the process of re-modelling each of this mod's items, because 
 ### 2.0.1
 * Readme inconsistencies
 
-### 2.0.0 - Version 2.0, and lots of big changes! Delete/reset your configs!
+### 2.0.0 - Version 2.0, and lots of big changes!
 7 brand-new items, 7 reworks to existing items, 3 achievements, and a lot of tweaks and bugfixes:
 * **Added item "Balance" (Common)**
 * **Added item "Miner's Helmet" (Common)**

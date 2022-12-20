@@ -6,6 +6,7 @@ using Hex3Mod.HelperClasses;
 using Hex3Mod.Logging;
 using System.Collections.Generic;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -16,9 +17,9 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ScavengersPouch";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
-        public static ItemDef consumedItemDefinition = CreateConsumedItem();
-        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
+        static ItemDef itemDef;
+        static ItemDef consumedItemDef;
+        static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
@@ -52,6 +53,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -269,11 +271,9 @@ namespace Hex3Mod.Items
             return new ItemDisplayRuleDict();
         }
 
-        public static void AddTokens(int ScavengersPack_Uses)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Scavenger's Pouch");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "When an item is consumed, replace it with a brand new one. Occurs up to " + ScavengersPack_Uses + " times.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed or broken</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pouch is empty.", ScavengersPack_Uses));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "========================================\n" +
             "====   MyBabel Machine Translator   ====\n" +
             "====     [Version 12.45.1.010 ]   ======\n" +
@@ -299,8 +299,21 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "No longer useful.");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer useful.");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!ScavengersPack_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Scavenger's Pouch" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Scavenger's Pouch");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", "When an item is consumed, replace it with a brand new one. Occurs up to " + ScavengersPack_Uses.Value + " times.");
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", String.Format("When an item is <style=cStack>consumed or broken</style>, <style=cIsUtility>replace it</style> with a brand new one. This may occur up to <style=cIsUtility>{0}</style> times before the pouch is empty.", ScavengersPack_Uses.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef, ItemDef hiddenItemDef, int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_CuteBow, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
+        private static void AddHooks()
         {
             int notificationsToClear = 0;
 
@@ -324,27 +337,47 @@ namespace Hex3Mod.Items
                 { "ITEM_CARTRIDGECONSUMED", "ITEM_AbyssalMedkit" }
             };
 
-            // Remove dictionary keys based on config values
-            if (!ScavengersPack_PowerElixir) { itemPairs.Remove("HealingPotionConsumed"); }
-            if (!ScavengersPack_DelicateWatch) { itemPairs.Remove("FragileDamagebonusConsumed"); }
-            if (!ScavengersPack_Dios) { itemPairs.Remove("ExtraLifeConsumed"); }
-            if (!ScavengersPack_VoidDios) { itemPairs.Remove("ExtraLifeVoidConsumed"); }
-            if (!ScavengersPack_RustedKey) { itemPairs.Remove("TreasureCacheConsumed"); }
-            if (!ScavengersPack_EncrustedKey) { itemPairs.Remove("TreasureCacheVoidConsumed"); }
-            if (!ScavengersPack_FourHundredTickets) { itemPairs.Remove("FourHundredTicketsConsumed"); }
-            if (!ScavengersPack_OneTicket) { itemPairs.Remove("OneTicketConsumed"); }
-            if (!ScavengersPack_ShopCard) { itemPairs.Remove("MysticsItems_KeepShopTerminalOpenConsumed"); }
-            if (!ScavengersPack_CuteBow) { itemPairs.Remove("MysticsItems_LimitedArmorBroken"); }
-            if (!ScavengersPack_ClockworkMechanism) { itemPairs.Remove("ITEM_BROKEN_MESS"); }
-            if (!ScavengersPack_Vials) { itemPairs.Remove("ITEM_EMPTY_VIALS"); }
-            if (!ScavengersPack_BrokenChopsticks) { itemPairs.Remove("HCFB_ITEM_BROKEN_CHOPSTICKS"); }
-            if (!ScavengersPack_AbyssalCartridge) { itemPairs.Remove("ITEM_CARTRIDGECONSUMED"); }
-            if (!ScavengersPack_Singularity) { itemPairs.Remove("ITEM_SINGULARITYCONSUMED"); }
+            void ValidateKeys()
+            {
+                // Dynamically change the dict depending on config values
+                if (!ScavengersPack_RegenScrap.Value) { itemPairs.Remove("RegeneratingScrapConsumed"); }
+                else if (!itemPairs.ContainsKey("RegeneratingScrapConsumed")) { itemPairs.Add("RegeneratingScrapConsumed", "RegeneratingScrap"); }
+                if (!ScavengersPack_PowerElixir.Value) { itemPairs.Remove("HealingPotionConsumed"); }
+                else if (!itemPairs.ContainsKey("HealingPotionConsumed")) { itemPairs.Add("HealingPotionConsumed", "HealingPotion"); }
+                if (!ScavengersPack_DelicateWatch.Value) { itemPairs.Remove("FragileDamagebonusConsumed"); }
+                else if (!itemPairs.ContainsKey("FragileDamagebonusConsumed")) { itemPairs.Add("FragileDamagebonusConsumed", "FragileDamageBonus"); }
+                if (!ScavengersPack_Dios.Value) { itemPairs.Remove("ExtraLifeConsumed"); }
+                else if (!itemPairs.ContainsKey("ExtraLifeConsumed")) { itemPairs.Add("ExtraLifeConsumed", "ExtraLife"); }
+                if (!ScavengersPack_VoidDios.Value) { itemPairs.Remove("ExtraLifeVoidConsumed"); }
+                else if (!itemPairs.ContainsKey("ExtraLifeVoidConsumed")) { itemPairs.Add("ExtraLifeVoidConsumed", "ExtraLifeVoid"); }
+                if (!ScavengersPack_RustedKey.Value) { itemPairs.Remove("TreasureCacheConsumed"); }
+                else if (!itemPairs.ContainsKey("TreasureCacheConsumed")) { itemPairs.Add("TreasureCacheConsumed", "TreasureCache"); }
+                if (!ScavengersPack_EncrustedKey.Value) { itemPairs.Remove("TreasureCacheVoidConsumed"); }
+                else if (!itemPairs.ContainsKey("TreasureCacheVoidConsumed")) { itemPairs.Add("TreasureCacheVoidConsumed", "TreasureCacheVoid"); }
+                if (!ScavengersPack_FourHundredTickets.Value) { itemPairs.Remove("FourHundredTicketsConsumed"); }
+                else if (!itemPairs.ContainsKey("FourHundredTicketsConsumed")) { itemPairs.Add("FourHundredTicketsConsumed", "FourHundredTickets"); }
+                if (!ScavengersPack_OneTicket.Value) { itemPairs.Remove("OneTicket"); }
+                else if (!itemPairs.ContainsKey("OneTicketConsumed")) { itemPairs.Add("OneTicketConsumed", "OneTicket"); }
+                if (!ScavengersPack_ShopCard.Value) { itemPairs.Remove("MysticsItems_KeepShopTerminalOpenConsumed"); }
+                else if (!itemPairs.ContainsKey("MysticsItems_KeepShopTerminalOpenConsumed")) { itemPairs.Add("MysticsItems_KeepShopTerminalOpenConsumed", "MysticsItems_KeepShopTerminalOpen"); }
+                if (!ScavengersPack_CuteBow.Value) { itemPairs.Remove("MysticsItems_LimitedArmorBroken"); }
+                else if (!itemPairs.ContainsKey("MysticsItems_LimitedArmorBroken")) { itemPairs.Add("MysticsItems_LimitedArmorBroken", "MysticsItems_LimitedArmor"); }
+                if (!ScavengersPack_ClockworkMechanism.Value) { itemPairs.Remove("ITEM_BROKEN_MESS"); }
+                else if (!itemPairs.ContainsKey("ITEM_BROKEN_MESS")) { itemPairs.Add("ITEM_BROKEN_MESS", "ITEM_CLOCKWORK_ITEM"); }
+                if (!ScavengersPack_Vials.Value) { itemPairs.Remove("ITEM_EMPTY_VIALS"); }
+                else if (!itemPairs.ContainsKey("ITEM_EMPTY_VIALS")) { itemPairs.Add("ITEM_EMPTY_VIALS", "ITEM_EHANCE_VIALS_ITEM"); }
+                if (!ScavengersPack_BrokenChopsticks.Value) { itemPairs.Remove("HCFB_ITEM_BROKEN_CHOPSTICKS"); }
+                else if (!itemPairs.ContainsKey("HCFB_ITEM_BROKEN_CHOPSTICKS")) { itemPairs.Add("HCFB_ITEM_BROKEN_CHOPSTICKS", "HCFB_ITEM_CHOPSTICKS"); }
+                if (!ScavengersPack_AbyssalCartridge.Value) { itemPairs.Remove("ITEM_CARTRIDGECONSUMED"); }
+                else if (!itemPairs.ContainsKey("ITEM_CARTRIDGECONSUMED")) { itemPairs.Add("ITEM_CARTRIDGECONSUMED", "ITEM_AbyssalMedkit"); }
+                if (!ScavengersPack_Singularity.Value) { itemPairs.Remove("ITEM_SINGULARITYCONSUMED"); }
+                else if (!itemPairs.ContainsKey("ITEM_SINGULARITYCONSUMED")) { itemPairs.Add("ITEM_SINGULARITYCONSUMED", "ITEM_SINGULARITY"); }
+            }
 
             void Inventory_RpcItemAdded(On.RoR2.Inventory.orig_RpcItemAdded orig, Inventory self, ItemIndex itemIndex)
             {
                 orig(self, itemIndex);
-
+                ValidateKeys();
                 if (self.GetItemCount(itemDef) > 0 && itemPairs.ContainsKey(ItemCatalog.GetItemDef(itemIndex).name)) // Should not call on itself, as it never adds consumed items
                 {
                     itemPairs.TryGetValue(ItemCatalog.GetItemDef(itemIndex).name, out string value);
@@ -364,12 +397,12 @@ namespace Hex3Mod.Items
 
                         self.GiveItem(hiddenItemDef);
 
-                        if (self.GetItemCount(hiddenItemDef) >= ScavengersPack_Uses) // Give empty pack if uses over 3, reset hidden items
+                        if (self.GetItemCount(hiddenItemDef) >= ScavengersPack_Uses.Value) // Give empty pack if uses over 3, reset hidden items
                         {
                             self.RemoveItem(itemDef);
-                            self.RemoveItem(hiddenItemDef, ScavengersPack_Uses);
-                            self.GiveItem(consumeditemDef);
-                            CharacterMasterNotificationQueue.PushItemTransformNotification(master, itemDef.itemIndex, consumeditemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
+                            self.RemoveItem(hiddenItemDef, ScavengersPack_Uses.Value);
+                            self.GiveItem(consumedItemDef);
+                            CharacterMasterNotificationQueue.PushItemTransformNotification(master, itemDef.itemIndex, consumedItemDef.itemIndex, CharacterMasterNotificationQueue.TransformationType.Default);
                         }
                     }
                 }
@@ -378,7 +411,7 @@ namespace Hex3Mod.Items
                 {
                     if (self.GetItemCount(itemDef) > 0)
                     {
-                        master1.GetBody().SetBuffCount(scavengerUses.buffIndex, ScavengersPack_Uses - self.GetItemCount(hiddenItemDef));
+                        master1.GetBody().SetBuffCount(scavengerUses.buffIndex, ScavengersPack_Uses.Value - self.GetItemCount(hiddenItemDef));
                     }
                     else
                     {
@@ -416,14 +449,18 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(scavengerUses);
         }
 
-        public static void Initiate(int ScavengersPack_Uses, bool ScavengersPack_PowerElixir, bool ScavengersPack_DelicateWatch, bool ScavengersPack_Dios, bool ScavengersPack_VoidDios, bool ScavengersPack_RustedKey, bool ScavengersPack_EncrustedKey, bool ScavengersPack_FourHundredTickets, bool ScavengersPack_OneTicket, bool ScavengersPack_ShopCard, bool ScavengersPack_CuteBow, bool ScavengersPack_ClockworkMechanism, bool ScavengersPack_Vials, bool ScavengersPack_BrokenChopsticks, bool ScavengersPack_AbyssalCartridge, bool ScavengersPack_Singularity)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));
-            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
+            itemDef = CreateItem();
+            consumedItemDef = CreateConsumedItem();
+            hiddenItemDef = CreateHiddenItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            ItemAPI.Add(new CustomItem(consumedItemDef, CreateHiddenDisplayRules()));
+            ItemAPI.Add(new CustomItem(hiddenItemDef, CreateHiddenDisplayRules()));
             AddBuffs();
-            AddTokens(ScavengersPack_Uses);
-            AddHooks(itemDefinition, consumedItemDefinition, hiddenItemDefinition, ScavengersPack_Uses, ScavengersPack_PowerElixir, ScavengersPack_DelicateWatch, ScavengersPack_Dios, ScavengersPack_VoidDios, ScavengersPack_RustedKey, ScavengersPack_EncrustedKey, ScavengersPack_FourHundredTickets, ScavengersPack_OneTicket, ScavengersPack_ShopCard, ScavengersPack_CuteBow, ScavengersPack_ClockworkMechanism, ScavengersPack_Vials, ScavengersPack_BrokenChopsticks, ScavengersPack_AbyssalCartridge, ScavengersPack_Singularity);
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

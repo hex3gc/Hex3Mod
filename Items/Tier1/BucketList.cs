@@ -1,6 +1,7 @@
 ﻿using R2API;
 using RoR2;
 using UnityEngine;
+using static Hex3Mod.Main;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
 
@@ -14,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "BucketList";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BucketListPrefab.prefab");
@@ -43,6 +44,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1; // Deprecated, consider changing soon
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -219,25 +221,32 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float BucketList_FullBuff, float BucketList_BuffReduce)
+        public static void AddTokens()
         {
-            float BucketList_FullBuff_Readable = BucketList_FullBuff * 100f;
-            float BucketList_BuffReduce_Readable = BucketList_BuffReduce * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Bucket List");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Move faster before teleporter events and boss fights.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Move <style=cIsUtility>" + BucketList_FullBuff_Readable + "%</style> faster <style=cStack>(+" + BucketList_FullBuff_Readable + "% per stack)</style>. Reduce this bonus by <style=cDeath>" + BucketList_BuffReduce_Readable + "%</style> during boss fights.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "- go to Saturn and see the night lights\n\n- visit grandma\n\n- see Bovine Joni in concert\n\n- try Mercurian Salts (get Jaden to make sure im ok after)\n\n- pet a gip");
         }
-
-        private static void AddHooks(ItemDef itemDef, float BucketList_FullBuff, float BucketList_BuffReduce)
+        public static void UpdateItemStatus()
         {
-            float ReducedBuff = (BucketList_FullBuff - (BucketList_FullBuff * BucketList_BuffReduce));
+            if (!BucketList_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Bucket List" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Bucket List");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Move <style=cIsUtility>" + BucketList_FullBuff.Value * 100f + "%</style> faster <style=cStack>(+" + BucketList_FullBuff.Value * 100f + "% per stack)</style>. Reduce this bonus by <style=cDeath>" + BucketList_BuffReduce.Value * 100f + "%</style> during boss fights.");
+        }
 
+        private static void AddHooks()
+        {
             void CheckForBosses(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
                 if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
+                    float ReducedBuff = BucketList_FullBuff.Value * (1f - BucketList_BuffReduce.Value);
                     var monsters = TeamComponent.GetTeamMembers(TeamIndex.Monster);
                     if (monsters != null)
                     {
@@ -256,7 +265,7 @@ namespace Hex3Mod.Items
                         }
                         else // Boss not present: Full buff
                         {
-                            args.moveSpeedMultAdd += (BucketList_FullBuff + ((body.inventory.GetItemCount(itemDef) - 1) * BucketList_FullBuff));
+                            args.moveSpeedMultAdd += (BucketList_FullBuff.Value + ((body.inventory.GetItemCount(itemDef) - 1) * BucketList_FullBuff.Value));
                         }
                     }
                 }
@@ -265,11 +274,13 @@ namespace Hex3Mod.Items
             RecalculateStatsAPI.GetStatCoefficients += CheckForBosses;
         }
 
-        public static void Initiate(float BucketList_FullBuff, float BucketList_BuffReduce)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(BucketList_FullBuff, BucketList_BuffReduce);
-            AddHooks(itemDefinition, BucketList_FullBuff, BucketList_BuffReduce);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

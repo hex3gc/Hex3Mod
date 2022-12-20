@@ -8,6 +8,7 @@ using VoidItemAPI;
 using UnityEngine.Networking;
 using System;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -19,7 +20,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "DoNotEat";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DoNotEatPrefab.prefab");
@@ -48,6 +49,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -224,18 +226,29 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Do Not Eat");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Chests may also contain a pearl.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Chests have a <style=cShrine>" + DoNotEat_PearlChancePerStack + "%</style> <style=cStack>(+" + DoNotEat_PearlChancePerStack + "% per stack)</style> chance to also contain a <style=cShrine>Pearl</style> or an <style=cShrine>Irradiant Pearl</style>.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "You know those little silica packets that say \"Do Not Eat\" on them? Or, should I say 'silica' at all?\n\n" +
                 "You see, I'm a skeptic. When the government tells me that something is dangerous, I will do it. When the government tells me there's nothing wrong, I won't believe them. The government tells me to wear protective equipment to work, I shrug it off-- and the funny thing is, I'm usually right! When was the last time a mask or a seatbelt did anything but make you uncomfortable?\n\n" +
                 "So when the government says, \"Do Not Eat\", my only logical choice is to eat. There must be something in there they don't *want* us to eat, for whatever reason... a chemical that counteracts flouridic mind control, perhaps? Something that decalcifies the pituitary gland? A cure for toxoplasmosis or even cancer? Nobody knows because nobody is willing to find out. As you know- my subscribers- that's a job for me.\n\n" +
                 "I've ordered 100 individual packs of Mercurian seaweed, each of which should contain a silica packet. I'll cut them open, pour out those little mysterious orbs and season my meals with them. My workplace is sending me out to a remote system so I won't be able to post for a while, but give me just a few months and I will reward you with the truth. Watch this space...");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!DoNotEat_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Do Not Eat" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Do Not Eat");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Chests have a <style=cShrine>" + DoNotEat_PearlChancePerStack.Value + "%</style> <style=cStack>(+" + DoNotEat_PearlChancePerStack.Value + "% per stack)</style> chance to also contain a <style=cShrine>Pearl</style> or an <style=cShrine>Irradiant Pearl</style>.");
+        }
 
-        private static void AddHooks(ItemDef itemDef, float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance)
+        private static void AddHooks()
         {
             On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
             {
@@ -254,12 +267,12 @@ namespace Hex3Mod.Items
                             }
                         }
                     }
-                    if (Util.CheckRoll(DoNotEat_PearlChancePerStack * totalItems, highestLuck))
+                    if (Util.CheckRoll(DoNotEat_PearlChancePerStack.Value * totalItems, highestLuck))
                     {
                         float angle = 360f / ((float)self.dropCount);
                         Vector3 vector = Vector3.up * (self.dropUpVelocityStrength / 2) + self.dropTransform.forward * 0f;
                         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
-                        if (Util.CheckRoll(DoNotEat_IrradiantChance))
+                        if (Util.CheckRoll(DoNotEat_IrradiantChance.Value))
                         {
                             PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.ShinyPearl.itemIndex), self.dropTransform.position + Vector3.up * 1.5f, vector);
                         }
@@ -272,11 +285,13 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float DoNotEat_PearlChancePerStack, float DoNotEat_IrradiantChance)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(DoNotEat_PearlChancePerStack, DoNotEat_IrradiantChance);
-            AddHooks(itemDefinition, DoNotEat_PearlChancePerStack, DoNotEat_IrradiantChance);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

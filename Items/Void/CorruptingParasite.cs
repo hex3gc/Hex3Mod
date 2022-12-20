@@ -7,6 +7,8 @@ using System.Linq;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -18,7 +20,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "CorruptingParasite";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CorruptingParasitePrefab.prefab");
@@ -57,7 +59,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
-            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -236,20 +238,9 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Corrupting Parasite");
-            if (CorruptingParasite_CorruptBossItems == false)
-            {
-                LanguageAPI.Add("H3_" + upperName + "_PICKUP", string.Format("Corrupts {0} of your items into their <style=cIsVoid>void equivalents</style> each stage.", CorruptingParasite_ItemsPerStage));
-                LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("At the start of a stage, <style=cIsVoid>{0} random item(s) will be corrupted into their void equivalent</style> <style=cStack>(+{0} per stack)</style>.", CorruptingParasite_ItemsPerStage));
-            }
-            else
-            {
-                LanguageAPI.Add("H3_" + upperName + "_PICKUP", string.Format("Corrupts {0} of your items into their <style=cIsVoid>void equivalents</style> each stage.", CorruptingParasite_ItemsPerStage));
-                LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("At the start of a stage, <style=cIsVoid>{0} random item(s) will be corrupted into their void equivalent</style> <style=cStack>(+{0} per stack)</style>. <style=cShrine>Affects boss items.</style>", CorruptingParasite_ItemsPerStage));
-            }
-            
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Order: Bugs" +
             "\nTracking Number: 977******" +
             "\nEstimated Delivery: Not approved" +
@@ -262,8 +253,21 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Enter the Deep Void Portal.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "From The Depths");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!CorruptingParasite_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Corrupting Parasite" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Corrupting Parasite");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", string.Format("Corrupts {0} of your items into their <style=cIsVoid>void equivalents</style> each stage.", CorruptingParasite_ItemsPerStage.Value));
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("At the start of a stage, <style=cIsVoid>{0} random item(s) will be corrupted into their void equivalent</style> <style=cStack>(+{0} per stack)</style>.", CorruptingParasite_ItemsPerStage.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
+        private static void AddHooks()
         {
             On.RoR2.CharacterMaster.OnServerStageBegin += (orig, self, stage) =>
             {
@@ -271,7 +275,7 @@ namespace Hex3Mod.Items
                 if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                 {
                     Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.stageRng.nextUlong);
-                    int itemsLeft = self.inventory.GetItemCount(itemDef) * CorruptingParasite_ItemsPerStage;
+                    int itemsLeft = self.inventory.GetItemCount(itemDef) * CorruptingParasite_ItemsPerStage.Value;
                     List<ItemIndex> itemList = new List<ItemIndex>(self.inventory.itemAcquisitionOrder);
                     Util.ShuffleList(itemList, rng);
                     rng.Next();
@@ -282,7 +286,7 @@ namespace Hex3Mod.Items
                         {
                             break;
                         }
-                        if (!CorruptingParasite_CorruptBossItems && ItemCatalog.GetItemDef(item).tier == ItemTier.Boss)
+                        if (!CorruptingParasite_CorruptBossItems.Value && ItemCatalog.GetItemDef(item).tier == ItemTier.Boss)
                         {
                             continue;
                         }
@@ -327,11 +331,13 @@ namespace Hex3Mod.Items
             }
         }
 
-        public static void Initiate(bool CorruptingParasite_CorruptBossItems, int CorruptingParasite_ItemsPerStage)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(CorruptingParasite_CorruptBossItems, CorruptingParasite_ItemsPerStage);
-            AddHooks(itemDefinition, CorruptingParasite_CorruptBossItems, CorruptingParasite_ItemsPerStage);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

@@ -4,8 +4,9 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using System.Collections.Generic;
 using System.Linq;
-using RoR2;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -18,7 +19,7 @@ namespace Hex3Mod.Items
     {
         static string equipName = "BloodOfTheLamb";
         static string upperName = equipName.ToUpper();
-        static EquipmentDef equipDefinition = CreateEquip();
+        static EquipmentDef equipmentDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BloodOfTheLambPrefab.prefab");
@@ -49,6 +50,7 @@ namespace Hex3Mod.Items
             equipment.canBeRandomlyTriggered = false;
             equipment.isBoss = false;
             equipment.isLunar = true;
+            equipment.requiredExpansion = Hex3ModExpansion;
 
             equipment.pickupModelPrefab = LoadPrefab();
             equipment.pickupIconSprite = LoadSprite();
@@ -225,11 +227,9 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(int BloodOfTheLamb_ItemsTaken)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Blood Of The Lamb");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "<style=cDeath>Purge " + BloodOfTheLamb_ItemsTaken + " of your items</style> for a <style=cShrine>random boss item.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cDeath>Purge " + BloodOfTheLamb_ItemsTaken + " of your items</style> for a <style=cShrine>random boss item.</style> Any item except <style=cIsUtility>Lunar</style>, <style=cStack>Tierless</style>, or <style=cShrine>Boss</style> items may be purged.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\nOrder: 0" +
             "\nTracking Number: <style=cIsUtility>0000000000000</style>" +
             "\nEstimated Delivery: <style=cIsUtility>00/00/0000</style>" +
@@ -242,8 +242,21 @@ namespace Hex3Mod.Items
             "\n\n<style=cIsUtility>000000</style>" +
             "\n\n<style=cIsUtility>ORIGIN</style>");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!BloodOfTheLamb_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Blood Of The Lamb" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Blood Of The Lamb");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_PICKUP", "<style=cDeath>Purge " + BloodOfTheLamb_ItemsTaken.Value + " of your items</style> for a <style=cShrine>random boss item.</style>");
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "<style=cDeath>Purge " + BloodOfTheLamb_ItemsTaken.Value + " of your items</style> for a <style=cShrine>random boss item.</style> Any item except <style=cIsUtility>Lunar</style>, <style=cStack>Tierless</style>, or <style=cShrine>Boss</style> items may be purged.");
+        }
 
-        private static void AddHooks(EquipmentDef equipmentDef, int BloodOfTheLamb_ItemsTaken)
+        private static void AddHooks()
         {
             bool PerformEquipmentAction(On.RoR2.EquipmentSlot.orig_PerformEquipmentAction orig, EquipmentSlot self, EquipmentDef heldEquipmentDef)
             {
@@ -252,7 +265,7 @@ namespace Hex3Mod.Items
                     if (self.characterBody && self.characterBody.inventory && self.characterBody.master)
                     {
                         int totalApplicableItemCount = self.characterBody.inventory.GetTotalItemCountOfTier(ItemTier.Tier1) + self.characterBody.inventory.GetTotalItemCountOfTier(ItemTier.Tier2) + self.characterBody.inventory.GetTotalItemCountOfTier(ItemTier.Tier3) + self.characterBody.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier1) + self.characterBody.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier2) + self.characterBody.inventory.GetTotalItemCountOfTier(ItemTier.VoidTier3);
-                        if (totalApplicableItemCount >= BloodOfTheLamb_ItemsTaken)
+                        if (totalApplicableItemCount >= BloodOfTheLamb_ItemsTaken.Value)
                         {
                             Util.PlaySound(EntityStates.ImpBossMonster.GroundPound.initialAttackSoundString, self.gameObject);
                             EffectData effectData = new EffectData
@@ -279,7 +292,7 @@ namespace Hex3Mod.Items
                                     break;
                                 }
                             }
-                            for (int i = 0; i < BloodOfTheLamb_ItemsTaken; i++) // Takes random item each loop
+                            for (int i = 0; i < BloodOfTheLamb_ItemsTaken.Value; i++) // Takes random item each loop
                             {
                                 itemList = inventory.itemAcquisitionOrder;
                                 Util.ShuffleList(itemList, rng);
@@ -311,11 +324,13 @@ namespace Hex3Mod.Items
             On.RoR2.EquipmentSlot.PerformEquipmentAction += PerformEquipmentAction;
         }
 
-        public static void Initiate(int BloodOfTheLamb_ItemsTaken)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomEquipment(equipDefinition, CreateDisplayRules()));
-            AddTokens(BloodOfTheLamb_ItemsTaken);
-            AddHooks(equipDefinition, BloodOfTheLamb_ItemsTaken);
+            equipmentDef = CreateEquip();
+            ItemAPI.Add(new CustomEquipment(equipmentDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

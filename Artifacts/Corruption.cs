@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Hex3Mod;
 using Hex3Mod.Logging;
+using static Hex3Mod.Main;
 namespace Hex3Mod.Artifacts
 {
     public class ArtifactOfCorruption
@@ -28,6 +29,7 @@ namespace Hex3Mod.Artifacts
             artifact.cachedName = artifactName;
             artifact.nameToken = "H3_" + upperName + "_NAME";
             artifact.descriptionToken = "H3_" + upperName + "_DESC";
+            artifact.requiredExpansion = Hex3ModExpansion;
 
             artifact.smallIconSelectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_On.png");
             artifact.smallIconDeselectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_Off.png");
@@ -40,13 +42,13 @@ namespace Hex3Mod.Artifacts
             LanguageAPI.Add("H3_" + upperName + "_DESC", "Gives you one <style=cIsVoid>Corrupting Parasite</style> each stage.");
         }
 
-        public static void AddHooks(ArtifactDef artifactDefToHooks) // Insert hooks here
+        public static void AddHooks() // Insert hooks here
         {
             void giveParasite(CharacterMaster master)
             {
-                if (artifactEnabled == true && master.inventory && ItemCatalog.FindItemIndex("CorruptingParasite") != ItemIndex.None)
+                if (artifactEnabled == true && master.inventory)
                 {
-                    master.inventory.GiveItemString("CorruptingParasite"); // Simple, easy, effective
+                    master.inventory.GiveItemString("CorruptingParasite");
                 }
             }
 
@@ -61,7 +63,7 @@ namespace Hex3Mod.Artifacts
             CreateArtifact();
             ContentAddition.AddArtifactDef(artifactDefinition);
             AddTokens();
-            AddHooks(artifactDefinition);
+            AddHooks();
         }
     }
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -17,7 +19,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "SpatteredCollection";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/SpatteredCollectionPrefab.prefab");
@@ -46,7 +48,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier2;
             item.canRemove = true;
             item.hidden = false;
-            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -223,18 +225,29 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float SpatteredCollection_ArmorReduction, float SpatteredCollection_DotChance)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Spattered Collection");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Your attacks may inflict a potent <style=cIsDamage>Blight</style> which melts through enemies' armor. <style=cIsVoid>Corrupts all Scattered Reflections.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Your attacks have a <style=cIsDamage>{1}%</style> chance to inflict <style=cIsDamage>Blight</style>, which now <style=cIsDamage>reduces enemies' armor by {0}</style> <style=cStack>(+2 per stack)</style> for each stack. <style=cIsVoid>Corrupts all Scattered Reflections.</style>", SpatteredCollection_ArmorReduction, SpatteredCollection_DotChance));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I don't remember my name... I don't, not at all. That's all gone.\"" +
             "\n\n<style=cStack>(Several minutes of silence, broken up by what sounds like shuffles and clattering of glass)</style>" +
             "\n\n\"My collection. It's wonderful, isn't it? I want you to see it. Please, come see my collection... Bubbling, stinging poisons, corrosive to the touch... If you listen closely it's bubbling, here...\"" +
             "\n\n<style=cStack>(Bubbling sounds, mixed with heavy breathing. The audio recording ends shortly after.)</style>");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!SpatteredCollection_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Spattered Collection" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Spattered Collection");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Your attacks have a <style=cIsDamage>{1}%</style> chance to inflict <style=cIsDamage>Blight</style>, which now <style=cIsDamage>reduces enemies' armor by {0}</style> <style=cStack>(+2 per stack)</style> for each stack. <style=cIsVoid>Corrupts all Scattered Reflections.</style>", SpatteredCollection_ArmorReduction.Value, SpatteredCollection_DotChance.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float SpatteredCollection_ArmorReduction, float SpatteredCollection_DotChance) // Insert hooks here
+        private static void AddHooks() // Insert hooks here
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "ScatteredReflection");
@@ -245,14 +258,14 @@ namespace Hex3Mod.Items
                 {
                     if (body.GetBuffCount(RoR2Content.Buffs.Blight) > 0)
                     {
-                        args.armorAdd -= (SpatteredCollection_ArmorReduction * Util.GetItemCountForTeam(TeamIndex.Player, itemDef.itemIndex, true)) * body.GetBuffCount(RoR2Content.Buffs.Blight);
+                        args.armorAdd -= (SpatteredCollection_ArmorReduction.Value * Util.GetItemCountForTeam(TeamIndex.Player, itemDef.itemIndex, true)) * body.GetBuffCount(RoR2Content.Buffs.Blight);
                     }
                 }
                 if (body.teamComponent && body.teamComponent.teamIndex == TeamIndex.Player && Util.GetItemCountForTeam(TeamIndex.Monster, itemDef.itemIndex, true) + Util.GetItemCountForTeam(TeamIndex.Lunar, itemDef.itemIndex, true) + Util.GetItemCountForTeam(TeamIndex.Void, itemDef.itemIndex, true) > 0)
                 {
                     if (body.GetBuffCount(RoR2Content.Buffs.Blight) > 0)
                     {
-                        args.armorAdd -= (SpatteredCollection_ArmorReduction * (Util.GetItemCountForTeam(TeamIndex.Monster, itemDef.itemIndex, true) + Util.GetItemCountForTeam(TeamIndex.Lunar, itemDef.itemIndex, true) + Util.GetItemCountForTeam(TeamIndex.Void, itemDef.itemIndex, true))) * body.GetBuffCount(RoR2Content.Buffs.Blight);
+                        args.armorAdd -= (SpatteredCollection_ArmorReduction.Value * (Util.GetItemCountForTeam(TeamIndex.Monster, itemDef.itemIndex, true) + Util.GetItemCountForTeam(TeamIndex.Lunar, itemDef.itemIndex, true) + Util.GetItemCountForTeam(TeamIndex.Void, itemDef.itemIndex, true))) * body.GetBuffCount(RoR2Content.Buffs.Blight);
                     }
                 }
             }
@@ -267,7 +280,7 @@ namespace Hex3Mod.Items
                     {
                         if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage && damageInfo.damage > 0f)
                         {
-                            if (Util.CheckRoll((SpatteredCollection_DotChance * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck) == true)
+                            if (Util.CheckRoll((SpatteredCollection_DotChance.Value * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck) == true)
                             {
                                 InflictDotInfo inflictDotInfo = new InflictDotInfo
                                 {
@@ -286,12 +299,13 @@ namespace Hex3Mod.Items
             };
         }
 
-        public static void Initiate(float SpatteredCollection_ArmorReduction, float SpatteredCollection_DotChance)
+        public static void Initiate()
         {
-            CreateItem();
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(SpatteredCollection_ArmorReduction, SpatteredCollection_DotChance);
-            AddHooks(itemDefinition, SpatteredCollection_ArmorReduction, SpatteredCollection_DotChance);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

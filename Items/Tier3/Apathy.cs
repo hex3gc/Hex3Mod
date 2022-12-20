@@ -3,11 +3,9 @@ using RoR2;
 using System;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
-using static Hex3Mod.Items.Empathy;
 using UnityEngine.AddressableAssets;
-using static RoR2.NetworkSession;
-using HG;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -18,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "Apathy";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
@@ -60,6 +58,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -236,11 +235,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Apathy");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Power up after witnessing enough violence.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", String.Format("When an enemy dies within <style=cDeath>{0}m</style> of you, gain a stack of <style=cDeath>Apathy</style>. After reaching <style=cIsDamage>{5}</style> stacks, <style=cDeath>enter a frenzy</style> which grants you <style=cIsDamage>+{1}% movement speed, +{2}% attack speed and {3} hp/s of regeneration for {4} seconds</style> <style=cStack>(+{4}s per stack)</style>", Apathy_Radius, Apathy_MoveSpeedAdd * 100f, Apathy_AttackSpeedAdd * 100f, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills));
             LanguageAPI.Add("H3_" + upperName + "_LORE",
                 "\"I can't [REDACTED] believe I'm doing this...\"" +
                 "\n\n\"We'll share the network. We have to.\"" +
@@ -252,7 +250,7 @@ namespace Hex3Mod.Items
                 "\n\nAs it drew near enough to the crewmates' faces, it suddenly gained speed and latched onto their noses and mouths, choking the one who wasn't prepared. The calmer of the crew raised a hand to try and ease the other down to his level, but he had already doubled over, trying to wrench the substance from his face. Neither could speak." +
                 "\n\nIt took less time for the substance to enter and integrate with its first host, who began to yell and command his crewmate to keep calm and hold his breath." +
                 "\n\nThe struggling crewmate was purple in the face and teary-eyed. He felt like he was about to die. The goop then sucked itself into his system and propogated its way through, leaving him coughing and wretching." +
-                "\n\n\"Oh my god... oh my god...\" He croaked out the words" +
+                "\n\n\"Oh my god... oh my god...\" He croaked out the words." +
                 "\n\n\"Look- we need to leave, now. That Titan could show up at-\"" +
                 "\n\nTheir ship was then crushed in on one side. Stone demolished metal for one deafening moment and then stopped. The Stone Titan only had to kick the craft once in order to destroy it beyond repair. One of its occupants, however, managed to get to his feet and reorient himself." +
                 "\n\n\"Burke ? You alright ? Where...\"" +
@@ -264,8 +262,20 @@ namespace Hex3Mod.Items
                 "\n\nThe Titan had never felt fear before."
                 );
         }
+        public static void UpdateItemStatus()
+        {
+            if (!Apathy_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Apathy" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Apathy");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", String.Format("When an enemy dies within <style=cDeath>{0}m</style> of you, gain a stack of <style=cDeath>Apathy</style>. After reaching <style=cIsDamage>{5}</style> stacks, <style=cDeath>enter a frenzy</style> which grants you <style=cIsDamage>+{1}% movement speed, +{2}% attack speed and {3} hp/s of regeneration for {4} seconds</style> <style=cStack>(+{4}s per stack)</style>", Apathy_Radius.Value, Apathy_MoveSpeedAdd.Value * 100f, Apathy_AttackSpeedAdd.Value * 100f, Apathy_RegenAdd.Value, Apathy_Duration.Value, Apathy_RequiredKills.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills, float OverkillOverdrive_ZoneIncrease)
+        private static void AddHooks()
         {
             // Add/remove radius indicator on inventory change
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
@@ -284,9 +294,9 @@ namespace Hex3Mod.Items
                     }
 
                     ApathyBehavior behavior = self.GetComponent<ApathyBehavior>();
-                    behavior.radius = Apathy_Radius + (Apathy_Radius * ((OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives));
-                    behavior.sizeAddMultiplier = (OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives;
-                    behavior.focusCrystalSizeDivisor = Apathy_Radius / 13f;
+                    behavior.radius = Apathy_Radius.Value + (Apathy_Radius.Value * ((OverkillOverdrive_ZoneIncrease.Value / 100f) * numberOfOverdrives));
+                    behavior.sizeAddMultiplier = (OverkillOverdrive_ZoneIncrease.Value / 100f) * numberOfOverdrives;
+                    behavior.focusCrystalSizeDivisor = Apathy_Radius.Value / 13f;
                     behavior.enable = true;
                 }
                 if (self.inventory && self.inventory.GetItemCount(itemDef) <= 0 && self.GetComponent<ApathyBehavior>())
@@ -309,15 +319,15 @@ namespace Hex3Mod.Items
                     {
                         numberOfOverdrives = apathyOwner.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("OverkillOverdrive"));
                     }
-                    if (deathDistanceVector.sqrMagnitude <= (float)Math.Pow(Apathy_Radius + (Apathy_Radius * ((OverkillOverdrive_ZoneIncrease / 100f) * numberOfOverdrives)), 2) && apathyOwner.body.GetBuffCount(apathyBuff) <= 0)
+                    if (deathDistanceVector.sqrMagnitude <= (float)Math.Pow(Apathy_Radius.Value + (Apathy_Radius.Value * ((OverkillOverdrive_ZoneIncrease.Value / 100f) * numberOfOverdrives)), 2) && apathyOwner.body.GetBuffCount(apathyBuff) <= 0)
                     {
                         apathyOwner.body.AddBuff(apathyStacks);
-                        if (apathyOwner.body.GetBuffCount(apathyStacks) >= Apathy_RequiredKills)
+                        if (apathyOwner.body.GetBuffCount(apathyStacks) >= Apathy_RequiredKills.Value)
                         {
                             Util.PlaySound(EntityStates.ImpBossMonster.GroundPound.initialAttackSoundString, apathyOwner.body.gameObject);
-                            apathyOwner.body.AddTimedBuff(apathyBuff, Apathy_Duration + (Apathy_Duration * (apathyOwner.body.inventory.GetItemCount(itemDef) - 1)));
+                            apathyOwner.body.AddTimedBuff(apathyBuff, Apathy_Duration.Value + (Apathy_Duration.Value * (apathyOwner.body.inventory.GetItemCount(itemDef) - 1)));
                             apathyOwner.body.SetBuffCount(apathyStacks.buffIndex, 0);
-                            apathyOwner.currentBuffDuration = Apathy_Duration + (Apathy_Duration * (apathyOwner.body.inventory.GetItemCount(itemDef) - 1));
+                            apathyOwner.currentBuffDuration = Apathy_Duration.Value + (Apathy_Duration.Value * (apathyOwner.body.inventory.GetItemCount(itemDef) - 1));
                             apathyOwner.body.RecalculateStats();
                         }
                     }
@@ -328,9 +338,9 @@ namespace Hex3Mod.Items
             {
                 if (body.GetBuffCount(apathyBuff) > 0)
                 {
-                    args.moveSpeedMultAdd += Apathy_MoveSpeedAdd;
-                    args.attackSpeedMultAdd += Apathy_MoveSpeedAdd;
-                    args.baseRegenAdd += Apathy_RegenAdd;
+                    args.moveSpeedMultAdd += Apathy_MoveSpeedAdd.Value;
+                    args.attackSpeedMultAdd += Apathy_MoveSpeedAdd.Value;
+                    args.baseRegenAdd += Apathy_RegenAdd.Value;
                 }
             }
 
@@ -438,12 +448,14 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(apathyBuff);
         }
 
-        public static void Initiate(float Apathy_Radius, float Apathy_MoveSpeedAdd, float Apathy_AttackSpeedAdd, float Apathy_RegenAdd, float Apathy_Duration, int Apathy_RequiredKills, float OverkillOverdrive_ZoneIncrease)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
             AddBuffs();
-            AddHooks(itemDefinition, Apathy_Radius, Apathy_MoveSpeedAdd, Apathy_AttackSpeedAdd, Apathy_RegenAdd, Apathy_Duration, Apathy_RequiredKills, OverkillOverdrive_ZoneIncrease);
+            AddHooks();
         }
     }
 }

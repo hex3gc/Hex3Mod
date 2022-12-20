@@ -3,6 +3,7 @@ using RoR2;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -14,7 +15,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "MintCondition";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MintConditionPrefab.prefab");
@@ -43,6 +44,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -219,14 +221,11 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack)
+        public static void AddTokens()
         {
-            float MintCondition_MoveSpeed_Readable = MintCondition_MoveSpeed * 100f;
-            float MintCondition_MoveSpeedStack_Readable = MintCondition_MoveSpeedStack * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Mint Condition");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "You are immune to movement restricting status effects. Gain movement speed and extra jumps.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cIsUtility>Provides immunity to all movement restricting status effects</style>. Gain <style=cIsUtility>" + MintCondition_MoveSpeed_Readable + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack_Readable + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack + " per stack)</style> extra jumps.");
+            LanguageAPI.Add("H3_" + upperName + "_DESC", "<style=cIsUtility>Provides immunity to all movement restricting status effects</style>. Gain <style=cIsUtility>" + MintCondition_MoveSpeed.Value * 100f + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack.Value * 100f + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps.Value + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack.Value + " per stack)</style> extra jumps.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", 
                 "\nOrder: Eclipse 380 Boosts(Mint Condition)" +
                 "\nTracking Number: 240******" +
@@ -240,8 +239,20 @@ namespace Hex3Mod.Items
                 "\n\nEdit by Customer 240****** (03/02/2056)" +
                 "\n\"Lost in transit\" are you joking??? you STILL HAVE the money it has not been refunded. I will sue your [REDACTED] [REDACTED] to mars and back if you keep turning down my calls, believe it you [REDACTED]. You don't know what kind of [REDACTED] youve gotten yourselves into now");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!MintCondition_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Mint Condition" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Mint Condition");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "<style=cIsUtility>Provides immunity to all movement restricting status effects</style>. Gain <style=cIsUtility>" + MintCondition_MoveSpeed.Value * 100f + "%</style> <style=cStack>(+" + MintCondition_MoveSpeedStack.Value * 100f + "% per stack)</style> movement speed and <style=cIsUtility>" + MintCondition_AddJumps.Value + "</style> <style=cStack>(+" + MintCondition_AddJumpsStack.Value + " per stack)</style> extra jumps.");
+        }
 
-        private static void AddHooks(ItemDef itemDef, float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack)
+        private static void AddHooks()
         {
             void H3_MobilityIncreaseRoR(CharacterBody body) // I don't know how to effectively add base move speed, so doing it separately through r2api is the safe option
             {
@@ -250,7 +261,7 @@ namespace Hex3Mod.Items
                     int itemCount = body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
-                        body.maxJumpCount += MintCondition_AddJumps + (MintCondition_AddJumpsStack * (itemCount - 1));
+                        body.maxJumpCount += MintCondition_AddJumps.Value + (MintCondition_AddJumpsStack.Value * (itemCount - 1));
                     }
                 }
             }
@@ -262,7 +273,7 @@ namespace Hex3Mod.Items
                     int itemCount = body.inventory.GetItemCount(itemDef);
                     if (itemCount > 0)
                     {
-                        args.moveSpeedMultAdd += (MintCondition_MoveSpeed + (MintCondition_MoveSpeedStack * (itemCount - 1)));
+                        args.moveSpeedMultAdd += (MintCondition_MoveSpeed.Value + (MintCondition_MoveSpeedStack.Value * (itemCount - 1)));
                     }
                 }
             }
@@ -293,7 +304,7 @@ namespace Hex3Mod.Items
                     {
                         if (receivedBuff.name == "bdBeetleJuice" || receivedBuff.name == "bdClayGoo" || receivedBuff.name == "bdCripple" || receivedBuff.name == "bdNullified" || receivedBuff.name == "bdNullifyStack" || receivedBuff.name == "bdSlow50" || receivedBuff.name == "bdSlow60" || receivedBuff.name == "bdSlow80" || receivedBuff.name == "bdWeak" || receivedBuff.name == "bdLunarSecondaryRoot" || receivedBuff.name == "bdEntangle" || receivedBuff.name == "bdJailerSlow" || receivedBuff.name == "bdJailerTether" || receivedBuff.name == "bdSlow30")
                         {
-                            body.RemoveBuff(receivedBuff); // Remove the buff if it matches the bill
+                            body.SetBuffCount(receivedBuff.buffIndex, 0); // Remove the buff if it matches the bill
                         }
                     }
                 }
@@ -317,12 +328,13 @@ namespace Hex3Mod.Items
             RecalculateStatsAPI.GetStatCoefficients += H3_MobilityIncreaseR2API;
         }
 
-        public static void Initiate(float MintCondition_MoveSpeed, float MintCondition_MoveSpeedStack, int MintCondition_AddJumps, int MintCondition_AddJumpsStack)
+        public static void Initiate()
         {
-            CreateItem();
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(MintCondition_MoveSpeed, MintCondition_MoveSpeedStack, MintCondition_AddJumps, MintCondition_AddJumpsStack);
-            AddHooks(itemDefinition, MintCondition_MoveSpeed, MintCondition_MoveSpeedStack, MintCondition_AddJumps, MintCondition_AddJumpsStack);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

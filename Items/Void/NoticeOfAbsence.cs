@@ -6,6 +6,7 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -17,7 +18,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "NoticeOfAbsence";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/NoticeOfAbsencePrefab.prefab");
@@ -46,7 +47,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
-            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -223,15 +224,26 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float NoticeOfAbsence_InvisibilityBuff, float NoticeOfAbsence_InvisibilityBuffStack)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Notice Of Absence");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Become temporarily invisible when boss fights begin. <style=cIsVoid>Corrupts all Bucket Lists.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Become invisible for {0} seconds</style> <style=cStack>(+{1} per stack)</style> whenever a boss spawns or a teleporter event begins. <style=cIsVoid>Corrupts all Bucket Lists.</style>", NoticeOfAbsence_InvisibilityBuff, NoticeOfAbsence_InvisibilityBuffStack));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "I'm leaving tomorrow\n\nYou wouldn't understand why\n\n- Alex");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!NoticeOfAbsence_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Notice Of Absence" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Notice Of Absence");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("<style=cIsUtility>Become invisible for {0} seconds</style> <style=cStack>(+{1} per stack)</style> whenever a boss spawns or a teleporter event begins. <style=cIsVoid>Corrupts all Bucket Lists.</style>", NoticeOfAbsence_InvisibilityBuff.Value, NoticeOfAbsence_InvisibilityBuffStack.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float NoticeOfAbsence_InvisibilityBuff, float NoticeOfAbsence_InvisibilityBuffStack)
+        private static void AddHooks()
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "BucketList");
@@ -242,7 +254,7 @@ namespace Hex3Mod.Items
                 {
                     if (ally.body && ally.body.inventory && ally.body.inventory.GetItemCount(itemDef) > 0)
                     {
-                        ally.body.AddTimedBuff(RoR2Content.Buffs.Cloak, NoticeOfAbsence_InvisibilityBuff + ((ally.body.inventory.GetItemCount(itemDef) - 1) * NoticeOfAbsence_InvisibilityBuffStack));
+                        ally.body.AddTimedBuff(RoR2Content.Buffs.Cloak, NoticeOfAbsence_InvisibilityBuff.Value + ((ally.body.inventory.GetItemCount(itemDef) - 1) * NoticeOfAbsence_InvisibilityBuffStack.Value));
                     }
                 }
             }
@@ -262,12 +274,13 @@ namespace Hex3Mod.Items
             On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable;
         }
 
-        public static void Initiate(float NoticeOfAbsence_InvisibilityBuff, float NoticeOfAbsence_InvisibilityBuffStack)
+        public static void Initiate()
         {
-            CreateItem();
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(NoticeOfAbsence_InvisibilityBuff, NoticeOfAbsence_InvisibilityBuffStack);
-            AddHooks(itemDefinition, NoticeOfAbsence_InvisibilityBuff, NoticeOfAbsence_InvisibilityBuffStack);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

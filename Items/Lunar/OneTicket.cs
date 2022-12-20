@@ -9,6 +9,7 @@ using UnityEngine.Diagnostics;
 using System.ComponentModel;
 using EntityStates.AffixVoid;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -20,9 +21,9 @@ namespace Hex3Mod.Items
     {
         static string itemName = "OneTicket";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
-        public static ItemDef consumedItemDefinition = CreateConsumedItem();
-        public static ItemDef hiddenItemDefinition = CreateHiddenItem();
+        static ItemDef itemDef;
+        public static ItemDef consumedItemDef;
+        public static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OneTicketPrefab.prefab");
@@ -66,6 +67,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Lunar;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -307,8 +309,19 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("ACHIEVEMENT_" + upperName + "_DESCRIPTION", "Use 400 Tickets to duplicate the contents of a Scavenger's bag.");
             LanguageAPI.Add(upperName + "_UNLOCK_NAME", "It's A Feature");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!OneTicket_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "One Ticket" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "One Ticket");
+            }
+        }
 
-        private static void AddHooks(ItemDef itemDef, ItemDef consumedItemDef, ItemDef hiddenItemDef)
+        private static void AddHooks()
         {
             // Give a hidden item every stage to ensure the player has been holding the ticket since the stage began
             void CharacterMaster_OnServerStageBegin(On.RoR2.CharacterMaster.orig_OnServerStageBegin orig, CharacterMaster self, Stage stage)
@@ -466,12 +479,16 @@ namespace Hex3Mod.Items
 
         public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));
-            ItemAPI.Add(new CustomItem(hiddenItemDefinition, CreateHiddenDisplayRules()));
-            AddBuffs();
+            itemDef = CreateItem();
+            consumedItemDef = CreateConsumedItem();
+            hiddenItemDef = CreateHiddenItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            ItemAPI.Add(new CustomItem(consumedItemDef, CreateHiddenDisplayRules()));
+            ItemAPI.Add(new CustomItem(hiddenItemDef, CreateHiddenDisplayRules()));
             AddTokens();
-            AddHooks(itemDefinition, consumedItemDefinition, hiddenItemDefinition);
+            UpdateItemStatus();
+            AddBuffs();
+            AddHooks();
         }
     }
 }

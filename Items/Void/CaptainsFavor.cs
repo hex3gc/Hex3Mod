@@ -1,9 +1,13 @@
 ﻿using R2API;
 using RoR2;
+using RoR2.ExpansionManagement;
 using UnityEngine;
 using Hex3Mod.HelperClasses;
 using VoidItemAPI;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
+using System.Linq;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -14,7 +18,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "CaptainsFavor";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CaptainsFavorPrefab.prefab");
@@ -43,6 +47,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -219,15 +224,26 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float CaptainsFavor_InteractableIncrease)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Captain's Favor");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Future stages will contain more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Stages contain <style=cShrine>{0}%</style> <style=cStack>(+{0}% per stack)</style> more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>", CaptainsFavor_InteractableIncrease));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Don't spend it all in one place...\n\nOr, better yet, don't spend it all. That's MY card!");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!CaptainsFavor_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Captain's Favor" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Captain's Favor");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Stages contain <style=cShrine>{0}%</style> <style=cStack>(+{0}% per stack)</style> more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>", CaptainsFavor_InteractableIncrease.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float CaptainsFavor_InteractableIncrease)
+        private static void AddHooks()
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "FourHundredTickets");
@@ -244,7 +260,7 @@ namespace Hex3Mod.Items
                 }
                 if (favorCount > 0)
                 {
-                    float extraCredits = self.interactableCredit * ((CaptainsFavor_InteractableIncrease / 100f) * favorCount);
+                    float extraCredits = self.interactableCredit * ((CaptainsFavor_InteractableIncrease.Value / 100f) * favorCount);
                     self.interactableCredit += (int)extraCredits;
                 }
                 orig(self);
@@ -252,11 +268,13 @@ namespace Hex3Mod.Items
             On.RoR2.SceneDirector.PopulateScene += SceneDirector_PopulateScene;
         }
 
-        public static void Initiate(float CaptainsFavor_InteractableIncrease)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(CaptainsFavor_InteractableIncrease);
-            AddHooks(itemDefinition, CaptainsFavor_InteractableIncrease);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

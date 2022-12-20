@@ -14,6 +14,8 @@ using MonoMod.Cil;
 using System;
 using System.Linq;
 using EntityStates.Missions.Arena.NullWard;
+using static Hex3Mod.Main;
+using Hex3Mod.Logging;
 
 namespace Hex3Mod.Items
 {
@@ -24,7 +26,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "OverkillOverdrive";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OverkillOverdrivePrefab.prefab");
@@ -53,6 +55,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier2;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -229,22 +232,33 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float OverkillOverdrive_ZoneIncrease)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Overkill Overdrive");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I want everyone to hear it, even if it doesn't sound good.\"\n\n- Written on a sticky note, attached to the package the item arrived in.");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Amplify the range of area buffs and holdout zones.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Amplify the radius of <style=cIsUtility>area buffs</style> and <style=cWorldEvent>holdout zones</style> by <style=cWorldEvent>{0}%</style> <style=cStack>(+{0}% per stack)</style>", OverkillOverdrive_ZoneIncrease));
+        }
+        public static void UpdateItemStatus()
+        {
+            if (!OverkillOverdrive_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Overkill Overdrive" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Overkill Overdrive");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Amplify the radius of <style=cIsUtility>area buffs</style> and <style=cWorldEvent>holdout zones</style> by <style=cWorldEvent>{0}%</style> <style=cStack>(+{0}% per stack)</style>", OverkillOverdrive_ZoneIncrease.Value));
         }
 
-        private static void AddHooks(ItemDef itemDef, bool OverkillOverdrive_TurretBlacklist, float OverkillOverdrive_ZoneIncrease, bool Overkilloverdrive_EnableHoldouts, bool Overkilloverdrive_EnableShrineWoods, bool Overkilloverdrive_EnableFocusCrystal, bool Overkilloverdrive_EnableBuffWards, bool Overkilloverdrive_EnableDeskPlant, bool Overkilloverdrive_EnableBungus)
+        private static void AddHooks()
         {
             float FindTotalMultiplier() // Gets the appropriate radius multiplier based on all player inventories
             {
                 int totalItemAmount = 0;
                 foreach (TeamComponent ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                 {
-                    if (ally.body && OverkillOverdrive_TurretBlacklist == true)
+                    if (ally.body && OverkillOverdrive_TurretBlacklist.Value == true)
                     {
                         string trimmedName = ally.body.name.Replace("(Clone)", "").Trim();
                         if (trimmedName == "EngiTurretBody" || trimmedName == "EngiWalkerTurretBody")
@@ -257,7 +271,7 @@ namespace Hex3Mod.Items
                         totalItemAmount += ally.body.inventory.GetItemCount(itemDef);
                     }
                 }
-                return totalItemAmount * (OverkillOverdrive_ZoneIncrease / 100f);
+                return totalItemAmount * (OverkillOverdrive_ZoneIncrease.Value / 100f);
             }
 
             // General holdout zones
@@ -273,8 +287,8 @@ namespace Hex3Mod.Items
                 {
                     foreach (HoldoutZoneController holdoutZone in GameObject.FindObjectsOfType<HoldoutZoneController>())
                     {
-                        holdoutZone.baseRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease / 100f) * count;
-                        holdoutZone.currentRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease / 100f) * count;
+                        holdoutZone.baseRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease.Value / 100f) * count;
+                        holdoutZone.currentRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease.Value / 100f) * count;
                     }
                 }
 
@@ -304,7 +318,7 @@ namespace Hex3Mod.Items
                     behavior.nearbyDamageBonusIndicator.transform.localScale = new Vector3(scaledSize, scaledSize, scaledSize);
                 }
             }
-            if (Overkilloverdrive_EnableFocusCrystal)
+            if (Overkilloverdrive_EnableFocusCrystal.Value)
             {
                 if (!UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
                 {
@@ -322,6 +336,10 @@ namespace Hex3Mod.Items
                         }
                     };
                 }
+                else
+                {
+                    Log.LogWarning("Ultimate Custom Run or VanillaRebalance are installed. Overkill Overdrive will not function on Focus Crystal!");
+                }
             }
 
             // Buff Wards
@@ -332,7 +350,7 @@ namespace Hex3Mod.Items
             }
 
             // Bustling Fungus
-            if (Overkilloverdrive_EnableBungus)
+            if (Overkilloverdrive_EnableBungus.Value)
             {
                 if (!UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
                 {
@@ -355,6 +373,10 @@ namespace Hex3Mod.Items
                         }
                     };
                 }
+                else
+                {
+                    Log.LogWarning("Ultimate Custom Run or VanillaRebalance are installed. Overkill Overdrive will not function on Bustling Fungus!");
+                }
             }
 
             // Interstellar Desk Plant
@@ -367,18 +389,20 @@ namespace Hex3Mod.Items
 
             // Captain Beacons?
 
-            if (Overkilloverdrive_EnableHoldouts) { On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable; On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int; }
-            if (Overkilloverdrive_EnableShrineWoods) { On.RoR2.ShrineHealingBehavior.SetWardEnabled += ShrineHealingBehavior_SetWardEnabled; }
-            if (Overkilloverdrive_EnableFocusCrystal) { On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged; }
-            if (Overkilloverdrive_EnableBuffWards) { On.RoR2.BuffWard.Start += BuffWard_Start; }
-            if (Overkilloverdrive_EnableDeskPlant) { On.RoR2.DeskPlantController.Awake += DeskPlantController_Awake; }
+            if (Overkilloverdrive_EnableHoldouts.Value) { On.RoR2.HoldoutZoneController.OnEnable += HoldoutZoneController_OnEnable; On.RoR2.Inventory.GiveItem_ItemIndex_int += Inventory_GiveItem_ItemIndex_int; }
+            if (Overkilloverdrive_EnableShrineWoods.Value) { On.RoR2.ShrineHealingBehavior.SetWardEnabled += ShrineHealingBehavior_SetWardEnabled; }
+            if (Overkilloverdrive_EnableFocusCrystal.Value) { On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged; }
+            if (Overkilloverdrive_EnableBuffWards.Value) { On.RoR2.BuffWard.Start += BuffWard_Start; }
+            if (Overkilloverdrive_EnableDeskPlant.Value) { On.RoR2.DeskPlantController.Awake += DeskPlantController_Awake; }
         }
 
-        public static void Initiate(bool OverkillOverdrive_TurretBlacklist, float OverkillOverdrive_ZoneIncrease, bool Overkilloverdrive_EnableHoldouts, bool Overkilloverdrive_EnableShrineWoods, bool Overkilloverdrive_EnableFocusCrystal, bool Overkilloverdrive_EnableBuffWards, bool Overkilloverdrive_EnableDeskPlant, bool Overkilloverdrive_EnableBungus)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(OverkillOverdrive_ZoneIncrease);
-            AddHooks(itemDefinition, OverkillOverdrive_TurretBlacklist, OverkillOverdrive_ZoneIncrease, Overkilloverdrive_EnableHoldouts, Overkilloverdrive_EnableShrineWoods, Overkilloverdrive_EnableFocusCrystal, Overkilloverdrive_EnableBuffWards, Overkilloverdrive_EnableDeskPlant, Overkilloverdrive_EnableBungus);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

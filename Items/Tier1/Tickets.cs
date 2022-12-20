@@ -1,9 +1,11 @@
 ﻿using R2API;
 using RoR2;
 using UnityEngine;
+using Hex3Mod;
 using Hex3Mod.HelperClasses;
 using EntityStates.AffixVoid;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -15,8 +17,8 @@ namespace Hex3Mod.Items
     {
         static string itemName = "FourHundredTickets";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
-        public static ItemDef consumedItemDefinition = CreateConsumedItem();
+        static ItemDef itemDef;
+        static ItemDef consumedItemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TicketsPrefab.prefab");
@@ -45,6 +47,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -260,8 +263,19 @@ namespace Hex3Mod.Items
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_PICKUP", "No longer valid.");
             LanguageAPI.Add("H3_" + upperName + "CONSUMED_DESC", "No longer valid.");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!Tickets_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "400 Tickets" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "400 Tickets");
+            }
+        }
 
-        private static void AddHooks(ItemDef itemDef, ItemDef consumeditemDef)
+        private static void AddHooks()
         {
             // Install item behavior to ticket holders
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
@@ -298,12 +312,12 @@ namespace Hex3Mod.Items
                         {
                             if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
                             {
-                                self.dropUpVelocityStrength = 7f;
-                                self.dropForwardVelocityStrength = 15f;
+                                self.dropUpVelocityStrength = 10f;
+                                self.dropForwardVelocityStrength = 20f;
                             }
                             self.dropCount += 1;
                             behavior.item = itemDef;
-                            behavior.consumedItem = consumeditemDef;
+                            behavior.consumedItem = consumedItemDef;
                             behavior.interaction = null;
                             behavior.ExchangeTickets();
                         }
@@ -341,10 +355,12 @@ namespace Hex3Mod.Items
 
         public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            ItemAPI.Add(new CustomItem(consumedItemDefinition, CreateHiddenDisplayRules()));
+            itemDef = CreateItem();
+            consumedItemDef = CreateConsumedItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            ItemAPI.Add(new CustomItem(consumedItemDef, CreateHiddenDisplayRules()));
             AddTokens();
-            AddHooks(itemDefinition, consumedItemDefinition);
+            AddHooks();
         }
     }
 }

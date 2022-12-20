@@ -7,19 +7,19 @@ using UnityEngine;
 using VoidItemAPI;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
     /*
-    The Hermit seeks to provide some extra survivability in a void build, taking advantage of the boost to primary potential w/ Shrimp and future void items.
-    This should be done carefully so that having too much attack speed doesn't cause invincibility.
-    It should be quite weak to begin with, but when the player has a lot of attack speed, it should ramp up.
+    The Hermit seeks to provide some extra survivability in a void build, and provide an alternative to Scorpion for builds that don't benefit much from it
+    Its purpose has changed, and now it should provide a very sizable damage reduction against Damage-Over-Time and sustained hits
     */
     public class TheHermit
     {
         static string itemName = "TheHermit";
         static string upperName = itemName.ToUpper();
-        public static ItemDef itemDefinition = CreateItem();
+        public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheHermitPrefab.prefab");
@@ -53,7 +53,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.VoidTier3;
             item.canRemove = true;
             item.hidden = false;
-            item.requiredExpansion = ExpansionCatalog.expansionDefs.FirstOrDefault(x => x.nameToken == "DLC1_NAME");
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -230,11 +230,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float TheHermit_BuffDuration, float TheHermit_DamageReduction)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "The Hermit");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Getting hit builds up damage resistance. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Taking damage grants a <style=cIsHealing>stacking damage resistance</style> of <style=cIsHealing>{1}%</style> that lasts for <style=cIsHealing>{0}</style> seconds <style=cStack>(+{0} per stack)</style>. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>", TheHermit_BuffDuration, TheHermit_DamageReduction));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"When do you think we'll get outta here?\"" +
         "\n\n\"I don't think we will.\"" +
         "\n\n\"Really? With this again?\"" +
@@ -260,8 +259,20 @@ namespace Hex3Mod.Items
         "\n\nAlex felt a push at her back, and she fell on solid ground. The purple hue on everything had vanished, and so had the rumbling. She looked back towards Lance, and behind him, the jaws of a giant claw ready to consume him." +
         "\n\nHe had found a way out, but it was too late to take it.");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!TheHermit_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Hermit" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Hermit");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Taking damage grants a <style=cIsHealing>stacking damage resistance</style> of <style=cIsHealing>{1}%</style> that lasts for <style=cIsHealing>{0}</style> seconds <style=cStack>(+{0} per stack)</style>. <style=cIsVoid>Corrupts all Symbiotic Scorpions.</style>", TheHermit_BuffDuration.Value, TheHermit_DamageReduction.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float TheHermit_BuffDuration, float TheHermit_DamageReduction) // Insert hooks here
+        private static void AddHooks() // Insert hooks here
         {
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "PermanentDebuffOnHit");
@@ -273,11 +284,11 @@ namespace Hex3Mod.Items
                 {
                     if (self.body.inventory.GetItemCount(itemDef) > 0)
                     {
-                        self.body.AddTimedBuff(hermitBuff, TheHermit_BuffDuration * self.body.inventory.GetItemCount(itemDef));
+                        self.body.AddTimedBuff(hermitBuff, TheHermit_BuffDuration.Value * self.body.inventory.GetItemCount(itemDef));
                     }
                     if (self.body.GetBuffCount(hermitBuff) > 0)
                     {
-                        damageInfo.damage *= Math.Abs(Util.ConvertAmplificationPercentageIntoReductionPercentage(TheHermit_DamageReduction * self.body.GetBuffCount(hermitBuff)) / 100f);
+                        damageInfo.damage *= Math.Abs(Util.ConvertAmplificationPercentageIntoReductionPercentage(TheHermit_DamageReduction.Value * self.body.GetBuffCount(hermitBuff)) / 100f);
                     }
                 }
             }
@@ -299,13 +310,14 @@ namespace Hex3Mod.Items
             ContentAddition.AddBuffDef(hermitBuff);
         }
 
-        public static void Initiate(float TheHermit_BuffDuration, float TheHermit_DamageReduction)
+        public static void Initiate()
         {
-            CreateItem();
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
             AddBuffs();
-            AddTokens(TheHermit_BuffDuration, TheHermit_DamageReduction);
-            AddHooks(itemDefinition, TheHermit_BuffDuration, TheHermit_DamageReduction);
+            AddHooks();
         }
     }
 }

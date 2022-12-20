@@ -4,6 +4,7 @@ using UnityEngine;
 using Hex3Mod.HelperClasses;
 using UnityEngine.AddressableAssets;
 using Hex3Mod.Utils;
+using static Hex3Mod.Main;
 
 namespace Hex3Mod.Items
 {
@@ -15,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "Balance";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BalancePrefab.prefab");
@@ -45,6 +46,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -221,11 +223,10 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float Balance_MaxDodge)
+        public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Balance");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Dodge more attacks the slower you're moving.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", string.Format("Gain a maximum <style=cWorldEvent>{0}% chance to dodge attacks</style> <style=cStack>(+{0}% per stack, hyperbolic)</style> <style=cWorldEvent>the slower you're moving:</style> <style=cIsUtility>Full chance</style> while not moving, <style=cIsUtility>half chance</style> while walking or receiving a speed debuff, and <style=cIsUtility>no chance</style> while freely sprinting. Unaffected by luck.", Balance_MaxDodge));
             LanguageAPI.Add("H3_" + upperName + "_LORE", "\"I think one of them stung me.\"" +
             "\n\n\"The beetles? Really?\"" +
             "\n\n\"What?\"" +
@@ -242,8 +243,20 @@ namespace Hex3Mod.Items
             "\n\nFor a moment, she felt close to drifting off, as her thoughts finally wandered away from the threat of danger. That was until a hand wrapped around the entrance of the cave. Like a skeleton covered in flesh, wrapped with pulsating muscle and vein, and adorned with crimson-spattered spikes." +
             "\n\n\"Captain-\"");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!Balance_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Balance" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Balance");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Gain a maximum <style=cWorldEvent>{0}% chance to dodge attacks</style> <style=cStack>(+{0}% per stack, hyperbolic)</style> <style=cWorldEvent>the slower you're moving:</style> <style=cIsUtility>Full chance</style> while not moving, <style=cIsUtility>half chance</style> while walking or receiving a speed debuff, and <style=cIsUtility>no chance</style> while freely sprinting. Unaffected by luck.", Balance_MaxDodge.Value));
+        }
 
-        private static void AddHooks(ItemDef itemDef, float Balance_MaxDodge)
+        private static void AddHooks()
         {
             void TakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self, DamageInfo damageInfo)
             {
@@ -294,7 +307,7 @@ namespace Hex3Mod.Items
                         chanceAlreadySet = true;
                     }
 
-                    if (Util.CheckRoll(Util.ConvertAmplificationPercentageIntoReductionPercentage((Balance_MaxDodge * chance) * (float)itemCount), 0f, null))
+                    if (Util.CheckRoll(Util.ConvertAmplificationPercentageIntoReductionPercentage((Balance_MaxDodge.Value * chance) * (float)itemCount), 0f, null))
                     {
                         EffectData effectData = new EffectData
                         {
@@ -311,11 +324,13 @@ namespace Hex3Mod.Items
             On.RoR2.HealthComponent.TakeDamage += TakeDamage;
         }
 
-        public static void Initiate(float Balance_MaxDodge)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(Balance_MaxDodge);
-            AddHooks(itemDefinition, Balance_MaxDodge);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }

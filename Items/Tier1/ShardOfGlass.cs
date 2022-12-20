@@ -1,8 +1,10 @@
 ﻿using R2API;
 using RoR2;
 using UnityEngine;
+using static Hex3Mod.Main;
 using Hex3Mod.HelperClasses;
 using Hex3Mod.Utils;
+using System;
 
 namespace Hex3Mod.Items
 {
@@ -14,7 +16,7 @@ namespace Hex3Mod.Items
     {
         static string itemName = "ShardOfGlass";
         static string upperName = itemName.ToUpper();
-        static ItemDef itemDefinition = CreateItem();
+        static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ShardOfGlassPrefab.prefab");
@@ -43,6 +45,7 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.Tier1;
             item.canRemove = true;
             item.hidden = false;
+            item.requiredExpansion = Hex3ModExpansion;
 
             item.pickupModelPrefab = LoadPrefab();
             item.pickupIconSprite = LoadSprite();
@@ -219,34 +222,45 @@ namespace Hex3Mod.Items
             return rules;
         }
 
-        public static void AddTokens(float DamageIncrease_Config)
+        public static void AddTokens()
         {
-            float DamageIncrease_Config_Readable = DamageIncrease_Config * 100f;
-
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Shard Of Glass");
             LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Increase your damage.");
-            LanguageAPI.Add("H3_" + upperName + "_DESC", "Increase your <style=cIsDamage>base damage</style> by <style=cIsDamage>" + DamageIncrease_Config_Readable + "%</style> <style=cStack>(+" + DamageIncrease_Config_Readable + "% per stack)</style>.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "The essence of a broken body\n\nYou collect the pieces carefully\n\nAn air of arrogance surrounds these shards\n\nYou feel like you can take on the world and never break beneath it");
         }
+        public static void UpdateItemStatus()
+        {
+            if (!ShardOfGlass_Enable.Value)
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Shard Of Glass" + " <style=cDeath>[DISABLED]</style>");
+            }
+            else
+            {
+                LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Shard Of Glass");
+            }
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Increase your <style=cIsDamage>base damage</style> by <style=cIsDamage>" + ShardOfGlass_DamageIncrease.Value * 100f + "%</style> <style=cStack>(+" + ShardOfGlass_DamageIncrease.Value * 100f + "% per stack)</style>.");
+        }
 
-        private static void AddHooks(ItemDef itemDef, float DamageIncrease_Config)
+        private static void AddHooks()
         {
             void GetStatCoefficients(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
             {
                 if (body.inventory && body.inventory.GetItemCount(itemDef) > 0)
                 {
-                    args.damageMultAdd += DamageIncrease_Config * body.inventory.GetItemCount(itemDef);
+                    args.damageMultAdd += ShardOfGlass_DamageIncrease.Value * body.inventory.GetItemCount(itemDef);
                 }
             }
 
             RecalculateStatsAPI.GetStatCoefficients += GetStatCoefficients;
         }
 
-        public static void Initiate(float DamageIncrease_Config)
+        public static void Initiate()
         {
-            ItemAPI.Add(new CustomItem(itemDefinition, CreateDisplayRules()));
-            AddTokens(DamageIncrease_Config);
-            AddHooks(itemDefinition, DamageIncrease_Config);
+            itemDef = CreateItem();
+            ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
+            AddTokens();
+            UpdateItemStatus();
+            AddHooks();
         }
     }
 }
