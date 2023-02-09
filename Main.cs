@@ -64,6 +64,10 @@ namespace Hex3Mod
 
         public static ConfigEntry<bool> Tickets_Load;
         public static ConfigEntry<bool> Tickets_Enable;
+        public static ConfigEntry<bool> Tickets_Bud;
+        public static ConfigEntry<bool> Tickets_Cradle;
+        public static ConfigEntry<bool> Tickets_Potential;
+        public static ConfigEntry<bool> Tickets_Pool;
 
         public static ConfigEntry<bool> Balance_Load;
         public static ConfigEntry<bool> Balance_Enable;
@@ -273,6 +277,14 @@ namespace Hex3Mod
             ModSettingsManager.AddOption(new CheckBoxOption(Tickets_Load));
             Tickets_Enable = Config.Bind(new ConfigDefinition("Common - 400 Tickets", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(Tickets_Enable));
+            Tickets_Bud = Config.Bind(new ConfigDefinition("Common - 400 Tickets", "Works on Lunar Bud"), true, new ConfigDescription("Should 400 Tickets double Lunar Bud drops?", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new CheckBoxOption(Tickets_Bud));
+            Tickets_Cradle = Config.Bind(new ConfigDefinition("Common - 400 Tickets", "Works on Void Cradle"), true, new ConfigDescription("Should 400 Tickets double Void Cradle drops?", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new CheckBoxOption(Tickets_Cradle));
+            Tickets_Potential = Config.Bind(new ConfigDefinition("Common - 400 Tickets", "Works on Void Potential"), true, new ConfigDescription("Should 400 Tickets double Void Potential and Encrusted Lockbox drops?", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new CheckBoxOption(Tickets_Potential));
+            Tickets_Pool = Config.Bind(new ConfigDefinition("Common - 400 Tickets", "Works on Cleansing Pool"), false, new ConfigDescription("Should 400 Tickets double Cleansing Pool drops?", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new CheckBoxOption(Tickets_Pool));
 
             Balance_Load = Config.Bind(new ConfigDefinition("Common - Balance", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(Balance_Load));

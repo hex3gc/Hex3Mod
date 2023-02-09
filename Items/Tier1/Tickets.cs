@@ -6,6 +6,8 @@ using Hex3Mod.HelperClasses;
 using EntityStates.AffixVoid;
 using Hex3Mod.Utils;
 using static Hex3Mod.Main;
+using System.Collections.Generic;
+using UnityEngine.Networking;
 
 namespace Hex3Mod.Items
 {
@@ -19,10 +21,11 @@ namespace Hex3Mod.Items
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         static ItemDef consumedItemDef;
+        static List<string> blacklist = new();
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TicketsPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TicketsPrefab.prefab");
+            if (debugMode == true)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -30,12 +33,19 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Tickets.png");
+            Sprite pickupIconSprite = MainAssets.LoadAsset<Sprite>("Assets/Icons/Tickets.png");
             return pickupIconSprite;
         }
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
+            if (!Tickets_Bud.Value) blacklist.Add("LunarChest");
+            if (!Tickets_Cradle.Value) blacklist.Add("VoidChest");
+            if (!Tickets_Potential.Value)
+            {
+                blacklist.Add("LockboxVoid");
+                blacklist.Add("VoidTriple");
+            }
 
             item.name = itemName;
             item.nameToken = "H3_" + upperName + "_NAME";
@@ -68,8 +78,8 @@ namespace Hex3Mod.Items
             item.canRemove = false;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TicketsPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/TicketsConsumed.png");
+            item.pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TicketsPrefab.prefab");
+            item.pickupIconSprite = MainAssets.LoadAsset<Sprite>("Assets/Icons/TicketsConsumed.png");
 
             return item;
         }
@@ -79,7 +89,7 @@ namespace Hex3Mod.Items
             GameObject ItemDisplayPrefab = helpers.PrepareItemDisplayModel(PrefabAPI.InstantiateClone(LoadPrefab(), LoadPrefab().name + "Display", false));
 
             ItemDisplayRuleDict rules = new ItemDisplayRuleDict();
-            rules.Add("mdlCommandoDualies", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlCommandoDualies", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "CalfL",
@@ -89,7 +99,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlHuntress", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlHuntress", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "HeadCenter",
@@ -99,7 +109,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlToolbot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlToolbot", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "LowerArmL",
@@ -109,7 +119,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlEngi", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlEngi", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Stomach",
@@ -119,7 +129,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlMage", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlMage", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Chest",
@@ -129,7 +139,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlMerc", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlMerc", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "HandL",
@@ -139,7 +149,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlTreebot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlTreebot", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "CalfBackR",
@@ -149,7 +159,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlLoader", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlLoader", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Chest",
@@ -159,7 +169,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlCroco", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlCroco", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "HandL",
@@ -169,7 +179,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlCaptain", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlCaptain", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "HandL",
@@ -179,7 +189,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlBandit2", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlBandit2", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Hat",
@@ -189,7 +199,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("EngiTurretBody", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("EngiTurretBody", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "LegBar2",
@@ -199,7 +209,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("EngiWalkerTurretBody", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("EngiWalkerTurretBody", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "LegBar2",
@@ -209,7 +219,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlScav", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlScav", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Backpack",
@@ -219,7 +229,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlRailGunner", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlRailGunner", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "ThighR",
@@ -229,7 +239,7 @@ namespace Hex3Mod.Items
                     }
                 }
             );
-            rules.Add("mdlVoidSurvivor", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
+            rules.Add("mdlVoidSurvivor", new ItemDisplayRule[]{new ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "UpperArmR",
@@ -292,15 +302,12 @@ namespace Hex3Mod.Items
             // Purchases mark the chest as ticketed, and also makes sure the purchaser has an itembehavior
             void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
             {
-                orig(self, activator);
-                if (activator.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0 && !self.isShrine)
+                if (activator.TryGetComponent(out CharacterBody body) && body.inventory && body.inventory.GetItemCount(itemDef) > 0 && !blacklist.Exists(x => self.name.Contains(x)) && (!self.isShrine || (Tickets_Pool.Value && self.name.Contains("ShrineCleanse"))))
                 {
-                    if (!body.GetComponent<TicketsBehavior>())
-                    {
-                        body.AddItemBehavior<TicketsBehavior>(1);
-                    }
+                    if (!body.GetComponent<TicketsBehavior>()) body.AddItemBehavior<TicketsBehavior>(1);
                     body.GetComponent<TicketsBehavior>().interaction = self;
                 }
+                orig(self, activator);
             }
 
             // If a chest is the same as an interactor's ticketed chest, drop more items
@@ -312,7 +319,7 @@ namespace Hex3Mod.Items
                     {
                         if (behavior && behavior.interaction && behavior.interaction == self.gameObject.GetComponent<PurchaseInteraction>())
                         {
-                            if (self.gameObject.name == "VoidChest(Clone)" || self.gameObject.name == "VoidChest")
+                            if (self.gameObject.name.Contains("VoidChest"))
                             {
                                 self.dropUpVelocityStrength = 10f;
                                 self.dropForwardVelocityStrength = 20f;
@@ -328,9 +335,51 @@ namespace Hex3Mod.Items
                 orig(self);
             }
 
+            void OptionChestBehaviour_ItemDrop(On.RoR2.OptionChestBehavior.orig_ItemDrop orig, OptionChestBehavior self)
+            {
+                if (self.generatedDrops != null && self.generatedDrops.Length != 0 && self.gameObject.GetComponent<PurchaseInteraction>())
+                {
+                    foreach (TicketsBehavior behavior in Object.FindObjectsOfType<TicketsBehavior>())
+                    {
+                        if (behavior && behavior.interaction && behavior.interaction == self.gameObject.GetComponent<PurchaseInteraction>())
+                        {
+                            behavior.item = itemDef;
+                            behavior.consumedItem = consumedItemDef;
+                            behavior.interaction = null;
+                            behavior.ExchangeTickets();
+                            PickupDropletController.CreatePickupDroplet(new GenericPickupController.CreatePickupInfo()
+                            {
+                                pickerOptions = PickupPickerController.GenerateOptionsFromArray(self.dropTable.GenerateUniqueDrops(self.numOptions, self.rng)),
+                                prefabOverride = self.pickupPrefab,
+                                position = self.dropTransform.position,
+                                rotation = Quaternion.identity,
+                                pickupIndex = PickupCatalog.FindPickupIndex(self.displayTier)
+                            }, self.dropTransform.position, Vector3.up * self.dropUpVelocityStrength + self.dropTransform.forward * -self.dropForwardVelocityStrength);
+                        }
+                    }
+                }
+                orig(self);
+            }
+
+            void ShopTerminalBehavior_DropPickup(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
+            {
+                foreach (var behavior in Object.FindObjectsOfType<TicketsBehavior>()) if (behavior != null && behavior.interaction != null && behavior.interaction == self.GetComponent<PurchaseInteraction>() && self.gameObject.name.Contains("ShrineCleanse"))
+                {
+                    behavior.item = itemDef;
+                    behavior.consumedItem = consumedItemDef;
+                    behavior.interaction = null;
+                    behavior.ExchangeTickets();
+                    Vector3 v = self.transform.TransformVector(self.dropVelocity);
+                    PickupDropletController.CreatePickupDroplet(self.pickupIndex, (self.dropTransform ?? self.transform).position, new Vector3(-v.x, v.y, -v.z));
+                }
+                orig(self);
+            }
+
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
             On.RoR2.ChestBehavior.ItemDrop += ChestBehavior_ItemDrop;
+            On.RoR2.OptionChestBehavior.ItemDrop += OptionChestBehaviour_ItemDrop;
+            if (Tickets_Pool.Value) On.RoR2.ShopTerminalBehavior.DropPickup += ShopTerminalBehavior_DropPickup;
         }
 
         public class TicketsBehavior : CharacterBody.ItemBehavior
