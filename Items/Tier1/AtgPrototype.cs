@@ -11,15 +11,15 @@ namespace Hex3Mod.Items
     ATG Prototype is a simple port of the ATG to the Common tier, but with a different proc condition.
     It should serve a different purpose than the normal ATG (Consistent, small damage rather than luck-based, large damage) and also give ICBM a good Common item to synergize with
     */
-    public class AtgPrototype
+    public static class AtgPrototype
     {
         static string itemName = "AtgPrototype";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ATGPrototypePrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ATGPrototypePrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -27,8 +27,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ATGPrototype.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/ATGPrototype.png");
         }
         public static ItemDef CreateItem()
         {
@@ -247,7 +246,7 @@ namespace Hex3Mod.Items
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
                 orig(self, damageInfo, victim);
-                if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody attackerBody) == true && attackerBody.inventory && attackerBody.inventory.GetItemCount(itemDef) > 0 && damageInfo.procCoefficient > 0f && !damageInfo.procChainMask.HasProc(ProcType.Missile) && !damageInfo.rejected && damageInfo.attacker != victim)
+                if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody attackerBody) && attackerBody.inventory && attackerBody.inventory.GetItemCount(itemDef) > 0 && damageInfo.procCoefficient > 0f && !damageInfo.procChainMask.HasProc(ProcType.Missile) && !damageInfo.rejected && damageInfo.attacker != victim)
                 {
                     if (attackerBody.GetBuffCount(atgCounter) == 0)
                     {

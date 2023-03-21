@@ -22,15 +22,15 @@ namespace Hex3Mod.Items
     /*
     An item I added later because I liked the idea. Ever felt like holdout zones were too small? Want your allies to be in bungus range? This is the item for you.
     */
-    public class OverkillOverdrive
+    public static class OverkillOverdrive
     {
         static string itemName = "OverkillOverdrive";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OverkillOverdrivePrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OverkillOverdrivePrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -38,8 +38,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OverkillOverdrive.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/OverkillOverdrive.png");
         }
         public static ItemDef CreateItem()
         {
@@ -260,7 +259,7 @@ namespace Hex3Mod.Items
                 int totalItemAmount = 0;
                 foreach (TeamComponent ally in TeamComponent.GetTeamMembers(TeamIndex.Player))
                 {
-                    if (ally.body && OverkillOverdrive_TurretBlacklist.Value == true)
+                    if (ally.body && OverkillOverdrive_TurretBlacklist.Value)
                     {
                         string trimmedName = ally.body.name.Replace("(Clone)", "").Trim();
                         if (trimmedName == "EngiTurretBody" || trimmedName == "EngiWalkerTurretBody")
@@ -287,7 +286,7 @@ namespace Hex3Mod.Items
                 orig(self, itemIndex, count);
                 if (itemIndex == itemDef.itemIndex)
                 {
-                    foreach (HoldoutZoneController holdoutZone in GameObject.FindObjectsOfType<HoldoutZoneController>())
+                    foreach (HoldoutZoneController holdoutZone in UnityEngine.Object.FindObjectsOfType<HoldoutZoneController>())
                     {
                         holdoutZone.baseRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease.Value / 100f) * count;
                         holdoutZone.currentRadius += (holdoutZone.currentRadius * OverkillOverdrive_ZoneIncrease.Value / 100f) * count;
@@ -314,7 +313,7 @@ namespace Hex3Mod.Items
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
                 orig(self);
-                if (self.TryGetComponent(out NearbyDamageBonusBodyBehavior behavior) == true && behavior.isActiveAndEnabled && !UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
+                if (self.TryGetComponent(out NearbyDamageBonusBodyBehavior behavior) && behavior.isActiveAndEnabled && !UltimateCustomRunCompatibility.enabled && !VanillaRebalanceCompatibility.enabled)
                 {
                     float scaledSize = 1 + (1 * FindTotalMultiplier());
                     behavior.nearbyDamageBonusIndicator.transform.localScale = new Vector3(scaledSize, scaledSize, scaledSize);

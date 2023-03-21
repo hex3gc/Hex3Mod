@@ -11,15 +11,15 @@ namespace Hex3Mod.Items
     Mint Condition is an attempt at making a mobility red item. This is good for both Benthic Bloom's playability and even more mobility options in a movement-focused game
     Ben's Raincoat used to be a powerful item for its debuff blocking power, but possibly too powerful. Restricting this item to only some debuffs should make it a more focused effect
     */
-    public class MintCondition
+    public static class MintCondition
     {
         static string itemName = "MintCondition";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MintConditionPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MintConditionPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -27,8 +27,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/MintCondition.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/MintCondition.png");
         }
         public static ItemDef CreateItem()
         {

@@ -16,15 +16,15 @@ namespace Hex3Mod.Items
     Based off of the Miner survivor's ability, this helmet has a slightly different function
     It should provide a good use for money-earning items (such as The Tax Man's Statement) but still be useful otherwise.
     */
-    public class MinersHelmet
+    public static class MinersHelmet
     {
         static string itemName = "MinersHelmet";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MinersHelmetPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/MinersHelmetPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -32,13 +32,11 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/MinersHelmet.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/MinersHelmet.png");
         }
         public static Sprite LoadAchievementSprite()
         {
-            Sprite achievementIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/MinersHelmetAchievement.png");
-            return achievementIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/MinersHelmetAchievement.png");
         }
         public static GameObject miningFX = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Common/VFX/CoinImpact.prefab").WaitForCompletion();
         public static ItemDef CreateItem()

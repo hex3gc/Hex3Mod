@@ -13,7 +13,7 @@ namespace Hex3Mod.Items
     /*
     It's a pouch now!
     */
-    public class ScavengersPack
+    public static class ScavengersPack
     {
         static string itemName = "ScavengersPouch";
         static string upperName = itemName.ToUpper();
@@ -22,8 +22,8 @@ namespace Hex3Mod.Items
         static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -31,13 +31,11 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ScavengersPack.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ScavengersPack.png");
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_ScavengersPack.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_ScavengersPack.png");
         }
         public static ItemDef CreateItem()
         {
@@ -74,8 +72,8 @@ namespace Hex3Mod.Items
             item.canRemove = false;
             item.hidden = false;
 
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ScavengersPackConsumed.png");
+            item.pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ScavengersPack.prefab");
+            item.pickupIconSprite = MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ScavengersPackConsumed.png");
 
             return item;
         }

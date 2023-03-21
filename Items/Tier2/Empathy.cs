@@ -13,15 +13,15 @@ namespace Hex3Mod.Items
     /*
     Empathy's purpose has changed slightly to make it scale better: You heal for a percent of the damage your allies take
     */
-    public class Empathy
+    public static class Empathy
     {
         static string itemName = "Empathy";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/EmpathyPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/EmpathyPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -29,8 +29,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Empathy.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Empathy.png");
         }
         static GameObject FocusCrystalPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion();
         public static ItemDef CreateItem()
@@ -294,7 +293,7 @@ namespace Hex3Mod.Items
                             }
                             if (enemyDistanceVector.sqrMagnitude <= (float)Math.Pow(Empathy_Radius.Value + (Empathy_Radius.Value * ((OverkillOverdrive_ZoneIncrease.Value / 100f) * numberOfOverdrives)), 2))
                             {
-                                ally.body.healthComponent.Heal(Empathy_HealthPerHit.Value * damageInfo.procCoefficient, new ProcChainMask());
+                                ally.body.healthComponent.Heal((Empathy_HealthPerHit.Value * damageInfo.procCoefficient) * ally.body.inventory.GetItemCount(itemDef), new ProcChainMask());
                             }
                         }
                     }
@@ -321,7 +320,7 @@ namespace Hex3Mod.Items
                     if (!setupDone)
                     {
                         radiusIndicator = PrefabAPI.InstantiateClone(FocusCrystalPrefab, "EmpathyRange");
-                        radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(base.gameObject, null);
+                        radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(gameObject, null);
                         radiusIndicator.transform.localScale = defaultScale;
                         defaultScale.x = focusCrystalSizeDivisor;
                         defaultScale.y = focusCrystalSizeDivisor;
@@ -337,7 +336,7 @@ namespace Hex3Mod.Items
 
             private void OnDestroy()
             {
-                UnityEngine.Object.Destroy(radiusIndicator);
+                Destroy(radiusIndicator);
             }
         }
 

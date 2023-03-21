@@ -14,15 +14,15 @@ namespace Hex3Mod.Items
     Two reworks in a row, huh?
     I wanted a max hp / regen item because those stats are underrated. Ramps up in a unique way to make lunar seers slightly more useful
     */
-    public class ElderMutagen
+    public static class ElderMutagen
     {
         static string itemName = "ElderMutagen";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ElderMutagen.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ElderMutagen.prefab");
+            if (debugMode)
             {
                 foreach (Renderer renderer in pickupModelPrefab.GetComponentsInChildren<Renderer>())
                 {
@@ -33,13 +33,11 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ElderMutagen.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/ElderMutagen.png");
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_Mutagen.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_Mutagen.png");
         }
         public static ItemDef CreateItem()
         {

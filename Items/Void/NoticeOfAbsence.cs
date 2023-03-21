@@ -14,15 +14,15 @@ namespace Hex3Mod.Items
     Notice Of Absence now has an opposite use to the Bucket List: A unique boost that only happens during boss fights.
     The effect should occur every time a boss spawns or a teleporter event begins, so it could be quite potent with enough stacks
     */
-    public class NoticeOfAbsence
+    public static class NoticeOfAbsence
     {
         static string itemName = "NoticeOfAbsence";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/NoticeOfAbsencePrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/NoticeOfAbsencePrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -30,8 +30,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/NoticeOfAbsence.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/NoticeOfAbsence.png");
         }
         public static ItemDef CreateItem()
         {

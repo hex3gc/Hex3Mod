@@ -10,7 +10,7 @@ namespace Hex3Mod.Items
     The Tax Man's Statement is partly for gold farming and partly to counter low-cooldown enemies in harder difficulties and with One Ticket
     Miner's Helmet is important as it adds a reason for taxation to exist beyond early game
     */
-    public class TaxManStatement
+    public static class TaxManStatement
     {
         static string itemName = "TaxManStatement";
         static string upperName = itemName.ToUpper();
@@ -18,7 +18,7 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
-            if (Main.debugMode == true)
+            if (Main.debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -26,8 +26,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ShardOfGlass.png");
-            return pickupIconSprite;
+            return Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ShardOfGlass.png");
         }
         public static ItemDef CreateItem()
         {

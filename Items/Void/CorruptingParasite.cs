@@ -16,15 +16,15 @@ namespace Hex3Mod.Items
     The Corrupting Parasite is an item idea thought up by conq and kking. I liked it and was given permission to make it into a full item, so here we are
     It should be a good way to form void builds and pave the way for more void items in the future
     */
-    public class CorruptingParasite
+    public static class CorruptingParasite
     {
         static string itemName = "CorruptingParasite";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CorruptingParasitePrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CorruptingParasitePrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -32,13 +32,11 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/CorruptingParasite.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/CorruptingParasite.png");
         }
         public static Sprite LoadAchievementSprite()
         {
-            Sprite achievementIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/corruptingParasiteAchievement.png");
-            return achievementIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/corruptingParasiteAchievement.png");
         }
         public static ItemDef CreateItem()
         {
@@ -274,6 +272,10 @@ namespace Hex3Mod.Items
             On.RoR2.CharacterMaster.OnServerStageBegin += (orig, self, stage) =>
             {
                 orig(self, stage);
+                if (!CorruptingParasite_NonStageCorrupt.Value && stage.sceneDef.sceneType == SceneType.Intermission)
+                {
+                    return;
+                }
                 if (self.inventory && self.inventory.GetItemCount(itemDef) > 0)
                 {
                     Xoroshiro128Plus rng = new Xoroshiro128Plus(Run.instance.stageRng.nextUlong);

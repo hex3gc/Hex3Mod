@@ -15,15 +15,15 @@ namespace Hex3Mod.Items
     The void item counterpart for Scattered Reflection. Meant to be paired with Drop Of Necrosis for a blight build, allowing damage scaling in a fully void build
     Replaces your bleeds with blight, but makes Blight stronger.
     */
-    public class SpatteredCollection
+    public static class SpatteredCollection
     {
         static string itemName = "SpatteredCollection";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/SpatteredCollectionPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/SpatteredCollectionPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -31,8 +31,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/SpatteredCollection.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/SpatteredCollection.png");
         }
         public static ItemDef CreateItem()
         {
@@ -282,7 +281,7 @@ namespace Hex3Mod.Items
                     {
                         if (damageInfo.damageType != DamageType.DoT && damageInfo.damageType != DamageType.FallDamage && damageInfo.damage > 0f)
                         {
-                            if (Util.CheckRoll((SpatteredCollection_DotChance.Value * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck) == true)
+                            if (Util.CheckRoll((SpatteredCollection_DotChance.Value * body1.inventory.GetItemCount(itemDef)) * damageInfo.procCoefficient, body1.master.luck))
                             {
                                 InflictDotInfo inflictDotInfo = new InflictDotInfo
                                 {

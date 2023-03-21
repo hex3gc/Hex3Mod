@@ -7,22 +7,24 @@ using VoidItemAPI;
 using Hex3Mod.Utils;
 using static Hex3Mod.Main;
 using System.Linq;
-using System;
+using System.Collections.Generic;
+using UnityEngine.AddressableAssets;
+using System.ComponentModel;
 
 namespace Hex3Mod.Items
 {
     /*
     Captain's Favor provides an alternative to the consumable, high-reward nature of Tickets, instead giving players a constant generalized reward of more items
     */
-    public class CaptainsFavor
+    public static class CaptainsFavor
     {
         static string itemName = "CaptainsFavor";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CaptainsFavorPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/CaptainsFavorPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -30,9 +32,14 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/CaptainsFavor.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/CaptainsFavor.png");
         }
+        public static Sprite LoadBuffSprite()
+        {
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_CaptainsFavor.png");
+        }
+        static GameObject potentialPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/OptionPickup/OptionPickup.prefab").WaitForCompletion();
+
         public static ItemDef CreateItem()
         {
             ItemDef item = ScriptableObject.CreateInstance<ItemDef>();
@@ -227,8 +234,8 @@ namespace Hex3Mod.Items
         public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Captain's Favor");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Future stages will contain more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
-            LanguageAPI.Add("H3_" + upperName + "_LORE", "Don't spend it all in one place...\n\nOr, better yet, don't spend it all. That's MY card!");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The first chests you open each stage will instead contain a Void Potential. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_LORE", "Don't spend it all in one place...\n\nOr, better yet, don't spend it. That's MY card!");
         }
         public static void UpdateItemStatus(Run run)
         {
@@ -242,32 +249,159 @@ namespace Hex3Mod.Items
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Captain's Favor");
                 if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
-            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Stages contain <style=cShrine>{0}%</style> <style=cStack>(+{0}% per stack)</style> more interactables. <style=cIsVoid>Corrupts all 400 Tickets.</style>", CaptainsFavor_InteractableIncrease.Value));
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "The first <style=cStack>(+1 per stack)</style> chest you open each stage will instead drop a <style=cIsVoid>Void Potential</style>, inheriting the tier of the item it replaced. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
         }
 
         private static void AddHooks()
         {
+            CostTypeIndex[] blacklistedCostTypes = new CostTypeIndex[9]
+            {
+                CostTypeIndex.LunarItemOrEquipment,
+                CostTypeIndex.WhiteItem,
+                CostTypeIndex.GreenItem,
+                CostTypeIndex.RedItem,
+                CostTypeIndex.BossItem,
+                CostTypeIndex.ArtifactShellKillerItem,
+                CostTypeIndex.VolatileBattery,
+                CostTypeIndex.TreasureCacheVoidItem,
+                CostTypeIndex.TreasureCacheItem
+            };
+
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "FourHundredTickets");
 
-            void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene orig, SceneDirector self)
+            // Give item holders an ItemBehavior
+            void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
-                int favorCount = 0;
-                foreach (PlayerCharacterMasterController playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                orig(self);
+                if (!self.inventory) { return; }
+                int itemCount = self.inventory.GetItemCount(itemDef);
+                if (itemCount > 0 && self.master && self.master.playerCharacterMasterController)
                 {
-                    if (playerCharacterMasterController.master && playerCharacterMasterController.master.inventory)
+                    VoidTicketsBehavior component;
+                    component = self.GetComponent<VoidTicketsBehavior>();
+                    if (!component)
                     {
-                        favorCount += playerCharacterMasterController.master.inventory.GetItemCount(itemDef);
+                        component = self.AddItemBehavior<VoidTicketsBehavior>(1);
+                    }
+                    component.stack = itemCount;
+                    component.usesLeft = itemCount - component.timesUsedThisStage;
+                    self.SetBuffCount(captainsFavorBuff.buffIndex, component.usesLeft);
+                }
+                else
+                {
+                    if (self.GetComponent<VoidTicketsBehavior>())
+                    {
+                        UnityEngine.Object.Destroy(self.GetComponent<VoidTicketsBehavior>());
+                        self.SetBuffCount(captainsFavorBuff.buffIndex, 0);
                     }
                 }
-                if (favorCount > 0)
+            }
+
+            void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
+            {
+                if (self.isShrine || self.isGoldShrine || blacklistedCostTypes.Contains(self.costType))
                 {
-                    float extraCredits = self.interactableCredit * ((CaptainsFavor_InteractableIncrease.Value / 100f) * favorCount);
-                    self.interactableCredit += (int)extraCredits;
+                    orig(self, activator);
+                    return;
+                }
+                CharacterBody body = activator.GetComponent<CharacterBody>();
+                if (body)
+                {
+                    VoidTicketsBehavior component = body.GetComponent<VoidTicketsBehavior>();
+                    if (component)
+                    {
+                        component.interactions.Add(self);
+                    }
+                }
+                orig(self, activator);
+            }
+
+            void ChestBehavior_ItemDrop(On.RoR2.ChestBehavior.orig_ItemDrop orig, ChestBehavior self)
+            {
+                if (self.gameObject.GetComponent<PurchaseInteraction>())
+                {
+                    foreach (VoidTicketsBehavior behavior in Object.FindObjectsOfType<VoidTicketsBehavior>())
+                    {
+                        if (behavior && behavior.interactions.Contains(self.gameObject.GetComponent<PurchaseInteraction>()) && behavior.usesLeft > 0)
+                        {
+                            ItemTier firstDropTier;
+                            PickupIndex[] generatedDrops = self.dropTable.GenerateUniqueDrops(3, self.rng);
+                            if (generatedDrops[0].itemIndex != ItemIndex.None && ItemCatalog.GetItemDef(generatedDrops[0].itemIndex).tier != ItemTier.NoTier)
+                            {
+                                firstDropTier = ItemCatalog.GetItemDef(generatedDrops[0].itemIndex).tier;
+                            }
+                            else
+                            {
+                                firstDropTier = ItemTier.Tier1;
+                            }
+
+                            PickupDropletController.CreatePickupDroplet(new GenericPickupController.CreatePickupInfo
+                            {
+                                pickerOptions = PickupPickerController.GenerateOptionsFromArray(generatedDrops),
+                                prefabOverride = potentialPrefab,
+                                position = self.dropTransform.position,
+                                rotation = Quaternion.identity,
+                                pickupIndex = PickupCatalog.FindPickupIndex(firstDropTier)
+                            }, 
+                            self.dropTransform.position, Vector3.up * self.dropUpVelocityStrength + self.dropTransform.forward * self.dropForwardVelocityStrength);
+                            Util.PlaySound("Play_ui_obj_voidCradle_open", self.gameObject);
+
+                            behavior.interactions.Remove(self.gameObject.GetComponent<PurchaseInteraction>());
+                            if (behavior.interactions.Count > 500) { behavior.interactions.Clear(); }
+                            behavior.usesLeft--;
+                            behavior.timesUsedThisStage++;
+                            behavior.body.SetBuffCount(captainsFavorBuff.buffIndex, behavior.usesLeft);
+                            return;
+                        }
+                    }
                 }
                 orig(self);
             }
+
+            void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene orig, SceneDirector self)
+            {
+                orig(self);
+                foreach (PlayerCharacterMasterController playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                {
+                    if (playerCharacterMasterController.master && playerCharacterMasterController.master.GetBody())
+                    {
+                        VoidTicketsBehavior component = playerCharacterMasterController.master.GetBody().GetComponent<VoidTicketsBehavior>();
+                        if (component)
+                        {
+                            component.timesUsedThisStage = 0;
+                            component.usesLeft = component.stack;
+                            component.body.SetBuffCount(captainsFavorBuff.buffIndex, component.usesLeft);
+                        }
+                    }
+                }
+            }
+
+            On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
+            On.RoR2.ChestBehavior.ItemDrop += ChestBehavior_ItemDrop;
             On.RoR2.SceneDirector.PopulateScene += SceneDirector_PopulateScene;
+        }
+
+        public class VoidTicketsBehavior : CharacterBody.ItemBehavior
+        {
+            public List<PurchaseInteraction> interactions = new List<PurchaseInteraction>();
+            public int usesLeft = 0;
+            public int timesUsedThisStage = 0;
+        }
+
+        public static BuffDef captainsFavorBuff { get; private set; }
+        public static void AddBuffs() // Visual indicator of Apathy stacks
+        {
+            captainsFavorBuff = ScriptableObject.CreateInstance<BuffDef>();
+            captainsFavorBuff.buffColor = new Color(1f, 0.6f, 0.94f);
+            captainsFavorBuff.canStack = true;
+            captainsFavorBuff.isDebuff = false;
+            captainsFavorBuff.name = "Captain's Favor Potentials Left";
+            captainsFavorBuff.isHidden = false;
+            captainsFavorBuff.isCooldown = false;
+            captainsFavorBuff.iconSprite = LoadBuffSprite();
+            ContentAddition.AddBuffDef(captainsFavorBuff);
         }
 
         public static void Initiate()
@@ -276,6 +410,7 @@ namespace Hex3Mod.Items
             ItemAPI.Add(new CustomItem(itemDef, CreateDisplayRules()));
             AddTokens();
             UpdateItemStatus(null);
+            AddBuffs();
             AddHooks();
         }
     }

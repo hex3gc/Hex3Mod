@@ -17,7 +17,7 @@ namespace Hex3Mod.Items
     Four Hundred Tickets' cooler older cousin
     Making a Tickets variant that granted extra items was too OP in many situations, so this iteration forces you to deal with a heavy downside before a big reward
     */
-    public class OneTicket
+    public static class OneTicket
     {
         static string itemName = "OneTicket";
         static string upperName = itemName.ToUpper();
@@ -26,8 +26,8 @@ namespace Hex3Mod.Items
         public static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OneTicketPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/OneTicketPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -35,18 +35,15 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket.png");
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_OneTicket.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_OneTicket.png");
         }
         public static Sprite LoadAchievementSprite()
         {
-            Sprite achievementIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicketAchievement.png");
-            return achievementIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicketAchievement.png");
         }
         public static ItemDef CreateItem()
         {
@@ -91,7 +88,7 @@ namespace Hex3Mod.Items
             item.hidden = false;
 
             item.pickupModelPrefab = LoadPrefab();
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket_Consumed.png");
+            item.pickupIconSprite = MainAssets.LoadAsset<Sprite>("Assets/Icons/OneTicket_Consumed.png");
 
             return item;
         }
@@ -415,6 +412,10 @@ namespace Hex3Mod.Items
             void CharacterBody_Start(On.RoR2.CharacterBody.orig_Start orig, CharacterBody self)
             {
                 orig(self);
+                if (self.baseNameToken.Contains("ARTIFACT"))
+                {
+                    return;
+                }
                 int ticketsInExistence = Util.GetItemCountGlobal(itemDef.itemIndex, true);
                 if (ticketsInExistence > 0 && self.inventory && self.teamComponent && (self.teamComponent.teamIndex == TeamIndex.Monster || self.teamComponent.teamIndex == TeamIndex.Lunar || self.teamComponent.teamIndex == TeamIndex.Void))
                 {

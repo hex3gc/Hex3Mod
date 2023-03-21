@@ -31,8 +31,8 @@ namespace Hex3Mod.Artifacts
             artifact.descriptionToken = "H3_" + upperName + "_DESC";
             artifact.requiredExpansion = Hex3ModExpansion;
 
-            artifact.smallIconSelectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_On.png");
-            artifact.smallIconDeselectedSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_Off.png");
+            artifact.smallIconSelectedSprite = MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_On.png");
+            artifact.smallIconDeselectedSprite = MainAssets.LoadAsset<Sprite>("Assets/Icons/ArtifactOfCorruption_Off.png");
 
             return artifact;
         }
@@ -46,7 +46,7 @@ namespace Hex3Mod.Artifacts
         {
             void giveParasite(CharacterMaster master)
             {
-                if (artifactEnabled == true && master.inventory)
+                if (artifactEnabled && master.inventory)
                 {
                     master.inventory.GiveItemString("CorruptingParasite");
                 }

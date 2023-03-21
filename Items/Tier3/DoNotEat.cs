@@ -10,6 +10,8 @@ using System;
 using Hex3Mod.Utils;
 using static Hex3Mod.Main;
 using System.ComponentModel;
+using static Hex3Mod.Items.Tickets;
+using System.Collections.Generic;
 
 namespace Hex3Mod.Items
 {
@@ -17,15 +19,15 @@ namespace Hex3Mod.Items
     What if you want a pearl run, but don't want to find a pesky cleansing pool? That's where Do Not Eat comes in
     Opening chests and getting a bonus feels good, plus we needed more max health items to counteract late game
     */
-    public class DoNotEat
+    public static class DoNotEat
     {
         static string itemName = "DoNotEat";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DoNotEatPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DoNotEatPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -33,8 +35,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/DoNotEat.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/DoNotEat.png");
         }
         public static ItemDef CreateItem()
         {
@@ -46,7 +47,7 @@ namespace Hex3Mod.Items
             item.descriptionToken = "H3_" + upperName + "_DESC";
             item.loreToken = "H3_" + upperName + "_LORE";
 
-            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.Healing };
+            item.tags = new ItemTag[]{ ItemTag.Utility, ItemTag.Healing, ItemTag.AIBlacklist, ItemTag.BrotherBlacklist };
             item.deprecatedTier = ItemTier.Tier3;
             item.canRemove = true;
             item.hidden = false;
@@ -66,10 +67,10 @@ namespace Hex3Mod.Items
             rules.Add("mdlCommandoDualies", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "Pelvis",
-                        localPos = new Vector3(0.15416F, -0.07144F, -0.00001F),
-                        localAngles = new Vector3(0F, 0F, 0F),
-                        localScale = new Vector3(0.09441F, 0.09441F, 0.09441F)
+                        childName = "Head",
+                        localPos = new Vector3(-0.0001F, 0.12851F, 0.18186F),
+                        localAngles = new Vector3(321.9487F, 359.8018F, 0.1498F),
+                        localScale = new Vector3(0.06886F, 0.06886F, 0.06886F)
                     }
                 }
             );
@@ -77,9 +78,9 @@ namespace Hex3Mod.Items
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Head",
-                        localPos = new Vector3(0.00001F, 0.24273F, 0.05034F),
-                        localAngles = new Vector3(25.39802F, 0F, 0F),
-                        localScale = new Vector3(0.07587F, 0.07587F, 0.07587F)
+                        localPos = new Vector3(0.00101F, 0.06548F, 0.11767F),
+                        localAngles = new Vector3(329.2418F, 359.8095F, 0.16626F),
+                        localScale = new Vector3(0.04379F, 0.04379F, 0.04379F)
                     }
                 }
             );
@@ -87,59 +88,59 @@ namespace Hex3Mod.Items
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Chest",
-                        localPos = new Vector3(1.05056F, 1.94221F, 1.64765F),
-                        localAngles = new Vector3(45.8378F, 0F, 0F),
-                        localScale = new Vector3(0.85108F, 0.85108F, 0.85108F)
+                        localPos = new Vector3(-1.98842F, 1.50671F, 3.35734F),
+                        localAngles = new Vector3(25.83804F, 356.7572F, 351.4152F),
+                        localScale = new Vector3(0.38077F, 0.38077F, 0.38077F)
                     }
                 }
             );
             rules.Add("mdlEngi", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "CannonHeadR",
-                        localPos = new Vector3(0F, 0.39234F, 0.00003F),
-                        localAngles = new Vector3(314.5863F, 0F, 0F),
-                        localScale = new Vector3(0.11812F, 0.11812F, 0.11812F)
+                        childName = "HeadCenter",
+                        localPos = new Vector3(-0.00101F, -0.14401F, 0.15288F),
+                        localAngles = new Vector3(353.669F, 359.8897F, 0.23848F),
+                        localScale = new Vector3(0.06797F, 0.06797F, 0.06797F)
                     }
                 }
             );
             rules.Add("mdlMage", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "Chest",
-                        localPos = new Vector3(0.11241F, 0.28087F, -0.18459F),
-                        localAngles = new Vector3(323.6529F, 0F, 0F),
-                        localScale = new Vector3(0.09022F, 0.09022F, 0.09022F)
+                        childName = "Head",
+                        localPos = new Vector3(0.0002F, -0.04308F, 0.12114F),
+                        localAngles = new Vector3(0F, 0F, 0F),
+                        localScale = new Vector3(0.04209F, 0.04209F, 0.04209F)
                     }
                 }
             );
             rules.Add("mdlMerc", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "HandR",
-                        localPos = new Vector3(-0.021F, 0.17313F, 0.01653F),
-                        localAngles = new Vector3(36.11853F, 98.29133F, 8.29494F),
-                        localScale = new Vector3(0.1098F, 0.1098F, 0.1098F)
+                        childName = "Head",
+                        localPos = new Vector3(-0.00012F, 0.0308F, 0.15569F),
+                        localAngles = new Vector3(338.8683F, 359.9052F, 0.01971F),
+                        localScale = new Vector3(0.05344F, 0.05344F, 0.05344F)
                     }
                 }
             );
             rules.Add("mdlTreebot", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "WeaponPlatform",
-                        localPos = new Vector3(-0.14601F, 0.07474F, 0.17599F),
-                        localAngles = new Vector3(314.9279F, 0F, 0F),
-                        localScale = new Vector3(0.19015F, 0.19015F, 0.19015F)
+                        childName = "Base",
+                        localPos = new Vector3(0.12404F, 0.61438F, -1.08326F),
+                        localAngles = new Vector3(280.3423F, 180.0001F, 179.9999F),
+                        localScale = new Vector3(0.10109F, 0.10109F, 0.10109F)
                     }
                 }
             );
             rules.Add("mdlLoader", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "Chest",
-                        localPos = new Vector3(0.20309F, 0.53486F, 0.03296F),
-                        localAngles = new Vector3(50.2245F, 0F, 0F),
-                        localScale = new Vector3(0.10039F, 0.10039F, 0.10039F)
+                        childName = "Head",
+                        localPos = new Vector3(0.00013F, -0.02358F, 0.16196F),
+                        localAngles = new Vector3(0F, 0F, 0F),
+                        localScale = new Vector3(0.05644F, 0.05729F, 0.0604F)
                     }
                 }
             );
@@ -147,29 +148,29 @@ namespace Hex3Mod.Items
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "MouthMuzzle",
-                        localPos = new Vector3(-0.21135F, 2.19588F, 2.52151F),
-                        localAngles = new Vector3(44.53611F, 86.83545F, 0.12085F),
-                        localScale = new Vector3(1.12444F, 1.12444F, 1.12885F)
+                        localPos = new Vector3(0.04082F, 2.49257F, 4.39971F),
+                        localAngles = new Vector3(41.27963F, 317.4682F, 237.4874F),
+                        localScale = new Vector3(0.58896F, 0.58896F, 0.59127F)
                     }
                 }
             );
             rules.Add("mdlCaptain", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "LowerArmL",
-                        localPos = new Vector3(-0.00595F, 0.42614F, 0.04707F),
-                        localAngles = new Vector3(315.9901F, 351.1433F, 12.76379F),
-                        localScale = new Vector3(0.11838F, 0.11838F, 0.11838F)
+                        childName = "Head",
+                        localPos = new Vector3(0.00075F, -0.03739F, 0.14602F),
+                        localAngles = new Vector3(337.1049F, 359.118F, 357.7592F),
+                        localScale = new Vector3(0.05007F, 0.05007F, 0.05007F)
                     }
                 }
             );
             rules.Add("mdlBandit2", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "MainWeapon",
-                        localPos = new Vector3(-0.14041F, 0.41272F, -0.00407F),
-                        localAngles = new Vector3(315.4345F, 0F, 0F),
-                        localScale = new Vector3(0.08203F, 0.08203F, 0.08203F)
+                        childName = "Head",
+                        localPos = new Vector3(0.00746F, -0.03999F, 0.12238F),
+                        localAngles = new Vector3(347.5478F, 357.5539F, 0.28736F),
+                        localScale = new Vector3(0.04863F, 0.04863F, 0.04863F)
                     }
                 }
             );
@@ -177,9 +178,9 @@ namespace Hex3Mod.Items
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Head",
-                        localPos = new Vector3(0F, 0.57577F, 0.58945F),
-                        localAngles = new Vector3(45.66947F, 0F, 0F),
-                        localScale = new Vector3(0.35445F, 0.35445F, 0.35445F)
+                        localPos = new Vector3(0F, 0.73386F, -0.51354F),
+                        localAngles = new Vector3(324.7035F, 0F, 0F),
+                        localScale = new Vector3(0.22695F, 0.22695F, 0.22695F)
                     }
                 }
             );
@@ -187,18 +188,18 @@ namespace Hex3Mod.Items
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
                         childName = "Head",
-                        localPos = new Vector3(0F, 0.20624F, -0.20413F),
-                        localAngles = new Vector3(45.29741F, 0F, 0F),
-                        localScale = new Vector3(0.33057F, 0.33057F, 0.33057F)
+                        localPos = new Vector3(0F, 0.20621F, 0.2632F),
+                        localAngles = new Vector3(337.459F, 0F, 0F),
+                        localScale = new Vector3(0.26621F, 0.26621F, 0.26621F)
                     }
                 }
             );
             rules.Add("mdlScav", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "Backpack",
-                        localPos = new Vector3(-10.62732F, 13.82996F, 1.14351F),
-                        localAngles = new Vector3(42.83438F, 0F, 0F),
+                        childName = "Head",
+                        localPos = new Vector3(0F, 4.23119F, 2.10605F),
+                        localAngles = new Vector3(47.57335F, 0.00004F, 0.00009F),
                         localScale = new Vector3(1.34648F, 1.34648F, 1.34648F)
                     }
                 }
@@ -206,20 +207,20 @@ namespace Hex3Mod.Items
             rules.Add("mdlRailGunner", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "GunScope",
-                        localPos = new Vector3(-0.07081F, -0.14643F, 0.17777F),
-                        localAngles = new Vector3(44.5719F, 0F, 0F),
-                        localScale = new Vector3(0.13531F, 0.13156F, 0.13156F)
+                        childName = "Head",
+                        localPos = new Vector3(0.00064F, -0.01436F, 0.06606F),
+                        localAngles = new Vector3(0F, 0F, 0F),
+                        localScale = new Vector3(0.0519F, 0.05046F, 0.05046F)
                     }
                 }
             );
             rules.Add("mdlVoidSurvivor", new RoR2.ItemDisplayRule[]{new RoR2.ItemDisplayRule{
                         ruleType = ItemDisplayRuleType.ParentedPrefab,
                         followerPrefab = ItemDisplayPrefab,
-                        childName = "ThighL",
-                        localPos = new Vector3(0F, 0F, -0.14146F),
-                        localAngles = new Vector3(345.2758F, 49.11308F, 282.4109F),
-                        localScale = new Vector3(0.10932F, 0.10932F, 0.10932F)
+                        childName = "Head",
+                        localPos = new Vector3(-0.02663F, 0.01837F, 0.17947F),
+                        localAngles = new Vector3(296.8297F, 308.2401F, 40.70057F),
+                        localScale = new Vector3(0.06899F, 0.06899F, 0.06899F)
                     }
                 }
             );
@@ -230,7 +231,7 @@ namespace Hex3Mod.Items
         public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Do Not Eat");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Chests may also contain a pearl.");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Chests and shop terminals may also contain a pearl.");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "You know those little silica packets that say \"Do Not Eat\" on them? Or, should I say 'silica' at all?\n\n" +
                 "You see, I'm a skeptic. When the government tells me that something is dangerous, I will do it. When the government tells me there's nothing wrong, I won't believe them. The government tells me to wear protective equipment to work, I shrug it off-- and the funny thing is, I'm usually right! When was the last time a mask or a seatbelt did anything but make you uncomfortable?\n\n" +
                 "So when the government says, \"Do Not Eat\", my only logical choice is to eat. There must be something in there they don't *want* us to eat, for whatever reason... a chemical that counteracts flouridic mind control, perhaps? Something that decalcifies the pituitary gland? A cure for toxoplasmosis or even cancer? Nobody knows because nobody is willing to find out. As you know- my subscribers- that's a job for me.\n\n" +
@@ -248,11 +249,23 @@ namespace Hex3Mod.Items
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Do Not Eat");
                 if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
-            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Chests have a <style=cShrine>" + DoNotEat_PearlChancePerStack.Value + "%</style> <style=cStack>(+" + DoNotEat_PearlChancePerStack.Value + "% per stack)</style> chance to also contain a <style=cShrine>Pearl</style> or an <style=cShrine>Irradiant Pearl</style>.");
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Chests and shop terminals have a <style=cShrine>" + DoNotEat_PearlChancePerStack.Value + "%</style> <style=cStack>(+" + DoNotEat_PearlChancePerStack.Value + "% per stack)</style> chance to also contain a <style=cShrine>Pearl</style> or an <style=cShrine>Irradiant Pearl</style>.");
         }
 
         private static void AddHooks()
         {
+            CostTypeIndex[] blacklistedCostTypes = new CostTypeIndex[8]
+            {
+                CostTypeIndex.LunarItemOrEquipment,
+                CostTypeIndex.WhiteItem,
+                CostTypeIndex.GreenItem,
+                CostTypeIndex.RedItem,
+                CostTypeIndex.BossItem,
+                CostTypeIndex.ArtifactShellKillerItem,
+                CostTypeIndex.PercentHealth,
+                CostTypeIndex.VolatileBattery
+            };
+
             // Give item holders an ItemBehavior
             void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
             {
@@ -265,7 +278,7 @@ namespace Hex3Mod.Items
                     component = self.GetComponent<DoNotEatBehavior>();
                     if (!component)
                     {
-                        component = self.AddItemBehavior<DoNotEatBehavior>(0);
+                        component = self.AddItemBehavior<DoNotEatBehavior>(1);
                     }
                     component.stack = itemCount;
                 }
@@ -273,46 +286,84 @@ namespace Hex3Mod.Items
                 {
                     if (self.GetComponent<DoNotEatBehavior>())
                     {
-                        GameObject.Destroy(self.GetComponent<DoNotEatBehavior>());
+                        UnityEngine.Object.Destroy(self.GetComponent<DoNotEatBehavior>());
                     }
                 }
             }
-            /*
-            On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
+
+            // Purchases mark the chest
+            void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
             {
-                orig(self);
-                if (Util.GetItemCountGlobal(itemDef.itemIndex, true) > 0)
+                if (self.isShrine || self.isGoldShrine || blacklistedCostTypes.Contains(self.costType))
                 {
-                    int totalItems = Util.GetItemCountGlobal(itemDef.itemIndex, true);
-                    float highestLuck = -99;
-                    foreach (PlayerCharacterMasterController masterController in PlayerCharacterMasterController.instances)
+                    orig(self, activator);
+                    return;
+                }
+                CharacterBody body = activator.GetComponent<CharacterBody>();
+                if (body)
+                {
+                    DoNotEatBehavior component = body.GetComponent<DoNotEatBehavior>();
+                    if (component)
                     {
-                        if (masterController.master && masterController.master.GetBody() && masterController.master.GetBody().inventory)
-                        {
-                            if (masterController.master.luck >= highestLuck)
-                            {
-                                highestLuck = masterController.master.luck;
-                            }
-                        }
+                        component.interactions.Add(self);
                     }
-                    if (Util.CheckRoll(DoNotEat_PearlChancePerStack.Value * totalItems, highestLuck))
+                }
+                orig(self, activator);
+            }
+
+            // Chest drops
+            void ChestBehavior_ItemDrop(On.RoR2.ChestBehavior.orig_ItemDrop orig, ChestBehavior self)
+            {
+                if (self.gameObject.GetComponent<PurchaseInteraction>())
+                {
+                    foreach (var behavior in UnityEngine.Object.FindObjectsOfType<DoNotEatBehavior>())
                     {
-                        float angle = 360f / ((float)self.dropCount);
-                        Vector3 vector = Vector3.up * (self.dropUpVelocityStrength / 2) + self.dropTransform.forward * 0f;
-                        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
-                        if (Util.CheckRoll(DoNotEat_IrradiantChance.Value))
+                        if (behavior && behavior.interactions.Contains(self.gameObject.GetComponent<PurchaseInteraction>()))
                         {
-                            PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.ShinyPearl.itemIndex), self.dropTransform.position + Vector3.up * 1.5f, vector);
-                        }
-                        else
-                        {
-                            PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.Pearl.itemIndex), self.dropTransform.position + Vector3.up * 1.5f, vector);
+                            if (behavior.body.master && Util.CheckRoll(DoNotEat_PearlChancePerStack.Value * (float)behavior.stack, behavior.body.master.luck, behavior.body.master))
+                            {
+                                if (Util.CheckRoll(DoNotEat_IrradiantChance.Value))
+                                {
+                                    PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.ShinyPearl.itemIndex), (self.dropTransform ?? self.transform).position, Vector3.up * self.dropUpVelocityStrength + self.dropTransform.forward * -self.dropForwardVelocityStrength);
+                                }
+                                else
+                                {
+                                    PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.Pearl.itemIndex), (self.dropTransform ?? self.transform).position, Vector3.up * self.dropUpVelocityStrength + self.dropTransform.forward * -self.dropForwardVelocityStrength);
+                                }
+                            }
+                            behavior.interactions.Remove(self.gameObject.GetComponent<PurchaseInteraction>());
+                            if (behavior.interactions.Count > 500) { behavior.interactions.Clear(); }
                         }
                     }
                 }
-            };
-            */
+                orig(self);
+            }
+
+            // Shop terminal compatibility
+            void ShopTerminalBehavior_DropPickup(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
+            {
+                foreach (var behavior in UnityEngine.Object.FindObjectsOfType<DoNotEatBehavior>()) if (behavior && behavior.interactions.Contains(self.GetComponent<PurchaseInteraction>()) && !self.gameObject.name.Contains("ShrineCleanse"))
+                {
+                    Vector3 v = self.transform.TransformVector(self.dropVelocity);
+                    if (behavior.body.master && Util.CheckRoll(DoNotEat_PearlChancePerStack.Value * (float)behavior.stack, behavior.body.master.luck, behavior.body.master))
+                    {
+                        if (Util.CheckRoll(DoNotEat_IrradiantChance.Value))
+                        {
+                            PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.ShinyPearl.itemIndex), (self.dropTransform ?? self.transform).position, new Vector3(-v.x, v.y, -v.z));
+                        }
+                        else
+                        {
+                            PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(RoR2Content.Items.Pearl.itemIndex), (self.dropTransform ?? self.transform).position, new Vector3(-v.x, v.y, -v.z));
+                        }
+                    }
+                    behavior.interactions.Remove(self.GetComponent<PurchaseInteraction>());
+                }
+                orig(self);
+            }
+
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
+            if (DoNotEat_ShopTerminals.Value) { On.RoR2.ShopTerminalBehavior.DropPickup += ShopTerminalBehavior_DropPickup; }
         }
 
         public static void Initiate()
@@ -326,7 +377,7 @@ namespace Hex3Mod.Items
 
         public class DoNotEatBehavior : CharacterBody.ItemBehavior
         {
-
+            public List<PurchaseInteraction> interactions = new List<PurchaseInteraction>();
         }
     }
 }

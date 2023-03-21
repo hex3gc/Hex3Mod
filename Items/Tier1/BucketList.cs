@@ -11,15 +11,15 @@ namespace Hex3Mod.Items
     Bucket List increases your movement drastically speed outside of the teleporter/boss event, but it also gives a small boost while in teleporter/boss events to ease the jarring change in speed
     This item is meant to be a great early-game boost for those who want to loot the stage in good time, but as a tradeoff not provide a big power boost for the important fights
     */
-    public class BucketList
+    public static class BucketList
     {
         static string itemName = "BucketList";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BucketListPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BucketListPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -27,8 +27,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/BucketList.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/BucketList.png");
         }
         public static ItemDef CreateItem()
         {
@@ -261,7 +260,7 @@ namespace Hex3Mod.Items
                                 break;
                             }
                         }
-                        if (bossFound == true) // Boss present: Reduced buff
+                        if (bossFound) // Boss present: Reduced buff
                         {
                             args.moveSpeedMultAdd += (ReducedBuff + ((body.inventory.GetItemCount(itemDef) - 1) * ReducedBuff));
                         }

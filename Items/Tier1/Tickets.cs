@@ -15,7 +15,7 @@ namespace Hex3Mod.Items
     400 Tickets is part of the Consumables pack. There are many "break on low health" consumables, so one that has a novel utility seemed like a good idea
     Mostly useless (but still advantageous) if used on a small chest, but a Large Chest or Legendary Chest is where you need one of these.
     */
-    public class Tickets
+    public static class Tickets
     {
         static string itemName = "FourHundredTickets";
         static string upperName = itemName.ToUpper();
@@ -25,7 +25,7 @@ namespace Hex3Mod.Items
         public static GameObject LoadPrefab()
         {
             GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TicketsPrefab.prefab");
-            if (debugMode == true)
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -33,8 +33,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = MainAssets.LoadAsset<Sprite>("Assets/Icons/Tickets.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Tickets.png");
         }
         public static ItemDef CreateItem()
         {
@@ -324,7 +323,7 @@ namespace Hex3Mod.Items
                                 self.dropUpVelocityStrength = 10f;
                                 self.dropForwardVelocityStrength = 20f;
                             }
-                            self.dropCount += 1;
+                            self.dropCount++;
                             behavior.item = itemDef;
                             behavior.consumedItem = consumedItemDef;
                             behavior.interaction = null;

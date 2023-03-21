@@ -12,15 +12,15 @@ namespace Hex3Mod.Items
     Balance provides dodge chance the slower you are.
     This balances it out for regular combat, while making it very useful while interacting with menus, being frozen/slowed, or using turrets-- all times when you're most vulnerable.
     */
-    public class Balance
+    public static class Balance
     {
         static string itemName = "Balance";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BalancePrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BalancePrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -28,8 +28,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Balance.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Balance.png");
         }
         public static GameObject dodgeFX = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/SprintOutOfCombat/SprintActivate.prefab").WaitForCompletion();
         public static ItemDef CreateItem()
@@ -314,7 +313,7 @@ namespace Hex3Mod.Items
                         EffectData effectData = new EffectData
                         {
                             origin = damageInfo.position,
-                            rotation = Util.QuaternionSafeLookRotation((damageInfo.force != Vector3.zero) ? damageInfo.force : UnityEngine.Random.onUnitSphere)
+                            rotation = Util.QuaternionSafeLookRotation((damageInfo.force != Vector3.zero) ? damageInfo.force : Random.onUnitSphere)
                         };
                         EffectManager.SpawnEffect(dodgeFX, effectData, true);
                         damageInfo.rejected = true;

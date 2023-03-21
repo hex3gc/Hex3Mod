@@ -12,15 +12,15 @@ namespace Hex3Mod.Items
     Scattered Reflection provides a unique item synergy for the simple Shard Of Glass
     It also provides damage reduction and retaliation in one, making it ideal for players who want to tank some damage
     */
-    public class ScatteredReflection
+    public static class ScatteredReflection
     {
         static string itemName = "ScatteredReflection";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ScatteredReflectionPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -28,8 +28,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ScatteredReflection.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/ScatteredReflection.png");
         }
         public static ItemDef CreateItem()
         {
@@ -268,17 +267,19 @@ namespace Hex3Mod.Items
                         shardCount = inventory.GetItemCount(ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex("ShardOfGlass")));
                     }
 
-                    // If all anti-nullref checks are passed, perform actions
-                    if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody enemyBody) && enemyBody.teamComponent && body != enemyBody && body.teamComponent.teamIndex != enemyBody.teamComponent.teamIndex && damageInfo.damage > 0.1f)
+                    if (damageInfo.attacker && damageInfo.attacker.TryGetComponent(out CharacterBody enemyBody) && enemyBody.teamComponent && body != enemyBody && body.teamComponent.teamIndex != enemyBody.teamComponent.teamIndex && damageInfo.damage > 0.1f && !damageInfo.procChainMask.HasProc(ProcType.Thorns))
                     {
                         shardCount *= inventory.GetItemCount(itemDef); // Stacks of Scattered Reflection now strengthen the synergy
                         float totalReflectPercent = ScatteredReflection_DamageReflectPercent.Value + (shardCount * ScatteredReflection_DamageReflectShardStack.Value);
-                        if (totalReflectPercent > 0.9f)
+                        if (totalReflectPercent > 0.8f)
                         { 
-                            totalReflectPercent = 0.9f; // Prevent damage capped at 90%
+                            totalReflectPercent = 0.8f; // Prevent damage capped at 80%
                         }
                         float damageReflected = damageInfo.damage * totalReflectPercent;
                         damageInfo.damage -= damageReflected;
+
+                        ProcChainMask mask = new ProcChainMask();
+                        mask.AddProc(ProcType.Thorns);
 
                         LightningOrb lightningOrb = new LightningOrb();
                         lightningOrb.attacker = body.gameObject;
@@ -291,7 +292,7 @@ namespace Hex3Mod.Items
                         lightningOrb.isCrit = false;
                         lightningOrb.lightningType = LightningOrb.LightningType.RazorWire;
                         lightningOrb.origin = body.corePosition;
-                        lightningOrb.procChainMask = default(ProcChainMask);
+                        lightningOrb.procChainMask = mask;
                         lightningOrb.procCoefficient = 0f;
                         lightningOrb.range = 0f;
                         lightningOrb.teamIndex = body.teamComponent.teamIndex;

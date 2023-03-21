@@ -12,15 +12,15 @@ namespace Hex3Mod.Items
     Shard Of Glass is a very simple stat increase, an item you'd never be unhappy to find
     Its secondary purpose, however, is to synergize with Shattered Reflection, forming a unique common-uncommon synergy and giving this simple item more utility
     */
-    public class ShardOfGlass
+    public static class ShardOfGlass
     {
         static string itemName = "ShardOfGlass";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ShardOfGlassPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ShardOfGlassPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -28,8 +28,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/ShardOfGlass.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/ShardOfGlass.png");
         }
         public static ItemDef CreateItem()
         {

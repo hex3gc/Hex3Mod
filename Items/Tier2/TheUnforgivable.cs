@@ -17,15 +17,15 @@ namespace Hex3Mod.Items
     The Unforgiven provides a neat way to utilize on-kill items without needing to kill anyone, making them viable for bossfights
     Synergizes well with Forgive Me Please, both in theme and practice
     */
-    public class TheUnforgivable
+    public static class TheUnforgivable
     {
         static string itemName = "TheUnforgivable";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheUnforgivablePrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/TheUnforgivablePrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -33,8 +33,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/TheUnforgivable.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/TheUnforgivable.png");
         }
         static GameObject fmpPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/DeathProjectile/DeathProjectile.prefab").WaitForCompletion();
         static GameObject fmpEffectPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/DeathProjectile/DeathProjectileTickEffect.prefab").WaitForCompletion();
@@ -254,7 +253,7 @@ namespace Hex3Mod.Items
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "The Unforgivable");
                 if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
-            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Activate your <style=cIsDamage>on-kill effects</style> at your location <style=cIsDamage>once</style> <style=cStack>(+1 per stack)</style> every <style=cIsDamage>{0}</style> seconds.", TheUnforgivable_Interval.Value));
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("Activate your <style=cIsDamage>on-kill effects</style> at your location every <style=cIsDamage>{0}</style> <style=cStack>(-50% per stack)</style> seconds.", TheUnforgivable_Interval.Value));
         }
 
         private static void AddHooks()
@@ -276,7 +275,7 @@ namespace Hex3Mod.Items
                 }
                 else
                 {
-                    if (self.TryGetComponent(out UnforgivableBehavior behavior) == true)
+                    if (self.TryGetComponent(out UnforgivableBehavior behavior))
                     {
                         UnityEngine.Object.Destroy(behavior);
                     }
@@ -309,7 +308,7 @@ namespace Hex3Mod.Items
 
             private void OnDestroy()
             {
-                UnityEngine.Object.Destroy(ghostFMP);
+                Destroy(ghostFMP);
             }
 
             private void FixedUpdate()
@@ -320,18 +319,18 @@ namespace Hex3Mod.Items
                 {
                     ghostFMP = Instantiate<GameObject>(fmpPrefab, /*new Vector3(0f, -200f, 0f)*/body.footPosition, Quaternion.identity);
                     ghostFMP.transform.localScale = new Vector3(0f, 0f, 0f);
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<DestroyOnTimer>());
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<DeathProjectile>());
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<ApplyTorqueOnStart>());
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<ProjectileDeployToOwner>());
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<Deployable>());
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<ProjectileStickOnImpact>());
-                    UnityEngine.Object.Destroy(ghostFMP.GetComponent<ProjectileController>());
+                    Destroy(ghostFMP.GetComponent<DestroyOnTimer>());
+                    Destroy(ghostFMP.GetComponent<DeathProjectile>());
+                    Destroy(ghostFMP.GetComponent<ApplyTorqueOnStart>());
+                    Destroy(ghostFMP.GetComponent<ProjectileDeployToOwner>());
+                    Destroy(ghostFMP.GetComponent<Deployable>());
+                    Destroy(ghostFMP.GetComponent<ProjectileStickOnImpact>());
+                    Destroy(ghostFMP.GetComponent<ProjectileController>());
                 }
 
                 ghostFMP.transform.position = body.footPosition;
 
-                if (killTimer >= (killInterval / stack)) // Spaces kills evenly along 8 seconds
+                if (killTimer >= (killInterval / stack)) // Spaces kills evenly along 10 seconds
                 {
                     EffectData effectData = new EffectData
                     {

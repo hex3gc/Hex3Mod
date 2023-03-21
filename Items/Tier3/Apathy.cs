@@ -12,15 +12,15 @@ namespace Hex3Mod.Items
     /*
     Final (I hope) version of Apathy. Now synergizes with close-range options and on-kill boosters like The Unforgivable
     */
-    public class Apathy
+    public static class Apathy
     {
         static string itemName = "Apathy";
         static string upperName = itemName.ToUpper();
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ApathyPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ApathyPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -28,18 +28,15 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Apathy.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Apathy.png");
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Apathy.png");
         }
         public static Sprite LoadBuffSprite2()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ApathyStacks.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_ApathyStacks.png");
         }
         static GameObject FocusCrystalPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/NearbyDamageBonus/NearbyDamageBonusIndicator.prefab").WaitForCompletion();
         static Material ApathyMaterial = Addressables.LoadAssetAsync<Material>("RoR2/Base/ArmorReductionOnHit/matPulverizedOverlay.mat").WaitForCompletion();
@@ -311,7 +308,7 @@ namespace Hex3Mod.Items
             void GlobalEventManager_OnCharacterDeath(On.RoR2.GlobalEventManager.orig_OnCharacterDeath orig, GlobalEventManager self, DamageReport damageReport)
             {
                 orig(self, damageReport);
-                foreach (ApathyBehavior apathyOwner in GameObject.FindObjectsOfType<ApathyBehavior>())
+                foreach (ApathyBehavior apathyOwner in UnityEngine.Object.FindObjectsOfType<ApathyBehavior>())
                 {
                     int numberOfOverdrives = 0;
                     Vector3 deathDistanceVector = Vector3.zero;
@@ -374,7 +371,7 @@ namespace Hex3Mod.Items
                         radiusIndicator = PrefabAPI.InstantiateClone(FocusCrystalPrefab, "ApathyRange");
                         apathyEffect = PrefabAPI.InstantiateClone(HealthComponent.AssetReferences.diamondDamageBonusImpactEffectPrefab, "ApathyPulse");
                         apathyEffect.transform.localScale *= 0.1f;
-                        radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(base.gameObject, null);
+                        radiusIndicator.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(gameObject, null);
                         radiusIndicator.transform.localScale = defaultScale;
                         defaultScale.x = focusCrystalSizeDivisor;
                         defaultScale.y = focusCrystalSizeDivisor;
@@ -421,7 +418,7 @@ namespace Hex3Mod.Items
 
             private void OnDestroy()
             {
-                UnityEngine.Object.Destroy(radiusIndicator);
+                Destroy(radiusIndicator);
             }
         }
 

@@ -12,29 +12,29 @@ Adds 1 artifact and 25 new items to the game:
 | ------------- | ------------- | ------------- |
 | | <p align="center">**COMMON**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891571519548/ATGPrototype.png?raw=true" width=128> | **ATG Prototype**<br>After inflicting **10** hits, fire a missile that deals **80%** <sup>(+80% per stack)</sup> TOTAL damage. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891810619442/BucketList.png?raw=true" width=128> | **Bucket List**<br>Move **20%** faster <sup>(+20% per stack)</sup>. Reduce this bonus by **75%** during boss fights. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890950758420/HopooEgg.png?raw=true" width=128> | **Hopoo Egg**<br>Jump **20%** <sup>(+20% per stack)</sup> higher. **Reduces fall damage**. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891810619442/BucketList.png?raw=true" width=128> | **Bucket List**<br>Move **24%** faster <sup>(+24% per stack)</sup>. Reduce this bonus by **80%** during boss fights. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890950758420/HopooEgg.png?raw=true" width=128> | **Hopoo Egg**<br>Jump **30%** <sup>(+30% per stack)</sup> higher. **Reduces fall damage**. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988812279849/ShardOfGlass.png?raw=true" width=128> | **Shard Of Glass**<br>Increase your **base damage** by **7%** <sup>(+7% per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987243618364/Tickets.png?raw=true" width=128> | **400 Tickets**<br>The next chest, lunar pod or void cradle you open will contain **double the amount of items**. Consumed on use. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044935829660905492/Balance.png?raw=true" width=128> | **Balance**<br>Gain a maximum **20% chance to dodge attacks** (+20% per stack, hyperbolic) **the slower you're moving:** **Full chance** while not moving, **half chance** while walking or receiving a speed debuff, and **no chance** while freely sprinting. Unaffected by luck. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1044761356659851274/MinersHelmet.png?raw=true" width=128> | **Miner's Helmet**<br>**Every time you earn $25** <sup>(Scaling with time)</sup>, reduce your **skill cooldowns** by **2** seconds <sup>(+2 per stack)</sup>. | <details><summary>Unlock</summary>Carry enough money to buy 3 legendary chests.</details> |
 | | <p align="center">**UNCOMMON**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1053878386017185842/Empathy.png?raw=true" width=128> | **Empathy**<br>**When an enemy takes damage within 20m** of you, heal for **4 hp** <sup>(+4 per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1053878386017185842/Empathy.png?raw=true" width=128> | **Empathy**<br>**When an enemy takes damage within 13m** of you, heal for **3 HP** <sup>(+3 per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988543852634/ScatteredReflection.png?raw=true" width=128> | **Scattered Reflection**<br>**Block and reflect 7% of all received damage** back to your attacker, magnifying it by **700%** <sup>(+700% per stack)</sup>. For every **Shard Of Glass** in your inventory, **reflect 0.7%** <sup>(+0.7% per stack)</sup> **more damage**. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188497302454312/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pouch**<br>When an item is **consumed or broken**, **replace it** with a brand new one. This may occur up to **2** times before the pouch is empty. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555785277452410/TheUnforgivable.png?raw=true" width=128> | **The Unforgivable**<br>Activate your **on-kill effects** at your location **once** <sup>(+1 per stack)</sup> every **8** seconds. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188497302454312/ScavengersPack.png?raw=true" width=128> | **Scavenger's Pouch**<br>When an item is **consumed**, **replace it** with a brand new one. This may occur up to **2** times before the pouch is empty. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1043555785277452410/TheUnforgivable.png?raw=true" width=128> | **The Unforgivable**<br>Activate your **on-kill effects** at your location every **10** <sup>(-50% per stack)</sup> seconds. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/1047947959779725312/OverkillOverdrive.png?raw=true" width=128> | **Overkill Overdrive**<br>Amplify the radius of your **area buffs** and **holdout zones** by **20%** <sup>(+20% per stack)</sup>. |
 | | <p align="center">**LEGENDARY**</p> |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838891164663818/Apathy.png?raw=true" width=128> | **Apathy**<br>**When an enemy dies within 20m** of you, gain a stack of **Apathy**. After reaching **15** stacks, **enter a frenzy** which grants you **+100% movement speed**, **attack speed** and **20 hp/s of regeneration** for **5 seconds** <sup>(+5s per stack)</sup>. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1087738209636732999/Apathy.png?raw=true" width=128> | **Apathy**<br>**When an enemy dies within 13m** of you, gain a stack of **Apathy**. After reaching **10** stacks, **enter a frenzy** which grants you **+100% movement speed**, **attack speed** and **20 hp/s of regeneration** for **7.5 seconds** <sup>(+7.5s per stack)</sup>. |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987465900052/MintCondition.png?raw=true" width=128> | **Mint Condition**<br>**Provides immunity to movement restricting status effects**. Gain **20%** movement speed <sup>(+60% per stack)</sup> and **1** <sup>(+2 per stack)</sup> extra jumps. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188496866254868/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **15 max health** and **1 hp per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests have a **10%** <sup>(+10% per stack)</sup> chance to also contain a **Pearl** or an **Irradiant Pearl**. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1054188496866254868/Mutagen.png?raw=true" width=128> | **Elder Mutagen**<br>**Killing a new monster species** grants a permanent **10 max health** and **0.5 HP per second** regeneration bonus. Each stack allows you to gain this bonus **1** more time from all species. |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1012988941437259796/DoNotEatPost.png?raw=true" width=128> | **Do Not Eat**<br>Chests and shop terminals have a **10%** <sup>(+10% per stack)</sup> chance to also contain a **Pearl** or an **Irradiant Pearl**. |
 | | <p align="center">**VOID**</p> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838988271198279/Parasite.png?raw=true" width=128> | **Corrupting Parasite**<br>At the start of each stage, **1 random item will be corrupted into its void equivalent** <sup>(+1 per stack)</sup>. | <details><summary>Unlock</summary>Enter the Deep Void.</details> |
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838987939840060/NoticeOfAbsence.png?raw=true" width=128> | **Notice Of Absence**<br>**Become invisible for 10 seconds** <sup>(+5 per stack)</sup> whenever a boss spawns or a teleporter event begins. **Corrupts all Bucket Lists.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890485198848/DropOfNecrosis.png?raw=true" width=128> | **Drop Of Necrosis**<br>Your attacks have a **5%** <sup>(+5% per stack)</sup> chance to inflict **Blight**, which deals **5%** more damage for each stack of this item. **Corrupts all Shards Of Glass.**|
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1048610656749899796/CaptainsFavor.png?raw=true" width=128> | **Captain's Favor**<br>Stages contain **7.5%** <sup>(+7.5% per stack)</sup> more interactables. **Corrupts all 400 Tickets.** |
-| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **3** points per stack of **regenerating shield** to every player who has this item. Caps at **300 shield** per stack. **Corrupts all Infusions.**|
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/1048610656749899796/CaptainsFavor.png?raw=true" width=128> | **Captain's Favor**<br>The first <sup>(+1 per stack)</sup> chest you open each stage will instead drop a **Void Potential**, inheriting the tier of the item it replaced. **Corrupts all 400 Tickets.** |
+| <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838890262904832/Discovery.png?raw=true" width=128> | **Discovery**<br>Using a world interactable grants **3** points of permanent **regenerating shield** to everyone on your team. Caps at **300 shield** per stack. **Corrupts all Infusions.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986677354506/SpatteredCollection.png?raw=true" width=128> | **Spattered Collection**<br>Your attacks have a **10%** chance to inflict **Blight**, which now **reduces enemies' armor by 2** <sup>(+2 per stack)</sup> for each stack. **Corrupts all Scattered Reflections.**|
 | <img src="https://cdn.discordapp.com/attachments/980836743894941696/980838986941616138/TheHermit.png?raw=true" width=128> | **The Hermit**<br>Taking damage grants a **stacking damage resistance of 5%** that lasts for **10 seconds** <sup>(+5 per stack)</sup>. **Corrupts all Symbiotic Scorpions.**|
 | | <p align="center">**LUNAR**</p> |
@@ -48,29 +48,45 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Bugs
 
-* Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
+KNOWN ISSUES:
+* Overkill Overdrive's incompatibility with certain mods. I'd prefer a way to have it modify Focus Crystal and Bustling Fungus non-destructively.
+* Corrupting Parasite can be found without the achievement. Not sure why this is happening.
+
+Please give feedback/bug reports on the RoR2 Modding discord, or by messaging directly: hex3#7952
 
 # Changelog
 
-TO CHANGE
-- Rewrite: Discovery, Do Not Eat, Overkill Overdrive
-- Rework: Empathy(?), Captain's Favor, Hopoo Egg
-- Update VFX: Apathy, Empathy
-- Fix bugs
-
-### 2.1.0
+### 2.1.0 - For balance changes to take effect, delete your config file. This will be done automatically in the future.
+A 3.0 update is in the future with new items, but first I want to focus on getting everything in working condition, and making it all look good.
 * **Revamped VFX** for Apathy
+* **Captain's Favor Rework:** The first chests you open each stage will instead contain a Void Potential.
+* **Discovery Rework:** Using a world interactable grants a small amount of permanent regenerating shield to your whole team.
+* 400 Tickets now works on lockboxes, void potentials and (optionally) cleansing pools. Thanks to prodzpod for contributing this fix.
+* Scattered Reflection no longer procs off of itself or razorwire.
+* Scattered Reflection damage prevention cap reduced to 80%.
+* Empathy healing now stacks.
+* Do Not Eat is rewritten so that it is tracked per-player, using each player's luck value individually.
+* Do Not Eat can now work on multishop terminals.
+* Do Not Eat is now AI blacklisted.
+* Do Not Eat item displays corrected.
+* Corrupting Parasite can now be configured to not corrupt in hidden realms and the bazaar.
+* One Ticket should no longer spawn the Artifact Reliquary as an elite.
 * Added support for Ghostly Apple (Mystic's Items) to Scavenger's Pouch.
 * <details><summary>Bucket List non-boss speed boost 20% -> 24%</summary>Bucket List, come to think of it, doesn't have enough of an edge over other movement speed items to justify its downside. This buff makes it considerably better than a Goat Hoof, increasing its case for use.</details>
 * <details><summary>Bucket List speed reduction if boss present 75% -> 80%</summary>Slight increase in downside to make up for the buff. It should still provide around 5% speed while a boss exists.</details>
 * <details><summary>Hopoo Egg jump height boost 20% -> 30%</summary>Sometimes you just want to jump higher.</details>
-* <details><summary>Scavenger's Pouch disabled by default for items: Delicate Watch, Regenerating Scrap, One Ticket, Platinum Card (Mystic's), Clockwork Mechanism (VanillaVoid)</summary>There were a few unsatisfying interactions with the pouch that either instantly consumed it or consumed it for very little gain. Regenerating Scrap and Platinum Card regen every stage- making the replacement redundant- and the watch items can easily consume all charges of a pack if you fall to low HP. One Ticket being replaced gives very little value, as you almost always want to just be rid of it when given the chance. You can always re-enable these if you want.</details>
+* <details><summary>Empathy effective range 20m -> 13m</summary>Both of these items felt like they overreached their niche as melee boosters. It also puts it in line with Focus Crystal, increasing their opportunity to work together.</details>
+* <details><summary>Scavenger's Pouch disabled by default for items: Delicate Watch, Regenerating Scrap, One Ticket, Platinum Card (Mystic's), Clockwork Mechanism (VanillaVoid), Sharpened Chopsticks (HCFIB)</summary>There were a few unsatisfying interactions with the pouch that either instantly consumed it or consumed it for very little gain. Regenerating Scrap and Platinum Card regen every stage- making the replacement redundant- and the watch items can easily consume all charges of a pack if you fall to low HP. One Ticket being replaced gives very little value, as you almost always want to just be rid of it when given the chance. You can always re-enable these if you want.</details>
 * <details><summary>The Unforgivable activation interval 8s -> 10s</summary>Turns out, an on-kill effect at your location every 8 seconds is very powerful. It also stacks extremely well. I'm unsure if this is enough of a nerf, but it should hamper the item's power a bit.</details>
+* <details><summary>Apathy effective range 20m -> 13m</summary>Both of these items felt like they overreached their niche as melee boosters. It also puts it in line with Focus Crystal, increasing their opportunity to work together.</details>
+* <details><summary>Apathy stacks required for buff 15 -> 10</summary>To compensate for the range nerf.</details>
+* <details><summary>Apathy buff duration 5s -> 7.5s</summary>Apathy already lacked consistency and felt a little underwhelming, so I gave it a bit of a duration boost.</details>
 * <details><summary>Elder Mutagen 1 HP/s regen per species -> 0.5 HP/s</summary>Elder mutagen can stack very quickly up to 20 or even 30, making its regen extremely powerful for a single item. It feels justified to just halve it.</details>
 * <details><summary>Elder Mutagen 15 max HP per species -> 10 max HP</summary>If we're still going on 30 being a benchmark, having 300 extra HP from one item is pretty potent, especially combined with the added regen.</details>
 * <details><summary>Mint Condition first stack jump increase 0 -> 1</summary>A very powerful item still; I just felt like there should be more accessible ways to gain extra jumps.</details>
 * Fixed some descriptions.
 * Changed some RiskOfOptions sliders to be easier to use.
+* RiskOfOptions sliders now generate automatically. <sup>Looking at you, HIFU</sup>
 
 ### 2.0.7
 * Disabling items via config now actually disables them on the next run, removing them from the drop pool.

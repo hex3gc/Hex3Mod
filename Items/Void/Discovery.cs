@@ -15,7 +15,7 @@ namespace Hex3Mod.Items
     If you're going for a full void build, Discovery will be a decent method of getting shields.
     To match with Infusion's purpose and to be thematically consistent with exploration of the void, this item gives shield based on your "discoveries" (interactions)
     */
-    public class Discovery
+    public static class Discovery
     {
         static string itemName = "Discovery";
         static string upperName = itemName.ToUpper();
@@ -23,8 +23,8 @@ namespace Hex3Mod.Items
         public static ItemDef hiddenItemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -32,13 +32,11 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Discovery.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Discovery.png");
         }
         public static Sprite LoadBuffSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/Buff_Discovery.png");
         }
         public static ItemDef CreateItem()
         {
@@ -75,9 +73,6 @@ namespace Hex3Mod.Items
             item.deprecatedTier = ItemTier.NoTier;
             item.canRemove = false;
             item.hidden = true;
-
-            item.pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/DiscoveryPrefab.prefab");
-            item.pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Textures/Icons/Discovery.png");
 
             return item;
         }
@@ -260,7 +255,7 @@ namespace Hex3Mod.Items
         public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Discovery");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Using a world interactable grants <style=cIsHealing>regenerating shield</style> to all holders of this item. <style=cIsVoid>Corrupts all Infusions.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "Using a world interactable grants a small amount of permanent <style=cIsHealing>regenerating shield</style> to everyone on your team. <style=cIsVoid>Corrupts all Infusions.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "EXPLORER'S LOG" +
             "\n// 'Author' information lost, attempting to fix..." +
             "\n// 'Date' information lost, attempting to fix..." +
@@ -283,102 +278,84 @@ namespace Hex3Mod.Items
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Discovery");
                 if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
-            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Using a world interactable grants <style=cIsHealing>" + Discovery_ShieldAdd.Value + "</style> points per stack of <style=cIsHealing>regenerating shield</style> to every player who has this item. Caps at <style=cIsHealing>" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " shield</style> <style=cStack>(+" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "Using a world interactable grants a permanent <style=cIsHealing>" + Discovery_ShieldAdd.Value + "</style> points per stack of <style=cIsHealing>regenerating shield</style> to everyone on your team. Caps at <style=cIsHealing>" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " shield</style> <style=cStack>(+" + Discovery_ShieldAdd.Value * Discovery_MaxStacks.Value + " per stack)</style>. <style=cIsVoid>Corrupts all Infusions.</style>");
         }
 
         private static void AddHooks() // Insert hooks here
         {
+            CostTypeIndex[] blacklistedCostTypes = new CostTypeIndex[4]
+            {
+                CostTypeIndex.WhiteItem,
+                CostTypeIndex.GreenItem,
+                CostTypeIndex.RedItem,
+                CostTypeIndex.BossItem
+            };
+
             // Void transformation
             VoidTransformation.CreateTransformation(itemDef, "Infusion");
 
-            // Easy way to do this: Make a new hidden item, add one each time an interactable is used
-            void DiscoveryInteract(Interactor interactor, PurchaseInteraction interaction)
+            void DiscoveryInteract(Interactor activator)
             {
-                // First, make sure the item isn't a printer, so we can't have infinite interaction loops
-                if (interaction.costType != CostTypeIndex.WhiteItem && interaction.costType != CostTypeIndex.GreenItem && interaction.costType != CostTypeIndex.RedItem && interaction.costType != CostTypeIndex.BossItem && interaction.costType != CostTypeIndex.LunarItemOrEquipment)
+                CharacterBody body = activator.GetComponent<CharacterBody>();
+                if (body && body.inventory)
                 {
-                    if (interactor.gameObject.GetComponent<CharacterBody>())
+                    int itemCount = body.inventory.GetItemCount(itemDef);
+                    if (itemCount > 0)
                     {
-                        CharacterBody body = interactor.gameObject.GetComponent<CharacterBody>();
-                        var bodyTeamMembers = TeamComponent.GetTeamMembers(body.teamComponent.teamIndex);
+                        Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, activator.gameObject);
 
-                        foreach (var member in bodyTeamMembers)
+                        foreach (var member in TeamComponent.GetTeamMembers(body.teamComponent.teamIndex))
                         {
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenItemDef) < (Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef)))
+                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(hiddenItemDef) < Discovery_MaxStacks.Value * Util.GetItemCountForTeam(body.teamComponent.teamIndex, itemDef.itemIndex, true))
                             {
-                                member.body.inventory.GiveItem(hiddenItemDef, member.body.inventory.GetItemCount(itemDef));
-                                if (member.body.inventory.GetItemCount(hiddenItemDef) > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef))
+                                member.body.inventory.GiveItem(hiddenItemDef);
+                                EffectData effectDataDist = new EffectData
                                 {
-                                    for (int i = member.body.inventory.GetItemCount(hiddenItemDef); i > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef); i--)
-                                    {
-                                        member.body.inventory.RemoveItem(hiddenItemDef);
-                                    }
-                                }
-                                Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
-                                EffectData effectData = new EffectData
-                                {
-                                    origin = body.corePosition
+                                    origin = member.body.corePosition
                                 };
-                                EffectManager.SpawnEffect(EntityStates.NullifierMonster.FirePortalBomb.muzzleflashEffectPrefab, effectData, false);
-                            }
-                            if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) < 1)
-                            {
-                                member.body.inventory.ResetItem(hiddenItemDef);
+                                EffectManager.SpawnEffect(EntityStates.NullifierMonster.FirePortalBomb.muzzleflashEffectPrefab, effectDataDist, false);
                             }
                         }
                     }
                 }
             }
-            void DiscoveryBarrelInteract(Interactor interactor)
-            {
-                if (interactor.gameObject.GetComponent<CharacterBody>())
-                {
-                    CharacterBody body = interactor.gameObject.GetComponent<CharacterBody>();
-                    var bodyTeamMembers = TeamComponent.GetTeamMembers(body.teamComponent.teamIndex);
 
-                    foreach (var member in bodyTeamMembers)
+            void PurchaseInteraction_OnInteractionBegin(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
+            {
+                orig(self, activator);
+                if (!blacklistedCostTypes.Contains(self.costType))
+                {
+                    DiscoveryInteract(activator);
+                }
+            }
+            void BarrelInteraction_OnInteractionBegin(On.RoR2.BarrelInteraction.orig_OnInteractionBegin orig, BarrelInteraction self, Interactor activator)
+            {
+                orig(self, activator);
+                DiscoveryInteract(activator);
+            }
+            void TeleporterInteraction_OnInteractionBegin(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig, TeleporterInteraction self, Interactor activator)
+            {
+                orig(self, activator);
+                DiscoveryInteract(activator);
+            }
+
+            void RecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
+            {
+                if (body && body.inventory && body.inventory.GetItemCount(hiddenItemDef) > 0)
+                {
+                    int hiddenItemCount = body.inventory.GetItemCount(hiddenItemDef);
+                    if (hiddenItemCount > 0)
                     {
-                        if (member.body && member.body.inventory && member.body.inventory.GetItemCount(itemDef) > 0 && body.inventory.GetItemCount(hiddenItemDef) < (Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef)))
-                        {
-                            member.body.inventory.GiveItem(hiddenItemDef, member.body.inventory.GetItemCount(itemDef));
-                            if (member.body.inventory.GetItemCount(hiddenItemDef) > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef))
-                            {
-                                for (int i = member.body.inventory.GetItemCount(hiddenItemDef); i > Discovery_MaxStacks.Value * member.body.inventory.GetItemCount(itemDef); i--)
-                                {
-                                    member.body.inventory.RemoveItem(hiddenItemDef);
-                                }
-                            }
-                            Util.PlaySound(EntityStates.VoidJailer.Weapon.ChargeFire.attackSoundEffect, interactor.gameObject);
-                            EffectData effectData = new EffectData
-                            {
-                                origin = body.corePosition
-                            };
-                            EffectManager.SpawnEffect(EntityStates.NullifierMonster.FirePortalBomb.muzzleflashEffectPrefab, effectData, false);
-                        }
+                        args.baseShieldAdd += Discovery_ShieldAdd.Value * hiddenItemCount;
+                        body.SetBuffCount(discoveryBuff.buffIndex, hiddenItemCount);
                     }
                 }
             }
 
-            void DiscoveryRecalculateStats(CharacterBody body, RecalculateStatsAPI.StatHookEventArgs args)
-            {
-                if (body && body.inventory && body.inventory.GetItemCount(itemDef) > 0)
-                {
-                    args.baseShieldAdd += Discovery_ShieldAdd.Value * body.inventory.GetItemCount(hiddenItemDef);
-                    body.SetBuffCount(discoveryBuff.buffIndex, body.inventory.GetItemCount(hiddenItemDef));
-                }
-            }
-
-            RecalculateStatsAPI.GetStatCoefficients += DiscoveryRecalculateStats;
-            On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, interactor) =>
-            {
-                orig(self, interactor);
-                DiscoveryInteract(interactor, self);
-            };
-            On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, interactor) =>
-            {
-                orig(self, interactor);
-                DiscoveryBarrelInteract(interactor);
-            };
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
+            On.RoR2.BarrelInteraction.OnInteractionBegin += BarrelInteraction_OnInteractionBegin;
+            On.RoR2.TeleporterInteraction.OnInteractionBegin += TeleporterInteraction_OnInteractionBegin;
+            RecalculateStatsAPI.GetStatCoefficients += RecalculateStats;
         }
 
         public static BuffDef discoveryBuff { get; private set; }

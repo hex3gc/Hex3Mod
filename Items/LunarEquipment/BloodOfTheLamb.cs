@@ -15,15 +15,15 @@ namespace Hex3Mod.Items
     The risk of using it is that sacrificed items are random, so in return for a legendary you may get a titanic knurl...
     Another neat thing about it is that it can purge unwanted void items.
     */
-    public class BloodOfTheLamb
+    public static class BloodOfTheLamb
     {
         static string equipName = "BloodOfTheLamb";
         static string upperName = equipName.ToUpper();
         static EquipmentDef equipmentDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BloodOfTheLambPrefab.prefab");
-            if (Main.debugMode == true)
+            GameObject pickupModelPrefab = MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/BloodOfTheLambPrefab.prefab");
+            if (debugMode)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
             }
@@ -31,8 +31,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/BloodOfTheLamb.png");
-            return pickupIconSprite;
+            return MainAssets.LoadAsset<Sprite>("Assets/Icons/BloodOfTheLamb.png");
         }
         public static EquipmentDef CreateEquip()
         {
