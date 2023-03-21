@@ -39,7 +39,7 @@ namespace Hex3Mod
     {
         public const string ModGuid = "com.Hex3.Hex3Mod";
         public const string ModName = "Hex3Mod";
-        public const string ModVer = "2.0.7";
+        public const string ModVer = "2.1.0";
 
         public static RoR2.ExpansionManagement.ExpansionDef Hex3ModExpansion;
 
@@ -100,6 +100,7 @@ namespace Hex3Mod
         public static ConfigEntry<bool> ScavengersPack_OneTicket;
         public static ConfigEntry<bool> ScavengersPack_ShopCard;
         public static ConfigEntry<bool> ScavengersPack_CuteBow;
+        public static ConfigEntry<bool> ScavengersPack_GhostApple;
         public static ConfigEntry<bool> ScavengersPack_ClockworkMechanism;
         public static ConfigEntry<bool> ScavengersPack_Vials;
         public static ConfigEntry<bool> ScavengersPack_BrokenChopsticks;
@@ -192,7 +193,7 @@ namespace Hex3Mod
         public static ConfigEntry<bool> BloodOfTheLamb_Enable;
         public static ConfigEntry<int> BloodOfTheLamb_ItemsTaken;
 
-        public static bool debugMode = false; // DISABLE BEFORE BUILD
+        public static bool debugMode = true; // DISABLE BEFORE BUILD
 
         public static AssetBundle MainAssets;
 
@@ -201,7 +202,8 @@ namespace Hex3Mod
             {"stubbed hopoo games/deferred/standard", "shaders/deferred/hgstandard"},
             {"stubbed hopoo games/fx/cloud intersection remap", "shaders/fx/hgintersectioncloudremap"},
             {"stubbed hopoo games/fx/cloud remap", "shaders/fx/hgcloudremap"},
-            {"stubbed hopoo games/fx/opaque cloud remap", "shaders/fx/hgopaquecloudremap"}
+            {"stubbed hopoo games/fx/opaque cloud remap", "shaders/fx/hgopaquecloudremap"},
+            {"stubbed hopoo games/fx/distortion", "shaders/fx/hgdistortion"}
         };
 
         public static ManualLogSource logger;
@@ -242,30 +244,30 @@ namespace Hex3Mod
             ShardOfGlass_Enable = Config.Bind(new ConfigDefinition("Common - Shard Of Glass", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ShardOfGlass_Enable));
             ShardOfGlass_DamageIncrease = Config.Bind(new ConfigDefinition("Common - Shard Of Glass", "Damage multiplier"), 0.07f, new ConfigDescription("Percentage of base damage this item adds", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(ShardOfGlass_DamageIncrease, new StepSliderConfig() { min = 0f, max = 1f, increment = 0.01f }));
+            ModSettingsManager.AddOption(new StepSliderOption(ShardOfGlass_DamageIncrease, new StepSliderConfig() { min = 0f, max = 0.5f, increment = 0.01f }));
 
             BucketList_Load = Config.Bind(new ConfigDefinition("Common - Bucket List", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(BucketList_Load));
             BucketList_Enable = Config.Bind(new ConfigDefinition("Common - Bucket List", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(BucketList_Enable));
-            BucketList_FullBuff = Config.Bind(new ConfigDefinition("Common - Bucket List", "Speed multiplier"), 0.2f, new ConfigDescription("Percent speed increase", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(BucketList_FullBuff, new StepSliderConfig() { min = 0f, max = 1f, increment = 0.01f }));
-            BucketList_BuffReduce = Config.Bind(new ConfigDefinition("Common - Bucket List", "Reduced buff multiplier"), 0.75f, new ConfigDescription("Multiplier subtracted from the speed buff while fighting a boss", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(BucketList_BuffReduce, new StepSliderConfig() { min = 0f, max = 1f, increment = 0.01f }));
+            BucketList_FullBuff = Config.Bind(new ConfigDefinition("Common - Bucket List", "Speed multiplier"), 0.24f, new ConfigDescription("Percent speed increase", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(BucketList_FullBuff, new StepSliderConfig() { min = 0f, max = 1f, increment = 0.1f }));
+            BucketList_BuffReduce = Config.Bind(new ConfigDefinition("Common - Bucket List", "Reduced buff multiplier"), 0.8f, new ConfigDescription("Multiplier subtracted from the speed buff while fighting a boss", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(BucketList_BuffReduce, new StepSliderConfig() { min = 0f, max = 1f, increment = 0.1f }));
 
             HopooEgg_Load = Config.Bind(new ConfigDefinition("Common - Hopoo Egg", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(HopooEgg_Load));
             HopooEgg_Enable = Config.Bind(new ConfigDefinition("Common - Hopoo Egg", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(HopooEgg_Enable));
-            HopooEgg_JumpModifier = Config.Bind(new ConfigDefinition("Common - Hopoo Egg", "Jump height multiplier"), 0.2f, new ConfigDescription("Percent jump height increase", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(HopooEgg_JumpModifier, new StepSliderConfig() { min = 0f, max = 2f, increment = 0.01f }));
+            HopooEgg_JumpModifier = Config.Bind(new ConfigDefinition("Common - Hopoo Egg", "Jump height multiplier"), 0.3f, new ConfigDescription("Percent jump height increase", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(HopooEgg_JumpModifier, new StepSliderConfig() { min = 0f, max = 1f, increment = 0.01f }));
 
             AtgPrototype_Load = Config.Bind(new ConfigDefinition("Common - ATG Prototype", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(AtgPrototype_Load));
             AtgPrototype_Enable = Config.Bind(new ConfigDefinition("Common - ATG Prototype", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(AtgPrototype_Enable));
             AtgPrototype_Damage = Config.Bind(new ConfigDefinition("Common - ATG Prototype", "Damage per stack"), 0.8f, new ConfigDescription("Multiplier of base damage the missile deals per stack", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(AtgPrototype_Damage, new StepSliderConfig() { min = 0f, max = 10f, increment = 0.01f }));
+            ModSettingsManager.AddOption(new StepSliderOption(AtgPrototype_Damage, new StepSliderConfig() { min = 0f, max = 5f, increment = 0.1f }));
             AtgPrototype_HitRequirement = Config.Bind(new ConfigDefinition("Common - ATG Prototype", "Hits required per missile"), 10, new ConfigDescription("How many hits it should take to fire each missile", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new IntSliderOption(AtgPrototype_HitRequirement, new IntSliderConfig() { min = 1, max = 50}));
 
@@ -306,10 +308,10 @@ namespace Hex3Mod
             ModSettingsManager.AddOption(new CheckBoxOption(Empathy_Load));
             Empathy_Enable = Config.Bind(new ConfigDefinition("Uncommon - Empathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(Empathy_Enable));
-            Empathy_HealthPerHit = Config.Bind(new ConfigDefinition("Uncommon - Empathy", "Health per hit"), 4f, new ConfigDescription("Health points restored when an enemy is hit within radius", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(Empathy_HealthPerHit, new StepSliderConfig() { min = 0f, max = 100f, increment = 0.1f }));
+            Empathy_HealthPerHit = Config.Bind(new ConfigDefinition("Uncommon - Empathy", "Health per hit"), 3f, new ConfigDescription("Health points restored when an enemy is hit within radius", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(Empathy_HealthPerHit, new StepSliderConfig() { min = 0f, max = 10f, increment = 0.1f }));
             Empathy_Radius = Config.Bind(new ConfigDefinition("Uncommon - Empathy", "Zone radius"), 20f, new ConfigDescription("Radius of activation zone in meters", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(Empathy_Radius, new StepSliderConfig() { min = 1f, max = 200f, increment = 1f }));
+            ModSettingsManager.AddOption(new StepSliderOption(Empathy_Radius, new StepSliderConfig() { min = 1f, max = 100f, increment = 1f }));
 
             ScavengersPack_Load = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_Load));
@@ -317,11 +319,11 @@ namespace Hex3Mod
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_Enable));
             ScavengersPack_Uses = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "Maximum uses"), 2, new ConfigDescription("Times the Scavenger's Pouch can be used before being emptied.", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new IntSliderOption(ScavengersPack_Uses, new IntSliderConfig() { min = 1, max = 20 }));
-            ScavengersPack_RegenScrap = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Regenerating Scrap"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
+            ScavengersPack_RegenScrap = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Regenerating Scrap"), false, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_RegenScrap));
             ScavengersPack_PowerElixir = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Power Elixir"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_PowerElixir));
-            ScavengersPack_DelicateWatch = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Delicate Watch"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
+            ScavengersPack_DelicateWatch = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Delicate Watch"), false, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_DelicateWatch));
             ScavengersPack_Dios = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLA: Dios Best Friend"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_Dios));
@@ -333,13 +335,15 @@ namespace Hex3Mod
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_EncrustedKey));
             ScavengersPack_FourHundredTickets = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "HEX3MOD: 400 Tickets"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_FourHundredTickets));
-            ScavengersPack_OneTicket = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "HEX3MOD: One Ticket"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
+            ScavengersPack_OneTicket = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "HEX3MOD: One Ticket"), false, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_OneTicket));
-            ScavengersPack_ShopCard = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "MYSTICS ITEMS: Platinum Card"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
+            ScavengersPack_ShopCard = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "MYSTICS ITEMS: Platinum Card"), false, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_ShopCard));
             ScavengersPack_CuteBow = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "MYSTICS ITEMS: Cutesy Bow"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_CuteBow));
-            ScavengersPack_ClockworkMechanism = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLAVOID: Clockwork Mechanism"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
+            ScavengersPack_GhostApple = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "MYSTICS ITEMS: Ghost Apple"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_GhostApple));
+            ScavengersPack_ClockworkMechanism = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLAVOID: Clockwork Mechanism"), false, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_ClockworkMechanism));
             ScavengersPack_Vials = Config.Bind(new ConfigDefinition("Uncommon - Scavengers Pouch", "VANILLAVOID: Enhancement Vials"), true, new ConfigDescription("Enable item replacement", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ScavengersPack_Vials));
@@ -354,8 +358,8 @@ namespace Hex3Mod
             ModSettingsManager.AddOption(new CheckBoxOption(TheUnforgivable_Load));
             TheUnforgivable_Enable = Config.Bind(new ConfigDefinition("Uncommon - The Unforgivable", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(TheUnforgivable_Enable));
-            TheUnforgivable_Interval = Config.Bind(new ConfigDefinition("Uncommon - The Unforgivable", "Activation interval"), 8f, new ConfigDescription("Activate your on-kill effects every time this amount of seconds passes", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(TheUnforgivable_Interval, new StepSliderConfig() { min = 0.1f, max = 60f, increment = 0.1f }));
+            TheUnforgivable_Interval = Config.Bind(new ConfigDefinition("Uncommon - The Unforgivable", "Activation interval"), 10f, new ConfigDescription("Activate your on-kill effects every time this amount of seconds passes", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(TheUnforgivable_Interval, new StepSliderConfig() { min = 0.1f, max = 24f, increment = 0.1f }));
 
             OverkillOverdrive_Load = Config.Bind(new ConfigDefinition("Uncommon - Overkill Overdrive", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(OverkillOverdrive_Load));
@@ -364,7 +368,7 @@ namespace Hex3Mod
             OverkillOverdrive_TurretBlacklist = Config.Bind(new ConfigDefinition("Uncommon - Overkill Overdrive", "Turret blacklist"), false, new ConfigDescription("This item has no effect if used by Engineer turrets. Disabled by default", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(OverkillOverdrive_TurretBlacklist));
             OverkillOverdrive_ZoneIncrease = Config.Bind(new ConfigDefinition("Uncommon - Overkill Overdrive", "Zone size percentage increase"), 20f, new ConfigDescription("How much larger affected zones should be in percentage", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(OverkillOverdrive_ZoneIncrease, new StepSliderConfig() { min = 0f, max = 200f, increment = 1f }));
+            ModSettingsManager.AddOption(new StepSliderOption(OverkillOverdrive_ZoneIncrease, new StepSliderConfig() { min = 0f, max = 100f, increment = 1f }));
             Overkilloverdrive_EnableHoldouts = Config.Bind(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify holdout zones"), true, new ConfigDescription("e.g Teleporter, Pillars", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(Overkilloverdrive_EnableHoldouts));
             Overkilloverdrive_EnableShrineWoods = Config.Bind(new ConfigDefinition("Uncommon - Overkill Overdrive", "Amplify Shrine of the Woods"), true, new ConfigDescription("", null, Array.Empty<object>()));
@@ -384,7 +388,7 @@ namespace Hex3Mod
             Apathy_Enable = Config.Bind(new ConfigDefinition("Legendary - Apathy", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(Apathy_Enable));
             Apathy_Radius = Config.Bind(new ConfigDefinition("Legendary - Apathy", "Radius"), 20f, new ConfigDescription("Radius within which kills contribute to Apathy stacks", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(Apathy_Radius, new StepSliderConfig() { min = 1f, max = 200f, increment = 1f }));
+            ModSettingsManager.AddOption(new StepSliderOption(Apathy_Radius, new StepSliderConfig() { min = 1f, max = 100f, increment = 1f }));
             Apathy_MoveSpeedAdd = Config.Bind(new ConfigDefinition("Legendary - Apathy", "Buff move speed multiplier"), 1f, new ConfigDescription("Move speed multiplier added while buffed", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new StepSliderOption(Apathy_MoveSpeedAdd, new StepSliderConfig() { min = 0f, max = 100f, increment = 0.1f }));
             Apathy_AttackSpeedAdd = Config.Bind(new ConfigDefinition("Legendary - Apathy", "Buff attack speed multiplier"), 1f, new ConfigDescription("Attack speed multiplier added while buffed", null, Array.Empty<object>()));
@@ -401,10 +405,10 @@ namespace Hex3Mod
             MintCondition_Enable = Config.Bind(new ConfigDefinition("Legendary - Mint Condition", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(MintCondition_Enable));
             MintCondition_MoveSpeed = Config.Bind(new ConfigDefinition("Legendary - Mint Condition", "Move speed increase"), 0.2f, new ConfigDescription("Base movement speed increase", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(MintCondition_MoveSpeed, new StepSliderConfig() { min = 0f, max = 5f, increment = 0.01f }));
+            ModSettingsManager.AddOption(new StepSliderOption(MintCondition_MoveSpeed, new StepSliderConfig() { min = 0f, max = 5f, increment = 0.1f }));
             MintCondition_MoveSpeedStack = Config.Bind(new ConfigDefinition("Legendary - Mint Condition", "Move speed increase per stack"), 0.6f, new ConfigDescription("Base movement speed increase per additional stack", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(MintCondition_MoveSpeedStack, new StepSliderConfig() { min = 0f, max = 5f, increment = 0.01f }));
-            MintCondition_AddJumps = Config.Bind(new ConfigDefinition("Legendary - Mint Condition", "Additional jumps"), 0, new ConfigDescription("Jump count increase", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(MintCondition_MoveSpeedStack, new StepSliderConfig() { min = 0f, max = 5f, increment = 0.1f }));
+            MintCondition_AddJumps = Config.Bind(new ConfigDefinition("Legendary - Mint Condition", "Additional jumps"), 1, new ConfigDescription("Jump count increase", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new IntSliderOption(MintCondition_AddJumps, new IntSliderConfig() { min = 0, max = 10 }));
             MintCondition_AddJumpsStack = Config.Bind(new ConfigDefinition("Legendary - Mint Condition", "Additional jumps per stack"), 2, new ConfigDescription("Jump count increase per additional stack", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new IntSliderOption(MintCondition_AddJumpsStack, new IntSliderConfig() { min = 0, max = 10 }));
@@ -413,10 +417,10 @@ namespace Hex3Mod
             ModSettingsManager.AddOption(new CheckBoxOption(ElderMutagen_Load));
             ElderMutagen_Enable = Config.Bind(new ConfigDefinition("Legendary - Elder Mutagen", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(ElderMutagen_Enable));
-            ElderMutagen_MaxHealthFlatAdd = Config.Bind(new ConfigDefinition("Legendary - Elder Mutagen", "Max health per species"), 15, new ConfigDescription("Amount of max health added per killed species", null, Array.Empty<object>()));
+            ElderMutagen_MaxHealthFlatAdd = Config.Bind(new ConfigDefinition("Legendary - Elder Mutagen", "Max health per species"), 10, new ConfigDescription("Amount of max health added per killed species", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new IntSliderOption(ElderMutagen_MaxHealthFlatAdd, new IntSliderConfig() { min = 0, max = 100 }));
-            ElderMutagen_RegenAdd = Config.Bind(new ConfigDefinition("Legendary - Elder Mutagen", "Regen per species"), 1f, new ConfigDescription("How much hp per second regen should be added for each killed species", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(ElderMutagen_RegenAdd, new StepSliderConfig() { min = 0.1f, max = 100f, increment = 0.1f }));
+            ElderMutagen_RegenAdd = Config.Bind(new ConfigDefinition("Legendary - Elder Mutagen", "Regen per species"), 0.5f, new ConfigDescription("How much hp per second regen should be added for each killed species", null, Array.Empty<object>()));
+            ModSettingsManager.AddOption(new StepSliderOption(ElderMutagen_RegenAdd, new StepSliderConfig() { min = 0.1f, max = 10f, increment = 0.1f }));
 
             DoNotEat_Load = Config.Bind(new ConfigDefinition("Legendary - Do Not Eat", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(DoNotEat_Load));
@@ -449,9 +453,9 @@ namespace Hex3Mod
             NoticeOfAbsence_Enable = Config.Bind(new ConfigDefinition("Void - Notice Of Absence", "Enable item"), true, new ConfigDescription("Allow the user to find this item in runs. <style=cDeath>Must start a new run to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(NoticeOfAbsence_Enable));
             NoticeOfAbsence_InvisibilityBuff = Config.Bind(new ConfigDefinition("Void - Notice Of Absence", "Base invisibility duration"), 10f, new ConfigDescription("How long you'll turn invisible at the start of a boss fight in seconds", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(NoticeOfAbsence_InvisibilityBuff, new StepSliderConfig() { min = 0f, max = 50f, increment = 0.1f }));
+            ModSettingsManager.AddOption(new StepSliderOption(NoticeOfAbsence_InvisibilityBuff, new StepSliderConfig() { min = 0f, max = 50f, increment = 1f }));
             NoticeOfAbsence_InvisibilityBuffStack = Config.Bind(new ConfigDefinition("Void - Notice Of Absence", "Invisibility duration per stack"), 5f, new ConfigDescription("How much longer you'll turn invisible at the start of a boss fight in seconds, per stack", null, Array.Empty<object>()));
-            ModSettingsManager.AddOption(new StepSliderOption(NoticeOfAbsence_InvisibilityBuffStack, new StepSliderConfig() { min = 0f, max = 50f, increment = 0.1f }));
+            ModSettingsManager.AddOption(new StepSliderOption(NoticeOfAbsence_InvisibilityBuffStack, new StepSliderConfig() { min = 0f, max = 50f, increment = 1f }));
 
             DropOfNecrosis_Load = Config.Bind(new ConfigDefinition("Void - Drop Of Necrosis", "Load item"), true, new ConfigDescription("Load the item at startup. <style=cDeath>Requires a restart to take effect!</style>", null, Array.Empty<object>()));
             ModSettingsManager.AddOption(new CheckBoxOption(DropOfNecrosis_Load));
@@ -519,7 +523,7 @@ namespace Hex3Mod
             Hex3ModExpansion = ScriptableObject.CreateInstance<RoR2.ExpansionManagement.ExpansionDef>();
             Hex3ModExpansion.name = "Hex3Mod";
             Hex3ModExpansion.nameToken = "Hex3Mod";
-            Hex3ModExpansion.descriptionToken = "Adds 25 new items.";
+            Hex3ModExpansion.descriptionToken = "Adds content from 'Hex3Mod' to the game.";
             Hex3ModExpansion.iconSprite = MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/expansion.png");
             Hex3ModExpansion.disabledIconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texUnlockIcon.png").WaitForCompletion();
             Hex3ModExpansion.requiredEntitlement = null;

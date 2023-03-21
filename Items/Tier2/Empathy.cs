@@ -242,7 +242,7 @@ namespace Hex3Mod.Items
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Empathy");
                 if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
-            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("When an enemy takes damage within <style=cIsHealing>{1}m</style> of you, heal for <style=cIsHealing>{0} hp</style> <style=cStack>(+{0} per stack)</style>.", Empathy_HealthPerHit.Value, Empathy_Radius.Value));
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", string.Format("When an enemy takes damage within <style=cIsHealing>{1}m</style> of you, heal for <style=cIsHealing>{0} HP</style> <style=cStack>(+{0} per stack)</style>.", Empathy_HealthPerHit.Value, Empathy_Radius.Value));
         }
 
         private static void AddHooks()

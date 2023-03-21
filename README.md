@@ -52,6 +52,26 @@ Each item has a unique effect and configurable values. Special thanks to the RoR
 
 # Changelog
 
+TO CHANGE
+- Rewrite: Discovery, Do Not Eat, Overkill Overdrive
+- Rework: Empathy(?), Captain's Favor, Hopoo Egg
+- Update VFX: Apathy, Empathy
+- Fix bugs
+
+### 2.1.0
+* **Revamped VFX** for Apathy
+* Added support for Ghostly Apple (Mystic's Items) to Scavenger's Pouch.
+* <details><summary>Bucket List non-boss speed boost 20% -> 24%</summary>Bucket List, come to think of it, doesn't have enough of an edge over other movement speed items to justify its downside. This buff makes it considerably better than a Goat Hoof, increasing its case for use.</details>
+* <details><summary>Bucket List speed reduction if boss present 75% -> 80%</summary>Slight increase in downside to make up for the buff. It should still provide around 5% speed while a boss exists.</details>
+* <details><summary>Hopoo Egg jump height boost 20% -> 30%</summary>Sometimes you just want to jump higher.</details>
+* <details><summary>Scavenger's Pouch disabled by default for items: Delicate Watch, Regenerating Scrap, One Ticket, Platinum Card (Mystic's), Clockwork Mechanism (VanillaVoid)</summary>There were a few unsatisfying interactions with the pouch that either instantly consumed it or consumed it for very little gain. Regenerating Scrap and Platinum Card regen every stage- making the replacement redundant- and the watch items can easily consume all charges of a pack if you fall to low HP. One Ticket being replaced gives very little value, as you almost always want to just be rid of it when given the chance. You can always re-enable these if you want.</details>
+* <details><summary>The Unforgivable activation interval 8s -> 10s</summary>Turns out, an on-kill effect at your location every 8 seconds is very powerful. It also stacks extremely well. I'm unsure if this is enough of a nerf, but it should hamper the item's power a bit.</details>
+* <details><summary>Elder Mutagen 1 HP/s regen per species -> 0.5 HP/s</summary>Elder mutagen can stack very quickly up to 20 or even 30, making its regen extremely powerful for a single item. It feels justified to just halve it.</details>
+* <details><summary>Elder Mutagen 15 max HP per species -> 10 max HP</summary>If we're still going on 30 being a benchmark, having 300 extra HP from one item is pretty potent, especially combined with the added regen.</details>
+* <details><summary>Mint Condition first stack jump increase 0 -> 1</summary>A very powerful item still; I just felt like there should be more accessible ways to gain extra jumps.</details>
+* Fixed some descriptions.
+* Changed some RiskOfOptions sliders to be easier to use.
+
 ### 2.0.7
 * Disabling items via config now actually disables them on the next run, removing them from the drop pool.
 * Discovery's hidden item will no longer spam the logs

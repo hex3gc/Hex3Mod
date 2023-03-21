@@ -332,6 +332,7 @@ namespace Hex3Mod.Items
                 { "TreasureCacheVoidConsumed", "TreasureCacheVoid" },
                 { "MysticsItems_KeepShopTerminalOpenConsumed", "MysticsItems_KeepShopTerminalOpen" }, // MysticsItems
                 { "MysticsItems_LimitedArmorBroken", "MysticsItems_LimitedArmor" },
+                { "MysticsItems_GhostAppleWeak", "MysticsItems_GhostApple" },
                 { "ITEM_BROKEN_MESS", "ITEM_CLOCKWORK_ITEM" }, // VanillaVoid
                 { "ITEM_EMPTY_VIALS", "ITEM_EHANCE_VIALS_ITEM" },
                 { "HCFB_ITEM_BROKEN_CHOPSTICKS", "HCFB_ITEM_CHOPSTICKS" }, // Fork Is Back
@@ -364,6 +365,8 @@ namespace Hex3Mod.Items
                 else if (!itemPairs.ContainsKey("MysticsItems_KeepShopTerminalOpenConsumed")) { itemPairs.Add("MysticsItems_KeepShopTerminalOpenConsumed", "MysticsItems_KeepShopTerminalOpen"); }
                 if (!ScavengersPack_CuteBow.Value) { itemPairs.Remove("MysticsItems_LimitedArmorBroken"); }
                 else if (!itemPairs.ContainsKey("MysticsItems_LimitedArmorBroken")) { itemPairs.Add("MysticsItems_LimitedArmorBroken", "MysticsItems_LimitedArmor"); }
+                if (!ScavengersPack_GhostApple.Value) { itemPairs.Remove("MysticsItems_GhostAppleWeak"); }
+                else if (!itemPairs.ContainsKey("MysticsItems_GhostAppleWeak")) { itemPairs.Add("MysticsItems_GhostAppleWeak", "MysticsItems_GhostApple"); }
                 if (!ScavengersPack_ClockworkMechanism.Value) { itemPairs.Remove("ITEM_BROKEN_MESS"); }
                 else if (!itemPairs.ContainsKey("ITEM_BROKEN_MESS")) { itemPairs.Add("ITEM_BROKEN_MESS", "ITEM_CLOCKWORK_ITEM"); }
                 if (!ScavengersPack_Vials.Value) { itemPairs.Remove("ITEM_EMPTY_VIALS"); }

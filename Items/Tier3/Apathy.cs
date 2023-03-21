@@ -19,7 +19,7 @@ namespace Hex3Mod.Items
         public static ItemDef itemDef;
         public static GameObject LoadPrefab()
         {
-            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/Models/Prefabs/ApathyPrefab.prefab");
+            GameObject pickupModelPrefab = Main.MainAssets.LoadAsset<GameObject>("Assets/VFXPASS3/Models/Prefabs/ApathyPrefab.prefab");
             if (Main.debugMode == true)
             {
                 pickupModelPrefab.GetComponentInChildren<Renderer>().gameObject.AddComponent<MaterialControllerComponents.HGControllerFinder>();
@@ -28,7 +28,7 @@ namespace Hex3Mod.Items
         }
         public static Sprite LoadSprite()
         {
-            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/Icons/Apathy.png");
+            Sprite pickupIconSprite = Main.MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Apathy.png");
             return pickupIconSprite;
         }
         public static Sprite LoadBuffSprite()

@@ -9,6 +9,7 @@ using UnityEngine.Networking;
 using System;
 using Hex3Mod.Utils;
 using static Hex3Mod.Main;
+using System.ComponentModel;
 
 namespace Hex3Mod.Items
 {
@@ -252,6 +253,31 @@ namespace Hex3Mod.Items
 
         private static void AddHooks()
         {
+            // Give item holders an ItemBehavior
+            void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
+            {
+                orig(self);
+                if (!self.inventory) { return; }
+                int itemCount = self.inventory.GetItemCount(itemDef);
+                if (itemCount > 0)
+                {
+                    DoNotEatBehavior component;
+                    component = self.GetComponent<DoNotEatBehavior>();
+                    if (!component)
+                    {
+                        component = self.AddItemBehavior<DoNotEatBehavior>(0);
+                    }
+                    component.stack = itemCount;
+                }
+                else
+                {
+                    if (self.GetComponent<DoNotEatBehavior>())
+                    {
+                        GameObject.Destroy(self.GetComponent<DoNotEatBehavior>());
+                    }
+                }
+            }
+            /*
             On.RoR2.ChestBehavior.ItemDrop += (orig, self) =>
             {
                 orig(self);
@@ -285,6 +311,8 @@ namespace Hex3Mod.Items
                     }
                 }
             };
+            */
+            On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
         }
 
         public static void Initiate()
@@ -294,6 +322,11 @@ namespace Hex3Mod.Items
             AddTokens();
             UpdateItemStatus(null);
             AddHooks();
+        }
+
+        public class DoNotEatBehavior : CharacterBody.ItemBehavior
+        {
+
         }
     }
 }
