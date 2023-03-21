@@ -363,6 +363,7 @@ namespace Hex3Mod.Items
 
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += PurchaseInteraction_OnInteractionBegin;
+            On.RoR2.ChestBehavior.ItemDrop += ChestBehavior_ItemDrop;
             if (DoNotEat_ShopTerminals.Value) { On.RoR2.ShopTerminalBehavior.DropPickup += ShopTerminalBehavior_DropPickup; }
         }
 

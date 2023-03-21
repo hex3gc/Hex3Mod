@@ -39,6 +39,7 @@ namespace Hex3Mod.Items
             return MainAssets.LoadAsset<Sprite>("Assets/VFXPASS3/Icons/Buff_CaptainsFavor.png");
         }
         static GameObject potentialPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/OptionPickup/OptionPickup.prefab").WaitForCompletion();
+        static GameObject chestKillPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/TreasureCacheVoid/VoidCacheOpenExplosion.prefab").WaitForCompletion();
 
         public static ItemDef CreateItem()
         {
@@ -234,7 +235,7 @@ namespace Hex3Mod.Items
         public static void AddTokens()
         {
             LanguageAPI.Add("H3_" + upperName + "_NAME", "Captain's Favor");
-            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The first chests you open each stage will instead contain a Void Potential. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
+            LanguageAPI.Add("H3_" + upperName + "_PICKUP", "The first chests you open each stage will be replaced by a Void Potential. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
             LanguageAPI.Add("H3_" + upperName + "_LORE", "Don't spend it all in one place...\n\nOr, better yet, don't spend it. That's MY card!");
         }
         public static void UpdateItemStatus(Run run)
@@ -249,7 +250,7 @@ namespace Hex3Mod.Items
                 LanguageAPI.AddOverlay("H3_" + upperName + "_NAME", "Captain's Favor");
                 if (run && !run.availableItems.Contains(itemDef.itemIndex) && run.IsExpansionEnabled(Hex3ModExpansion)) { run.availableItems.Add(itemDef.itemIndex); }
             }
-            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "The first <style=cStack>(+1 per stack)</style> chest you open each stage will instead drop a <style=cIsVoid>Void Potential</style>, inheriting the tier of the item it replaced. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
+            LanguageAPI.AddOverlay("H3_" + upperName + "_DESC", "The first <style=cStack>(+1 per stack)</style> chest you open each stage will be replaced by a <style=cIsVoid>Void Potential</style>, inheriting the chest's item tiers. <style=cIsVoid>Corrupts all 400 Tickets.</style>");
         }
 
         private static void AddHooks()
@@ -345,13 +346,19 @@ namespace Hex3Mod.Items
                                 pickupIndex = PickupCatalog.FindPickupIndex(firstDropTier)
                             }, 
                             self.dropTransform.position, Vector3.up * self.dropUpVelocityStrength + self.dropTransform.forward * self.dropForwardVelocityStrength);
-                            Util.PlaySound("Play_ui_obj_voidCradle_open", self.gameObject);
-
                             behavior.interactions.Remove(self.gameObject.GetComponent<PurchaseInteraction>());
                             if (behavior.interactions.Count > 500) { behavior.interactions.Clear(); }
                             behavior.usesLeft--;
                             behavior.timesUsedThisStage++;
                             behavior.body.SetBuffCount(captainsFavorBuff.buffIndex, behavior.usesLeft);
+
+                            EffectData effectData = new EffectData
+                            {
+                                origin = self.transform.position
+                            };
+                            EffectManager.SpawnEffect(chestKillPrefab, effectData, false);
+                            Object.Destroy(self.gameObject);
+
                             return;
                         }
                     }
