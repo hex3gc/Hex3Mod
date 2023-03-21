@@ -1,82 +1,82 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>preview</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="libs\**" />
-    <EmbeddedResource Remove="libs\**" />
-    <None Remove="libs\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="libs\**" />
+		<EmbeddedResource Remove="libs\**" />
+		<None Remove="libs\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="vfxpass2" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="vfxpass2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="BepInEx">
-      <HintPath>libs\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="com.unity.multiplayer-hlapi.Runtime">
-      <HintPath>libs\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="HGCSharpUtils">
-      <HintPath>libs\HGCSharpUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="HGUnityUtils">
-      <HintPath>libs\HGUnityUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="MMHOOK_RoR2">
-      <HintPath>libs\MMHOOK_RoR2.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>libs\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>libs\MonoMod.RuntimeDetour.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>libs\MonoMod.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="R2API">
-      <HintPath>libs\R2API.dll</HintPath>
-    </Reference>
-    <Reference Include="RiskOfOptions">
-      <HintPath>libs\RiskOfOptions.dll</HintPath>
-    </Reference>
-    <Reference Include="RoR2">
-      <HintPath>libs\RoR2.dll</HintPath>
-    </Reference>
-    <Reference Include="UltimateCustomRun">
-      <HintPath>libs\SoftDependencies\UltimateCustomRun.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Addressables">
-      <HintPath>libs\Unity.Addressables.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>libs\Unity.Postprocessing.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ResourceManager">
-      <HintPath>libs\Unity.ResourceManager.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>libs\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>libs\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="VanillaRebalance">
-      <HintPath>libs\SoftDependencies\VanillaRebalance.dll</HintPath>
-    </Reference>
-    <Reference Include="VoidItemAPI">
-      <HintPath>libs\VoidItemAPI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="BepInEx">
+			<HintPath>libs\BepInEx.dll</HintPath>
+		</Reference>
+		<Reference Include="com.unity.multiplayer-hlapi.Runtime">
+			<HintPath>libs\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="HGCSharpUtils">
+			<HintPath>libs\HGCSharpUtils.dll</HintPath>
+		</Reference>
+		<Reference Include="HGUnityUtils">
+			<HintPath>libs\HGUnityUtils.dll</HintPath>
+		</Reference>
+		<Reference Include="MMHOOK_RoR2">
+			<HintPath>libs\MMHOOK_RoR2.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil">
+			<HintPath>libs\Mono.Cecil.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.RuntimeDetour">
+			<HintPath>libs\MonoMod.RuntimeDetour.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.Utils">
+			<HintPath>libs\MonoMod.Utils.dll</HintPath>
+		</Reference>
+		<Reference Include="R2API">
+			<HintPath>libs\R2API.dll</HintPath>
+		</Reference>
+		<Reference Include="RiskOfOptions">
+			<HintPath>libs\RiskOfOptions.dll</HintPath>
+		</Reference>
+		<Reference Include="RoR2">
+			<HintPath>libs\RoR2.dll</HintPath>
+		</Reference>
+		<Reference Include="UltimateCustomRun">
+			<HintPath>libs\SoftDependencies\UltimateCustomRun.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Addressables">
+			<HintPath>libs\Unity.Addressables.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Postprocessing.Runtime">
+			<HintPath>libs\Unity.Postprocessing.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.ResourceManager">
+			<HintPath>libs\Unity.ResourceManager.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>libs\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath>libs\UnityEngine.AssetBundleModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="VanillaRebalance">
+			<HintPath>libs\SoftDependencies\VanillaRebalance.dll</HintPath>
+		</Reference>
+		<Reference Include="VoidItemAPI">
+			<HintPath>libs\VoidItemAPI.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>
