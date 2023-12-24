@@ -341,7 +341,7 @@ namespace Hex3Mod.Items
                             {
                                 pickerOptions = PickupPickerController.GenerateOptionsFromArray(generatedDrops),
                                 prefabOverride = potentialPrefab,
-                                position = self.dropTransform.position,
+                                position = self.dropTransform.position + Vector3.up * 1.5f,
                                 rotation = Quaternion.identity,
                                 pickupIndex = PickupCatalog.FindPickupIndex(firstDropTier)
                             }, 
